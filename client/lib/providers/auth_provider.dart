@@ -80,7 +80,7 @@ class AuthNotifier extends Notifier<AuthState> {
     await prefs.remove(_storageKey);
   }
 
-  Future<void> loginWithGoogle() async {
+  Future<void> loginWithGoogle({String? inviteCode}) async {
     try {
       final googleUser = await _googleSignIn.signIn();
       if (googleUser == null) return;
@@ -101,6 +101,7 @@ class AuthNotifier extends Notifier<AuthState> {
         body: jsonEncode({
           'id_token': idToken,
           'access_token': accessToken,
+          'invite_code': inviteCode,
         }),
       );
 

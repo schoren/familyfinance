@@ -52,6 +52,9 @@ func main() {
 		// Legacy sync endpoint (for backwards compatibility)
 		h.GET("/sync", handlers.HandleSync)
 
+		// Invitations
+		h.POST("/invites", handlers.CreateInvitation)
+
 		// Categories
 		h.GET("/categories", handlers.GetCategories)
 		h.POST("/categories", handlers.CreateCategory)

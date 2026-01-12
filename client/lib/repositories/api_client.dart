@@ -240,6 +240,23 @@ class ApiClient {
   }
 
   // ============================================================================
+  // INVITATIONS
+  // ============================================================================
+
+  Future<void> createInvitation(String email) async {
+    final uri = Uri.parse('$_scopedUrl/invites');
+    final response = await _client.post(
+      uri,
+      headers: _headers,
+      body: jsonEncode({'email': email}),
+    );
+
+    if (response.statusCode != 201) {
+      throw Exception('Failed to create invitation: ${response.statusCode}');
+    }
+  }
+
+  // ============================================================================
   // LEGACY SYNC
   // ============================================================================
 

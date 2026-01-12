@@ -12,8 +12,25 @@ services:
       - DB_PORT=5432
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - JWT_SECRET=${JWT_SECRET}
+      - SMTP_HOST=mailpit
+      - SMTP_PORT=1025
+      - SMTP_USER=
+      - SMTP_PASS=
+      - APP_URL=http://localhost:8080
     depends_on:
       - db
+      - mailpit
+
+  mailpit:
+    image: axllent/mailpit
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+    environment:
+      - MP_MAX_MESSAGES=100
+      - MP_DATABASE=/data/mailpit.db
+    volumes:
+      - mailpit_data:/data
 
   db:
     image: postgres:15-alpine
@@ -29,3 +46,4 @@ services:
 
 volumes:
   postgres_data:
+  mailpit_data:

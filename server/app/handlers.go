@@ -1,6 +1,8 @@
 package app
 
 import (
+	"crypto/rand"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -40,6 +42,49 @@ func (h *Handlers) CreateHousehold(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, household)
+}
+
+func (h *Handlers) CreateInvitation(c *gin.Context) {
+	householdID := c.Param("household_id")
+
+	var req struct {
+		Email string `json:"email"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Generate a 6-char random hex code
+	b := make([]byte, 3)
+	if _, err := rand.Read(b); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate invitation code"})
+		return
+	}
+	code := hex.EncodeToString(b)
+
+	invitation := Invitation{
+		ID:          uuid.New().String(),
+		Code:        code,
+		Email:       req.Email,
+		HouseholdID: householdID,
+		Status:      "pending",
+	}
+
+	if err := h.db.Create(&invitation).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create invitation"})
+		return
+	}
+
+	// Send email asyc
+	go func() {
+		err := h.SendInvitationEmail(req.Email, code)
+		if err != nil {
+			log.Printf("Error sending invitation email to %s: %v", req.Email, err)
+		}
+	}()
+
+	c.JSON(http.StatusCreated, invitation)
 }
 
 // ============================================================================
@@ -496,6 +541,7 @@ func (h *Handlers) JWTMiddleware() gin.HandlerFunc {
 type GoogleLoginRequest struct {
 	IDToken     string `json:"id_token"`
 	AccessToken string `json:"access_token"`
+	InviteCode  string `json:"invite_code"`
 }
 
 type AuthResponse struct {
@@ -549,14 +595,31 @@ func (h *Handlers) AuthGoogle(c *gin.Context) {
 
 	if result.Error == gorm.ErrRecordNotFound {
 		// New User
-		household := Household{
-			ID:   uuid.New().String(),
-			Name: name + "'s Household",
+		householdID := ""
+
+		// Check if there is an invite code
+		if req.InviteCode != "" {
+			var invitation Invitation
+			if err := h.db.Where("code = ? AND status = ?", req.InviteCode, "pending").First(&invitation).Error; err == nil {
+				householdID = invitation.HouseholdID
+				// Mark invitation as accepted
+				invitation.Status = "accepted"
+				h.db.Save(&invitation)
+			}
 		}
 
-		if err := h.db.Create(&household).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create household"})
-			return
+		if householdID == "" {
+			// Create new household if no valid invite code
+			household := Household{
+				ID:   uuid.New().String(),
+				Name: name + "'s Household",
+			}
+
+			if err := h.db.Create(&household).Error; err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create household"})
+				return
+			}
+			householdID = household.ID
 		}
 
 		user = User{
@@ -564,7 +627,7 @@ func (h *Handlers) AuthGoogle(c *gin.Context) {
 			Email:       email,
 			Name:        name,
 			GoogleID:    googleID,
-			HouseholdID: household.ID,
+			HouseholdID: householdID,
 		}
 
 		if err := h.db.Create(&user).Error; err != nil {

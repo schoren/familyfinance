@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../providers/auth_provider.dart';
 
 class LoginScreen extends ConsumerWidget {
@@ -19,7 +20,8 @@ class LoginScreen extends ConsumerWidget {
             const SizedBox(height: 48),
             ElevatedButton.icon(
               onPressed: () {
-                ref.read(authProvider.notifier).loginWithGoogle();
+                final inviteCode = GoRouterState.of(context).uri.queryParameters['code'];
+                ref.read(authProvider.notifier).loginWithGoogle(inviteCode: inviteCode);
               },
               icon: const Icon(Icons.login),
               label: const Text('Login with Google'),

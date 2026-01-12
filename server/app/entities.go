@@ -12,6 +12,7 @@ var Entities = []any{
 	&Account{},
 	&Category{},
 	&Transaction{},
+	&Invitation{},
 }
 
 type Household struct {
@@ -68,4 +69,15 @@ type Transaction struct {
 	Date        time.Time      `gorm:"type:timestamp" json:"date"`
 	Description string         `gorm:"type:varchar(255)" json:"note"`
 	HouseholdID string         `gorm:"type:varchar(255)" json:"household_id"`
+}
+
+type Invitation struct {
+	ID          string         `gorm:"type:varchar(255);primaryKey" json:"id"`
+	CreatedAt   time.Time      `json:"created_at"`
+	UpdatedAt   time.Time      `json:"updated_at"`
+	DeletedAt   gorm.DeletedAt `gorm:"index" json:"deleted_at,omitempty"`
+	Code        string         `gorm:"type:varchar(255);unique;index" json:"code"`
+	Email       string         `gorm:"type:varchar(255)" json:"email"`
+	HouseholdID string         `gorm:"type:varchar(255)" json:"household_id"`
+	Status      string         `gorm:"type:varchar(50);default:'pending'" json:"status"` // pending, accepted, expired
 }

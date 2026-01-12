@@ -26,7 +26,14 @@ final routerProvider = Provider<GoRouter>((ref) {
       final loggingIn = state.matchedLocation == '/login';
       
       if (!authState.isAuthenticated) {
-        return loggingIn ? null : '/login';
+        if (loggingIn) return null;
+        
+        // Preserve query parameters (like ?code=...) when redirecting to login
+        final query = state.uri.queryParameters;
+        if (query.isNotEmpty) {
+          return Uri(path: '/login', queryParameters: query).toString();
+        }
+        return '/login';
       }
       if (loggingIn) {
         return '/';
@@ -41,6 +48,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/login',
         builder: (context, state) => const LoginScreen(),
+      ),
+      GoRoute(
+        path: '/invite',
+        redirect: (context, state) => Uri(path: '/login', queryParameters: state.uri.queryParameters).toString(),
       ),
       GoRoute(
         path: '/category/:categoryId',

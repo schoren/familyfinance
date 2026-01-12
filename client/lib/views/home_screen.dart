@@ -16,7 +16,7 @@ class HomeScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Family Finance (DEBUG: LATEST CODE)'),
+        title: const Text('Presupuestos'),
         actions: [
           ref.watch(expensesProvider).when(
             data: (expenses) => Center(child: Padding(
@@ -60,6 +60,14 @@ class HomeScreen extends ConsumerWidget {
               onTap: () {
                 context.pop();
                 context.push('/manage-accounts');
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.person_add),
+              title: const Text('Invitar Miembro'),
+              onTap: () {
+                context.pop();
+                _showInviteDialog(context, ref);
               },
             ),
             const Spacer(),
@@ -218,6 +226,88 @@ class HomeScreen extends ConsumerWidget {
           context.push('/manage-category/new');
         },
         child: const Icon(Icons.add),
+      ),
+    );
+  }
+
+  void _showInviteDialog(BuildContext context, WidgetRef ref) {
+    final emailController = TextEditingController();
+
+    void submit() async {
+      final email = emailController.text.trim();
+      if (email.isEmpty) return;
+
+      try {
+        // Show loading indicator or disable button could be nice, but simple for now
+        Navigator.pop(context); // Close dialog first or show loading? 
+        // User asked to submit on enter.
+        // Let's close dialog on success, or keep open on error?
+        // The original logic closed it inside the try block after success.
+        // But popping first is risky if it fails.
+        // Let's stick to original logic: keep dialog open while sending?
+        // The original code popped AFTER `createInvitation` success.
+        // BUT `showDialog` returns a Future that completes when popped.
+        // If we want to show a snackbar on the underlying screen, we need context.
+        
+        // Let's recreate the logic but reusable.
+        // NOTE: We can't pop `context` if we are not in the dialog context anymore if we pop too early.
+        // Actually, let's keep it simple: call createInvitation, then pop.
+        
+        await ref.read(apiClientProvider).createInvitation(email);
+        
+        if (context.mounted) {
+           // We might need to check if dialog is still open? 
+           // If onSubmitted calls this, the dialog is open.
+           // If button calls this, the dialog is open.
+           // However, we popped in the original code. 
+           // Wait, the original code had `Navigator.pop(context)` INSIDE the `if (context.mounted)`.
+           // But `showDialog` creates a new route. We need to pop THAT route.
+           // Just calling `Navigator.pop(context)` works for the dialog.
+           
+           // Issue: If we use `onSubmitted`, we are in the TextField.
+           Navigator.of(context).pop(); // Close the dialog
+           ScaffoldMessenger.of(context).showSnackBar(
+             const SnackBar(content: Text('Invitación enviada con éxito')),
+           );
+        }
+      } catch (e) {
+        if (context.mounted) {
+          // If we failed, maybe we DON'T want to close the dialog?
+          // The previous logic didn't close it on error (it was in catch block printing to snackbar).
+          // But to show snackbar we probably want to be on the screen below?
+          // Or we can show snackbar above dialog.
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error al enviar invitación: $e')),
+          );
+        }
+      }
+    }
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog( // Use ctx to avoid confusion, though implies same variable shadowing
+        title: const Text('Invitar Miembro'),
+        content: TextField(
+          controller: emailController,
+          decoration: const InputDecoration(
+            labelText: 'Email',
+            hintText: 'ejemplo@gmail.com',
+          ),
+          keyboardType: TextInputType.emailAddress,
+          textInputAction: TextInputAction.send,
+          onSubmitted: (_) => submit(),
+          autofocus: true, // Nice to have
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: submit,
+            child: const Text('Enviar'),
+          ),
+        ],
       ),
     );
   }
