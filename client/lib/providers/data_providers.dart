@@ -182,6 +182,9 @@ class ExpensesNotifier extends AsyncNotifier<List<Expense>> {
       final created = await apiClient.createTransaction(expense);
       final current = await future;
       state = AsyncData([...current, created]);
+      final now = DateTime.now();
+      final month = '${now.year}-${now.month.toString().padLeft(2, '0')}';
+      ref.invalidate(monthlySummaryProvider(month));
       ref.invalidate(currentMonthSummaryProvider);
     } catch (e) {
       if (kDebugMode) print('Failed to add expense: $e');
@@ -197,6 +200,9 @@ class ExpensesNotifier extends AsyncNotifier<List<Expense>> {
       state = AsyncData(
         current.map((e) => e.id == updated.id ? updated : e).toList(),
       );
+      final now = DateTime.now();
+      final month = '${now.year}-${now.month.toString().padLeft(2, '0')}';
+      ref.invalidate(monthlySummaryProvider(month));
       ref.invalidate(currentMonthSummaryProvider);
     } catch (e) {
       if (kDebugMode) print('Failed to update expense: $e');
@@ -210,6 +216,9 @@ class ExpensesNotifier extends AsyncNotifier<List<Expense>> {
       await apiClient.deleteTransaction(id);
       final current = await future;
       state = AsyncData(current.where((e) => e.id != id).toList());
+      final now = DateTime.now();
+      final month = '${now.year}-${now.month.toString().padLeft(2, '0')}';
+      ref.invalidate(monthlySummaryProvider(month));
       ref.invalidate(currentMonthSummaryProvider);
     } catch (e) {
       if (kDebugMode) print('Failed to delete expense: $e');
