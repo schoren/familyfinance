@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/data_providers.dart';
+import 'package:intl/intl.dart';
 import '../providers/auth_provider.dart';
 import 'widgets/month_summary_card.dart';
 
@@ -65,6 +66,7 @@ class HomeScreen extends ConsumerWidget {
                       final category = categories[index];
                       final remaining = ref.watch(categoryRemainingProvider(category.id));
                       final progress = remaining > 0 ? (remaining / category.monthlyBudget) : 0.0;
+                      final currencyFormat = NumberFormat.currency(locale: Localizations.localeOf(context).toString(), symbol: '\$');
                       
                       return Card(
                         elevation: 2,
@@ -89,7 +91,7 @@ class HomeScreen extends ConsumerWidget {
                                     ),
                                     const Spacer(),
                                     Text(
-                                      '\$${remaining.toStringAsFixed(0)}',
+                                      currencyFormat.format(remaining),
                                       style: TextStyle(
                                         fontSize: 15,
                                         color: remaining < 0 ? Colors.red : Colors.green,

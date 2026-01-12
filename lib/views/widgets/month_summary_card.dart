@@ -14,13 +14,15 @@ class MonthSummaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final now = DateTime.now();
-    final monthName = DateFormat('MMMM yyyy', 'es_ES').format(now);
+    final locale = Localizations.localeOf(context).toString();
+    final monthName = DateFormat('MMMM yyyy', locale).format(now);
     // Capitalize first letter
     final formattedMonth = monthName[0].toUpperCase() + monthName.substring(1);
 
-    final progress = totalBudget > 0 ? (totalSpent / totalBudget) : 0.0;
     final remaining = totalBudget - totalSpent;
     final isOverBudget = remaining < 0;
+    
+    final currencyFormat = NumberFormat.currency(locale: locale, symbol: '\$');
 
     return Card(
       elevation: 4,
@@ -42,13 +44,13 @@ class MonthSummaryCard extends StatelessWidget {
                 _buildInfoColumn(
                   context,
                   'Presupuesto',
-                  totalBudget,
+                  currencyFormat.format(totalBudget),
                   Colors.green,
                 ),
                 _buildInfoColumn(
                   context,
                   'Gastado',
-                  totalSpent,
+                  currencyFormat.format(totalSpent),
                   Colors.red,
                 ),
               ],
@@ -66,8 +68,8 @@ class MonthSummaryCard extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               isOverBudget
-                  ? 'Excedido por \$${(-remaining).toStringAsFixed(0)}'
-                  : 'Quedan \$${remaining.toStringAsFixed(0)}',
+                  ? 'Excedido por ${currencyFormat.format(-remaining)}'
+                  : 'Quedan ${currencyFormat.format(remaining)}',
               style: TextStyle(
                 color: isOverBudget ? Colors.red : Colors.green,
                 fontWeight: FontWeight.bold,
@@ -80,11 +82,10 @@ class MonthSummaryCard extends StatelessWidget {
   }
 
 
-
   Widget _buildInfoColumn(
     BuildContext context,
     String label,
-    double amount,
+    String amount,
     Color amountColor,
   ) {
     return Column(
@@ -98,7 +99,7 @@ class MonthSummaryCard extends StatelessWidget {
         ),
         const SizedBox(height: 4),
         Text(
-          '\$${amount.toStringAsFixed(0)}',
+          amount,
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,

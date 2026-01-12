@@ -16,6 +16,8 @@ class CategoryDetailScreen extends ConsumerWidget {
     final accountsAsync = ref.watch(accountsProvider);
     final remaining = ref.watch(categoryRemainingProvider(categoryId));
 
+    final currencyFormat = NumberFormat.currency(locale: Localizations.localeOf(context).toString(), symbol: '\$');
+
     return categoriesAsync.when(
       data: (categories) {
         final category = categories.firstWhere(
@@ -56,7 +58,7 @@ class CategoryDetailScreen extends ConsumerWidget {
                            child: Column(
                              children: [
                                Text(
-                                 'Presupuesto Mensual: \$${category.monthlyBudget.toStringAsFixed(0)}',
+                                 'Presupuesto Mensual: ${currencyFormat.format(category.monthlyBudget)}',
                                  style: Theme.of(context).textTheme.titleMedium,
                                ),
                                const SizedBox(height: 16),
@@ -65,7 +67,7 @@ class CategoryDetailScreen extends ConsumerWidget {
                                  style: Theme.of(context).textTheme.bodyMedium,
                                ),
                                Text(
-                                 '\$${remaining.toStringAsFixed(2)}',
+                                 currencyFormat.format(remaining),
                                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                                    color: remaining < 0 ? Colors.red : Colors.green,
                                    fontWeight: FontWeight.bold,
@@ -118,7 +120,7 @@ class CategoryDetailScreen extends ConsumerWidget {
                                       style: Theme.of(context).textTheme.bodySmall,
                                     ),
                                     trailing: Text(
-                                      '\$${expense.amount.toStringAsFixed(2)}',
+                                      currencyFormat.format(expense.amount),
                                       style: const TextStyle(fontWeight: FontWeight.bold),
                                     ),
                                  );
