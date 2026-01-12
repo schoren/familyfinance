@@ -12,6 +12,7 @@ _Account _$AccountFromJson(Map<String, dynamic> json) => _Account(
   name: json['name'] as String,
   brand: json['brand'] as String?,
   bank: json['bank'] as String?,
+  displayName: json['displayName'] as String,
 );
 
 Map<String, dynamic> _$AccountToJson(_Account instance) => <String, dynamic>{
@@ -20,9 +21,11 @@ Map<String, dynamic> _$AccountToJson(_Account instance) => <String, dynamic>{
   'name': instance.name,
   'brand': instance.brand,
   'bank': instance.bank,
+  'displayName': instance.displayName,
 };
 
 const _$AccountTypeEnumMap = {
   AccountType.cash: 'cash',
   AccountType.card: 'card',
+  AccountType.bank: 'bank',
 };

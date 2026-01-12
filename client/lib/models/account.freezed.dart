@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Account {
 
- String get id; AccountType get type; String get name; String? get brand; String? get bank;
+ String get id; AccountType get type; String get name; String? get brand; String? get bank; String get displayName;
 /// Create a copy of Account
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $AccountCopyWith<Account> get copyWith => _$AccountCopyWithImpl<Account>(this as
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Account&&(identical(other.id, id) || other.id == id)&&(identical(other.type, type) || other.type == type)&&(identical(other.name, name) || other.name == name)&&(identical(other.brand, brand) || other.brand == brand)&&(identical(other.bank, bank) || other.bank == bank));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Account&&(identical(other.id, id) || other.id == id)&&(identical(other.type, type) || other.type == type)&&(identical(other.name, name) || other.name == name)&&(identical(other.brand, brand) || other.brand == brand)&&(identical(other.bank, bank) || other.bank == bank)&&(identical(other.displayName, displayName) || other.displayName == displayName));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,type,name,brand,bank);
+int get hashCode => Object.hash(runtimeType,id,type,name,brand,bank,displayName);
 
 @override
 String toString() {
-  return 'Account(id: $id, type: $type, name: $name, brand: $brand, bank: $bank)';
+  return 'Account(id: $id, type: $type, name: $name, brand: $brand, bank: $bank, displayName: $displayName)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $AccountCopyWith<$Res>  {
   factory $AccountCopyWith(Account value, $Res Function(Account) _then) = _$AccountCopyWithImpl;
 @useResult
 $Res call({
- String id, AccountType type, String name, String? brand, String? bank
+ String id, AccountType type, String name, String? brand, String? bank, String displayName
 });
 
 
@@ -65,14 +65,15 @@ class _$AccountCopyWithImpl<$Res>
 
 /// Create a copy of Account
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? type = null,Object? name = null,Object? brand = freezed,Object? bank = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? type = null,Object? name = null,Object? brand = freezed,Object? bank = freezed,Object? displayName = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
 as AccountType,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,brand: freezed == brand ? _self.brand : brand // ignore: cast_nullable_to_non_nullable
 as String?,bank: freezed == bank ? _self.bank : bank // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,displayName: null == displayName ? _self.displayName : displayName // ignore: cast_nullable_to_non_nullable
+as String,
   ));
 }
 
@@ -157,10 +158,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  AccountType type,  String name,  String? brand,  String? bank)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  AccountType type,  String name,  String? brand,  String? bank,  String displayName)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Account() when $default != null:
-return $default(_that.id,_that.type,_that.name,_that.brand,_that.bank);case _:
+return $default(_that.id,_that.type,_that.name,_that.brand,_that.bank,_that.displayName);case _:
   return orElse();
 
 }
@@ -178,10 +179,10 @@ return $default(_that.id,_that.type,_that.name,_that.brand,_that.bank);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  AccountType type,  String name,  String? brand,  String? bank)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  AccountType type,  String name,  String? brand,  String? bank,  String displayName)  $default,) {final _that = this;
 switch (_that) {
 case _Account():
-return $default(_that.id,_that.type,_that.name,_that.brand,_that.bank);case _:
+return $default(_that.id,_that.type,_that.name,_that.brand,_that.bank,_that.displayName);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -198,10 +199,10 @@ return $default(_that.id,_that.type,_that.name,_that.brand,_that.bank);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  AccountType type,  String name,  String? brand,  String? bank)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  AccountType type,  String name,  String? brand,  String? bank,  String displayName)?  $default,) {final _that = this;
 switch (_that) {
 case _Account() when $default != null:
-return $default(_that.id,_that.type,_that.name,_that.brand,_that.bank);case _:
+return $default(_that.id,_that.type,_that.name,_that.brand,_that.bank,_that.displayName);case _:
   return null;
 
 }
@@ -213,7 +214,7 @@ return $default(_that.id,_that.type,_that.name,_that.brand,_that.bank);case _:
 @JsonSerializable()
 
 class _Account implements Account {
-  const _Account({required this.id, required this.type, required this.name, this.brand, this.bank});
+  const _Account({required this.id, required this.type, required this.name, this.brand, this.bank, required this.displayName});
   factory _Account.fromJson(Map<String, dynamic> json) => _$AccountFromJson(json);
 
 @override final  String id;
@@ -221,6 +222,7 @@ class _Account implements Account {
 @override final  String name;
 @override final  String? brand;
 @override final  String? bank;
+@override final  String displayName;
 
 /// Create a copy of Account
 /// with the given fields replaced by the non-null parameter values.
@@ -235,16 +237,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Account&&(identical(other.id, id) || other.id == id)&&(identical(other.type, type) || other.type == type)&&(identical(other.name, name) || other.name == name)&&(identical(other.brand, brand) || other.brand == brand)&&(identical(other.bank, bank) || other.bank == bank));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Account&&(identical(other.id, id) || other.id == id)&&(identical(other.type, type) || other.type == type)&&(identical(other.name, name) || other.name == name)&&(identical(other.brand, brand) || other.brand == brand)&&(identical(other.bank, bank) || other.bank == bank)&&(identical(other.displayName, displayName) || other.displayName == displayName));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,type,name,brand,bank);
+int get hashCode => Object.hash(runtimeType,id,type,name,brand,bank,displayName);
 
 @override
 String toString() {
-  return 'Account(id: $id, type: $type, name: $name, brand: $brand, bank: $bank)';
+  return 'Account(id: $id, type: $type, name: $name, brand: $brand, bank: $bank, displayName: $displayName)';
 }
 
 
@@ -255,7 +257,7 @@ abstract mixin class _$AccountCopyWith<$Res> implements $AccountCopyWith<$Res> {
   factory _$AccountCopyWith(_Account value, $Res Function(_Account) _then) = __$AccountCopyWithImpl;
 @override @useResult
 $Res call({
- String id, AccountType type, String name, String? brand, String? bank
+ String id, AccountType type, String name, String? brand, String? bank, String displayName
 });
 
 
@@ -272,14 +274,15 @@ class __$AccountCopyWithImpl<$Res>
 
 /// Create a copy of Account
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? type = null,Object? name = null,Object? brand = freezed,Object? bank = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? type = null,Object? name = null,Object? brand = freezed,Object? bank = freezed,Object? displayName = null,}) {
   return _then(_Account(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
 as AccountType,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,brand: freezed == brand ? _self.brand : brand // ignore: cast_nullable_to_non_nullable
 as String?,bank: freezed == bank ? _self.bank : bank // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,displayName: null == displayName ? _self.displayName : displayName // ignore: cast_nullable_to_non_nullable
+as String,
   ));
 }
 

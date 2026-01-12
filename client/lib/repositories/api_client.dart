@@ -18,15 +18,18 @@ class SyncResponse {
 
   factory SyncResponse.fromJson(Map<String, dynamic> json) {
     return SyncResponse(
-      categories: (json['categories'] as List)
-          .map((e) => Category.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      accounts: (json['accounts'] as List)
-          .map((e) => FinanceAccount.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      transactions: (json['transactions'] as List)
-          .map((e) => Expense.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      categories: (json['categories'] as List<dynamic>?)
+              ?.map((e) => Category.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
+      accounts: (json['accounts'] as List<dynamic>?)
+              ?.map((e) => FinanceAccount.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
+      transactions: (json['transactions'] as List<dynamic>?)
+              ?.map((e) => Expense.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
     );
   }
 }

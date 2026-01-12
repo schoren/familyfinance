@@ -119,6 +119,34 @@ class AccountsNotifier extends AsyncNotifier<List<FinanceAccount>> {
       rethrow;
     }
   }
+
+  Future<void> updateAccount(FinanceAccount account) async {
+    final apiClient = ref.read(apiClientProvider);
+    try {
+      final updated = await apiClient.updateAccount(account.id, account);
+      final current = await future;
+      state = AsyncData(
+        current.map((a) => a.id == updated.id ? updated : a).toList(),
+      );
+    } catch (e) {
+      if (kDebugMode) print('Failed to update account: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> deleteAccount(String id) async {
+    final apiClient = ref.read(apiClientProvider);
+    try {
+      await apiClient.deleteAccount(id);
+      final current = await future;
+      state = AsyncData(current.where((a) => a.id != id).toList());
+      // Re-invalidate summary because account balance might affect it (though currently summary is by category)
+      ref.invalidate(currentMonthSummaryProvider);
+    } catch (e) {
+      if (kDebugMode) print('Failed to delete account: $e');
+      rethrow;
+    }
+  }
 }
 
 final accountsProvider = AsyncNotifierProvider<AccountsNotifier, List<FinanceAccount>>(() {

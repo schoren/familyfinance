@@ -1,9 +1,8 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'account_type.dart';
 
 part 'account.freezed.dart';
 part 'account.g.dart';
-
-enum AccountType { cash, card }
 
 @freezed
 class Account with _$Account {
@@ -13,6 +12,7 @@ class Account with _$Account {
     required String name,
     String? brand,
     String? bank,
+    required String displayName,
   }) = _Account;
 
   factory Account.fromJson(Map<String, dynamic> json) => _$AccountFromJson(json);

@@ -32,6 +32,46 @@ class HomeScreen extends ConsumerWidget {
           ),
         ],
       ),
+      drawer: Drawer(
+        child: Column(
+          children: [
+            DrawerHeader(
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              child: const Center(
+                child: Text(
+                  'Family Finance',
+                  style: TextStyle(color: Colors.white, fontSize: 24),
+                ),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.dashboard),
+              title: const Text('Presupuestos'),
+              onTap: () {
+                context.pop();
+                context.go('/');
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.account_balance),
+              title: const Text('Cuentas'),
+              onTap: () {
+                context.pop();
+                context.push('/manage-accounts');
+              },
+            ),
+            const Spacer(),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.logout),
+              title: const Text('Cerrar Sesión'),
+              onTap: () => ref.read(authProvider.notifier).logout(),
+            ),
+          ],
+        ),
+      ),
       body: Column(
         children: [
           Padding(

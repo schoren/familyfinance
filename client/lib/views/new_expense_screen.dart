@@ -113,7 +113,7 @@ class _NewExpenseScreenState extends ConsumerState<NewExpenseScreen> {
                 items: accounts.map((account) {
                   return DropdownMenuItem(
                     value: account.id,
-                    child: Text(account.name),
+                    child: Text(account.displayName),
                   );
                 }).toList(),
                 onChanged: (value) {
@@ -123,9 +123,19 @@ class _NewExpenseScreenState extends ConsumerState<NewExpenseScreen> {
                 },
               )
             else
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 16.0),
-                child: Text('No tienes cuentas creadas. Crea una primero.'),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16.0),
+                child: Column(
+                  children: [
+                    const Text('No tienes cuentas creadas.'),
+                    const SizedBox(height: 8),
+                    ElevatedButton.icon(
+                      onPressed: () => context.push('/manage-accounts'),
+                      icon: const Icon(Icons.add),
+                      label: const Text('Crear mi primera cuenta'),
+                    ),
+                  ],
+                ),
               ),
             const SizedBox(height: 16),
             TextField(

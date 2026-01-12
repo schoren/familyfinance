@@ -42,6 +42,7 @@ type Account struct {
 	Name        string         `gorm:"type:varchar(255)" json:"name"`
 	Brand       *string        `gorm:"type:varchar(255)" json:"brand,omitempty"`
 	Bank        *string        `gorm:"type:varchar(255)" json:"bank,omitempty"`
+	DisplayName string         `gorm:"-" json:"display_name"`
 	HouseholdID string         `gorm:"type:varchar(255)" json:"household_id"`
 }
 

@@ -48,7 +48,7 @@ func (h *Handlers) CreateHousehold(c *gin.Context) {
 
 func (h *Handlers) GetCategories(c *gin.Context) {
 	householdID := c.Param("household_id")
-	var categories []Category
+	categories := []Category{}
 	if err := h.db.Where("household_id = ?", householdID).Find(&categories).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch categories"})
 		return
@@ -120,10 +120,13 @@ func (h *Handlers) DeleteCategory(c *gin.Context) {
 
 func (h *Handlers) GetAccounts(c *gin.Context) {
 	householdID := c.Param("household_id")
-	var accounts []Account
+	accounts := []Account{}
 	if err := h.db.Where("household_id = ?", householdID).Find(&accounts).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch accounts"})
 		return
+	}
+	for i := range accounts {
+		h.populateAccountDisplayName(&accounts[i])
 	}
 	c.JSON(http.StatusOK, accounts)
 }
@@ -142,6 +145,7 @@ func (h *Handlers) CreateAccount(c *gin.Context) {
 		return
 	}
 
+	h.populateAccountDisplayName(&account)
 	c.JSON(http.StatusCreated, account)
 }
 
@@ -172,7 +176,37 @@ func (h *Handlers) UpdateAccount(c *gin.Context) {
 		return
 	}
 
+	h.populateAccountDisplayName(&account)
 	c.JSON(http.StatusOK, account)
+}
+
+func (h *Handlers) populateAccountDisplayName(a *Account) {
+	switch a.Type {
+	case "cash":
+		a.DisplayName = "Efectivo"
+	case "card":
+		brand := ""
+		if a.Brand != nil {
+			brand = *a.Brand
+		}
+		bank := ""
+		if a.Bank != nil {
+			bank = *a.Bank
+		}
+		if brand != "" && bank != "" {
+			a.DisplayName = brand + " - " + bank
+		} else if brand != "" {
+			a.DisplayName = brand
+		} else if bank != "" {
+			a.DisplayName = bank
+		} else {
+			a.DisplayName = "Tarjeta"
+		}
+	case "bank":
+		a.DisplayName = a.Name
+	default:
+		a.DisplayName = a.Name
+	}
 }
 
 func (h *Handlers) DeleteAccount(c *gin.Context) {
@@ -194,7 +228,7 @@ func (h *Handlers) DeleteAccount(c *gin.Context) {
 func (h *Handlers) GetTransactions(c *gin.Context) {
 	householdID := c.Param("household_id")
 	monthStr := c.Query("month")
-	var transactions []Transaction
+	transactions := []Transaction{}
 
 	query := h.db.Where("household_id = ?", householdID)
 	if monthStr != "" {
@@ -374,22 +408,26 @@ func (h *Handlers) HandleSync(c *gin.Context) {
 	}
 	endOfMonth = startOfMonth.AddDate(0, 1, 0)
 
-	var accounts []Account
+	accounts := []Account{}
 	if err := h.db.Where("household_id = ?", householdID).Find(&accounts).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch accounts"})
 		return
 	}
 
-	var categories []Category
+	categories := []Category{}
 	if err := h.db.Where("household_id = ?", householdID).Find(&categories).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch categories"})
 		return
 	}
 
-	var transactions []Transaction
+	transactions := []Transaction{}
 	if err := h.db.Where("household_id = ? AND date >= ? AND date < ?", householdID, startOfMonth, endOfMonth).Find(&transactions).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch transactions"})
 		return
+	}
+
+	for i := range accounts {
+		h.populateAccountDisplayName(&accounts[i])
 	}
 
 	c.JSON(http.StatusOK, gin.H{

@@ -7,6 +7,7 @@ import '../views/login_screen.dart';
 import '../views/new_expense_screen.dart';
 import '../views/category_detail_screen.dart';
 import '../views/manage_category_screen.dart';
+import '../views/manage_accounts_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authProvider);
@@ -52,6 +53,10 @@ final routerProvider = Provider<GoRouter>((ref) {
           final id = state.uri.queryParameters['id'];
           return ManageCategoryScreen(categoryId: id);
         },
+      ),
+      GoRoute(
+        path: '/manage-accounts',
+        builder: (context, state) => const ManageAccountsScreen(),
       ),
     ],
   );

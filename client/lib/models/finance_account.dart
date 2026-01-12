@@ -10,6 +10,7 @@ class FinanceAccount {
   final String name;
   final String? brand;
   final String? bank;
+  final String displayName;
 
   FinanceAccount({
     required this.id,
@@ -17,6 +18,7 @@ class FinanceAccount {
     required this.name,
     this.brand,
     this.bank,
+    required this.displayName,
   });
 
   factory FinanceAccount.fromJson(Map<String, dynamic> json) => _$FinanceAccountFromJson(json);
