@@ -21,5 +21,9 @@ class Expense {
   });
 
   factory Expense.fromJson(Map<String, dynamic> json) => _$ExpenseFromJson(json);
-  Map<String, dynamic> toJson() => _$ExpenseToJson(this);
+  Map<String, dynamic> toJson() {
+    final map = _$ExpenseToJson(this);
+    map['date'] = date.toUtc().toIso8601String();
+    return map;
+  }
 }
