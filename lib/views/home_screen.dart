@@ -162,8 +162,7 @@ class HomeScreen extends ConsumerWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // Default to first category if none selected? 
-          // Or just let user pick from Home.
+          context.push('/manage-category');
         },
         child: const Icon(Icons.add),
       ),
