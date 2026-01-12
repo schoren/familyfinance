@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthState {
   final bool isAuthenticated;
@@ -19,6 +20,24 @@ class AuthState {
     this.householdId,
     this.token,
   });
+
+  Map<String, dynamic> toJson() => {
+    'isAuthenticated': isAuthenticated,
+    'userId': userId,
+    'userName': userName,
+    'userEmail': userEmail,
+    'householdId': householdId,
+    'token': token,
+  };
+
+  factory AuthState.fromJson(Map<String, dynamic> json) => AuthState(
+    isAuthenticated: json['isAuthenticated'] ?? false,
+    userId: json['userId'],
+    userName: json['userName'],
+    userEmail: json['userEmail'],
+    householdId: json['householdId'],
+    token: json['token'],
+  );
 }
 
 class AuthNotifier extends Notifier<AuthState> {
@@ -31,7 +50,34 @@ class AuthNotifier extends Notifier<AuthState> {
 
   @override
   AuthState build() {
+    // Try to load state from persistent storage
+    _loadState();
     return AuthState();
+  }
+
+  static const _storageKey = 'auth_state';
+
+  Future<void> _loadState() async {
+    final prefs = await SharedPreferences.getInstance();
+    final jsonString = prefs.getString(_storageKey);
+    if (jsonString != null) {
+      try {
+        final data = jsonDecode(jsonString);
+        state = AuthState.fromJson(data);
+      } catch (e) {
+        print('Error loading auth state: $e');
+      }
+    }
+  }
+
+  Future<void> _saveState() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_storageKey, jsonEncode(state.toJson()));
+  }
+
+  Future<void> _clearState() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_storageKey);
   }
 
   Future<void> loginWithGoogle() async {
@@ -70,6 +116,7 @@ class AuthNotifier extends Notifier<AuthState> {
           householdId: data['household_id'],
           token: data['token'],
         );
+        await _saveState();
       } else {
         throw Exception('Backend authentication failed: ${response.statusCode}');
       }
@@ -81,6 +128,7 @@ class AuthNotifier extends Notifier<AuthState> {
 
   Future<void> logout() async {
     await _googleSignIn.signOut();
+    await _clearState();
     state = AuthState();
   }
 }
