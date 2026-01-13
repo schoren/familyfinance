@@ -1,5 +1,8 @@
 .PHONY: help test test-backend test-client test-e2e test-all clean dev-up dev-down test-up test-down
 
+TEST_COMPOSE_PROJECT := family-finance-test
+TEST_SERVER_PORT := 8091
+
 # Default target
 help:
 	@echo "Family Finance - Test Automation"
@@ -42,11 +45,11 @@ test-client:
 test-e2e: test-up
 	@echo "🧪 Running E2E integration tests..."
 	@echo "⏳ Waiting for server to be ready..."
-	@timeout 60 bash -c 'until curl -sf http://localhost:8090/health > /dev/null 2>&1; do sleep 2; done' || \
+	@timeout 60 bash -c 'until curl -sf http://localhost:$(TEST_SERVER_PORT)/health > /dev/null 2>&1; do sleep 2; done' || \
 		(echo "❌ Server failed to start" && make test-down && exit 1)
 	@echo "✅ Server is ready"
 	@echo ""
-	cd e2e-tests && npm install && API_URL=http://localhost:8090 npx playwright test
+	cd e2e-tests && npm install && API_URL=http://localhost:$(TEST_SERVER_PORT) npx playwright test
 	@make test-down
 
 # Run all tests
@@ -72,15 +75,15 @@ dev-down:
 # Test environment
 test-up:
 	@echo "🧪 Starting test environment..."
-	@docker compose -f docker-compose.test.yml down -v 2>/dev/null || true
+	@docker compose -p $(TEST_COMPOSE_PROJECT) -f docker-compose.test.yml down -v 2>/dev/null || true
 	@echo "🔨 Building images..."
-	@docker compose -f docker-compose.test.yml build
-	docker compose -f docker-compose.test.yml up -d --remove-orphans
+	@docker compose -p $(TEST_COMPOSE_PROJECT) -f docker-compose.test.yml build
+	docker compose -p $(TEST_COMPOSE_PROJECT) -f docker-compose.test.yml up -d --remove-orphans
 	@echo "✅ Test environment started"
 
 test-down:
 	@echo "🛑 Stopping test environment..."
-	docker compose -f docker-compose.test.yml down -v
+	docker compose -p $(TEST_COMPOSE_PROJECT) -f docker-compose.test.yml down -v
 
 # Clean everything
 clean: dev-down test-down

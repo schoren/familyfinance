@@ -5,8 +5,6 @@ services:
       POSTGRES_DB: family_finance_test
       POSTGRES_USER: test_user
       POSTGRES_PASSWORD: test_password
-    ports:
-      - "5433:5432"
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U test_user -d family_finance_test" ]
       interval: 5s
@@ -27,25 +25,12 @@ services:
       TEST_MODE: "true"
       PORT: 8090
     ports:
-      - "8090:8090"
+      - "8091:8090"
     depends_on:
       db:
         condition: service_healthy
     healthcheck:
-      test: [ "CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8090/health" ]
+      test: [ "CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8091/health" ]
       interval: 5s
       timeout: 5s
       retries: 10
-  # Client not needed for API-only E2E tests
-  # client:
-  #   build:
-  #     context: ./client
-  #     dockerfile: Dockerfile
-  #     args:
-  #       API_URL: http://localhost:8090
-  #       GOOGLE_CLIENT_ID: test-client-id
-  #   ports:
-  #     - "8080:80"
-  #   depends_on:
-  #     server:
-  #       condition: service_healthy

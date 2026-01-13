@@ -1,5 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
+const API_URL = process.env.API_URL || 'http://localhost:8090';
+
 export default defineConfig({
   testDir: './tests',
   fullyParallel: false,
@@ -9,7 +11,7 @@ export default defineConfig({
   reporter: 'html',
 
   use: {
-    baseURL: process.env.API_URL || 'http://localhost:8090',
+    baseURL: API_URL,
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
   },
@@ -21,10 +23,4 @@ export default defineConfig({
     },
   ],
 
-  webServer: process.env.CI ? undefined : {
-    command: 'docker compose -f ../docker-compose.test.yml up',
-    url: 'http://localhost:8090/health',
-    reuseExistingServer: !process.env.CI,
-    timeout: 120 * 1000,
-  },
 });
