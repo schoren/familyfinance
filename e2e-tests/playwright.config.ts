@@ -22,7 +22,7 @@ export default defineConfig({
   ],
 
   webServer: process.env.CI ? undefined : {
-    command: 'docker compose -f docker-compose.test.yml up',
+    command: 'docker compose -f ../docker-compose.test.yml up',
     url: 'http://localhost:8090/health',
     reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000,
