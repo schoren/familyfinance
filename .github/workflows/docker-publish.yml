@@ -45,7 +45,6 @@ jobs:
           context: ./client
           push: true
           build-args: |
-            GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
             APP_VERSION=${{ steps.meta.outputs.short_tag }}
           tags: |
             schoren/familyfinance-client:latest

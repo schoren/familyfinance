@@ -4,6 +4,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../core/runtime_config.dart';
+
 class AuthState {
   final bool isAuthenticated;
   final String? userId;
@@ -41,10 +43,8 @@ class AuthState {
 }
 
 class AuthNotifier extends Notifier<AuthState> {
-  static const String _googleClientId = String.fromEnvironment('GOOGLE_CLIENT_ID');
-
   final GoogleSignIn _googleSignIn = GoogleSignIn(
-    clientId: _googleClientId.isNotEmpty ? _googleClientId : null,
+    clientId: RuntimeConfig.googleClientId,
     scopes: ['email', 'profile'],
   );
 
@@ -94,9 +94,8 @@ class AuthNotifier extends Notifier<AuthState> {
       }
 
       // Authenticate with backend
-      // TODO: Use actual base URL from config
       final response = await http.post(
-        Uri.parse('http://localhost:8090/auth/google'),
+        Uri.parse('${RuntimeConfig.apiUrl}/auth/google'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id_token': idToken,

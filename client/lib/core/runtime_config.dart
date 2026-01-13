@@ -9,4 +9,13 @@ class RuntimeConfig {
     }
     return const String.fromEnvironment('API_URL', defaultValue: 'http://localhost:8090');
   }
+
+  static String? get googleClientId {
+    final runtimeValue = getRuntimeGoogleClientId();
+    if (runtimeValue != null && runtimeValue.isNotEmpty && !runtimeValue.contains('GOOGLE_CLIENT_ID_PLACEHOLD')) {
+      return runtimeValue;
+    }
+    const envValue = String.fromEnvironment('GOOGLE_CLIENT_ID');
+    return envValue.isNotEmpty ? envValue : null;
+  }
 }

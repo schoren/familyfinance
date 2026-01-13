@@ -5,9 +5,8 @@ WORKDIR /app
 COPY . .
 RUN flutter pub get
 
-ARG GOOGLE_CLIENT_ID
 ARG APP_VERSION=local-dev
-RUN flutter build web --dart-define=GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID --dart-define=APP_VERSION=$APP_VERSION
+RUN flutter build web --dart-define=APP_VERSION=$APP_VERSION
 
 # Stage 2: Serve with Nginx
 FROM nginx:alpine
@@ -29,5 +28,5 @@ RUN echo 'server { \
 # Expose port 80
 EXPOSE 80
 
-# Replace API_URL_PLACEHOLD with the actual environment variable at runtime
-CMD ["/bin/sh", "-c", "sed -i 's|API_URL_PLACEHOLD|'\"${API_URL:-http://localhost:8090}\"'|g' /usr/share/nginx/html/config.js && nginx -g 'daemon off;'"]
+# Replace API_URL_PLACEHOLD and GOOGLE_CLIENT_ID_PLACEHOLD with actual environment variables at runtime
+CMD ["/bin/sh", "-c", "sed -i 's|API_URL_PLACEHOLD|'\"${API_URL:-http://localhost:8090}\"'|g; s|GOOGLE_CLIENT_ID_PLACEHOLD|'\"${GOOGLE_CLIENT_ID:-}\"'|g' /usr/share/nginx/html/config.js && nginx -g 'daemon off;'"]

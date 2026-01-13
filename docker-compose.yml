@@ -3,10 +3,10 @@ services:
     build:
       context: ./client
       args:
-        GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
         APP_VERSION: ${APP_VERSION:-local-dev}
     environment:
       - API_URL=${API_URL:-http://localhost:8090}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
     ports:
       - "8080:80"
 
