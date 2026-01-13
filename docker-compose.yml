@@ -4,12 +4,15 @@ services:
       context: ./client
       args:
         GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+        APP_VERSION: ${APP_VERSION:-local-dev}
     ports:
       - "8080:80"
 
   server:
     build:
       context: ./server
+      args:
+        APP_VERSION: ${APP_VERSION:-local-dev}
     ports:
       - "8090:8090"
     environment:

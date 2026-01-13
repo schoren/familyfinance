@@ -72,6 +72,32 @@ class HomeScreen extends ConsumerWidget {
             ),
             const Spacer(),
             const Divider(),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Versión Cliente: ${String.fromEnvironment('APP_VERSION', defaultValue: 'dev')}',
+                    style: TextStyle(color: Colors.grey, fontSize: 11),
+                  ),
+                  ref.watch(serverVersionProvider).when(
+                    data: (version) => Text(
+                      'Versión Servidor: $version',
+                      style: const TextStyle(color: Colors.grey, fontSize: 11),
+                    ),
+                    loading: () => const Text(
+                      'Versión Servidor: cargando...',
+                      style: TextStyle(color: Colors.grey, fontSize: 11),
+                    ),
+                    error: (_, __) => const Text(
+                      'Versión Servidor: error',
+                      style: TextStyle(color: Colors.grey, fontSize: 11),
+                    ),
+                  ),
+                ],
+              ),
+            ),
             ListTile(
               leading: const Icon(Icons.logout),
               title: const Text('Cerrar Sesión'),

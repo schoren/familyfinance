@@ -281,3 +281,8 @@ final monthlyTotalsProvider = Provider.autoDispose<(double budget, double spent)
     orElse: () => (0.0, 0.0),
   );
 });
+
+final serverVersionProvider = FutureProvider<String>((ref) async {
+  final apiClient = ref.watch(apiClientProvider);
+  return await apiClient.getServerVersion();
+});

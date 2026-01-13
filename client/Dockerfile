@@ -6,7 +6,8 @@ COPY . .
 RUN flutter pub get
 
 ARG GOOGLE_CLIENT_ID
-RUN flutter build web --dart-define=GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID
+ARG APP_VERSION=local-dev
+RUN flutter build web --dart-define=GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID --dart-define=APP_VERSION=$APP_VERSION
 
 # Stage 2: Serve with Nginx
 FROM nginx:alpine

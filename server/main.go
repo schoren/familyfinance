@@ -14,7 +14,8 @@ import (
 )
 
 var (
-	db *gorm.DB
+	db      *gorm.DB
+	Version = "dev"
 )
 
 func main() {
@@ -37,6 +38,11 @@ func main() {
 	// Health check
 	r.GET("/health", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"status": "ok"})
+	})
+
+	// Version
+	r.GET("/version", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{"version": Version})
 	})
 
 	// Authentication
@@ -85,6 +91,7 @@ func main() {
 	if port == "" {
 		port = "8090"
 	}
+	log.Printf("Server version: %s", Version)
 	log.Printf("Server running on port %s", port)
 	r.Run(":" + port)
 }

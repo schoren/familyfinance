@@ -302,6 +302,22 @@ class ApiClient {
     }
   }
 
+  // ============================================================================
+  // MISC
+  // ============================================================================
+
+  Future<String> getServerVersion() async {
+    final uri = Uri.parse('$baseUrl/version');
+    final response = await _client.get(uri, headers: {'Content-Type': 'application/json'});
+
+    if (response.statusCode == 200) {
+      final json = jsonDecode(response.body) as Map<String, dynamic>;
+      return json['version'] as String;
+    } else {
+      throw Exception('Failed to fetch server version: ${response.statusCode}');
+    }
+  }
+
   void dispose() {
     _client.close();
   }

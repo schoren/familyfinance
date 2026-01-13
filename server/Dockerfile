@@ -5,7 +5,8 @@ COPY go.mod go.sum ./
 RUN go mod download
 
 COPY . .
-RUN go build -o server .
+ARG APP_VERSION=local-dev
+RUN go build -o server -ldflags "-X main.Version=${APP_VERSION}" .
 
 FROM alpine:latest
 
