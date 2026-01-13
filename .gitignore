@@ -1,2 +1,3 @@
 .env
 server/server
+server/app/coverage.out
