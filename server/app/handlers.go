@@ -18,11 +18,15 @@ import (
 )
 
 type Handlers struct {
-	db *gorm.DB
+	db           *gorm.DB
+	googleAPIURL string
 }
 
 func NewHandlers(db *gorm.DB) *Handlers {
-	return &Handlers{db: db}
+	return &Handlers{
+		db:           db,
+		googleAPIURL: "https://www.googleapis.com/oauth2/v3/userinfo",
+	}
 }
 
 // ============================================================================
@@ -613,7 +617,7 @@ func (h *Handlers) AuthGoogle(c *gin.Context) {
 
 	// Fallback to AccessToken (common in Web)
 	if email == "" && req.AccessToken != "" {
-		userInfo, err := fetchGoogleUserInfo(req.AccessToken)
+		userInfo, err := h.fetchGoogleUserInfo(req.AccessToken)
 		if err != nil {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid Google access token"})
 			return
@@ -719,8 +723,8 @@ type GoogleUserInfo struct {
 	Name  string `json:"name"`
 }
 
-func fetchGoogleUserInfo(accessToken string) (*GoogleUserInfo, error) {
-	resp, err := http.Get("https://www.googleapis.com/oauth2/v3/userinfo?access_token=" + accessToken)
+func (h *Handlers) fetchGoogleUserInfo(accessToken string) (*GoogleUserInfo, error) {
+	resp, err := http.Get(h.googleAPIURL + "?access_token=" + accessToken)
 	if err != nil {
 		return nil, err
 	}

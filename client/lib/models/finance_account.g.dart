@@ -8,12 +8,12 @@ part of 'finance_account.dart';
 
 FinanceAccount _$FinanceAccountFromJson(Map<String, dynamic> json) =>
     FinanceAccount(
-      id: json['id'] as String? ?? '',
-      type: $enumDecodeNullable(_$AccountTypeEnumMap, json['type']) ?? AccountType.cash,
-      name: json['name'] as String? ?? '',
+      id: json['id'] as String,
+      type: $enumDecode(_$AccountTypeEnumMap, json['type']),
+      name: json['name'] as String,
       brand: json['brand'] as String?,
       bank: json['bank'] as String?,
-      displayName: json['display_name'] as String? ?? json['name'] as String? ?? 'Cuenta sin nombre',
+      displayName: json['display_name'] as String,
     );
 
 Map<String, dynamic> _$FinanceAccountToJson(FinanceAccount instance) =>

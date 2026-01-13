@@ -7,11 +7,11 @@ part of 'expense.dart';
 // **************************************************************************
 
 Expense _$ExpenseFromJson(Map<String, dynamic> json) => Expense(
-  id: json['id'] as String? ?? '',
-  date: json['date'] == null ? DateTime.now() : DateTime.parse(json['date'] as String),
-  categoryId: json['category_id'] as String? ?? '',
-  accountId: json['account_id'] as String? ?? '',
-  amount: (json['amount'] as num?)?.toDouble() ?? 0.0,
+  id: json['id'] as String,
+  date: DateTime.parse(json['date'] as String),
+  categoryId: json['category_id'] as String,
+  accountId: json['account_id'] as String,
+  amount: (json['amount'] as num).toDouble(),
   note: json['note'] as String?,
 );
 
