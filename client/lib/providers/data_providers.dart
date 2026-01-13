@@ -6,6 +6,7 @@ import '../models/expense.dart';
 import '../models/monthly_summary.dart';
 import '../repositories/api_client.dart';
 import '../providers/auth_provider.dart';
+import '../core/runtime_config.dart';
 
 // ============================================================================
 // API CLIENT
@@ -14,7 +15,7 @@ import '../providers/auth_provider.dart';
 final apiClientProvider = Provider((ref) {
   final authState = ref.watch(authProvider);
   return ApiClient(
-    baseUrl: 'http://localhost:8090',
+    baseUrl: RuntimeConfig.apiUrl,
     householdId: authState.householdId,
     authToken: authState.token,
   );

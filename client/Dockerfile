@@ -26,6 +26,8 @@ RUN echo 'server { \
   } \
   }' > /etc/nginx/conf.d/default.conf
 
+# Expose port 80
 EXPOSE 80
 
-CMD ["nginx", "-g", "daemon off;"]
+# Replace API_URL_PLACEHOLD with the actual environment variable at runtime
+CMD ["/bin/sh", "-c", "sed -i 's|API_URL_PLACEHOLD|'\"${API_URL:-http://localhost:8090}\"'|g' /usr/share/nginx/html/config.js && nginx -g 'daemon off;'"]
