@@ -37,9 +37,9 @@ jobs:
         uses: phips28/gh-action-bump-version@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BUMP: ${{ github.event.inputs.bump_type }}
         with:
           target-branch: main
+          default: ${{ github.event.inputs.bump_type }}
 
       - name: Get New Version
         id: get_version
