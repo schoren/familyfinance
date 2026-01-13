@@ -76,6 +76,7 @@ func main() {
 		h.POST("/categories", handlers.CreateCategory)
 		h.PUT("/categories/:id", handlers.UpdateCategory)
 		h.DELETE("/categories/:id", handlers.DeleteCategory)
+		h.GET("/categories/:id/suggested-notes", handlers.GetSuggestedNotes)
 
 		// Accounts
 		h.GET("/accounts", handlers.GetAccounts)

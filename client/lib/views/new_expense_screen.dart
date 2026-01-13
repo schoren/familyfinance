@@ -169,15 +169,35 @@ class _NewExpenseScreenState extends ConsumerState<NewExpenseScreen> {
                   ),
                 ),
               const SizedBox(height: 16),
-              TextFormField(
-                controller: _noteController,
-                textInputAction: TextInputAction.done,
-                textCapitalization: TextCapitalization.sentences,
-                decoration: const InputDecoration(
-                  labelText: 'Nota (opcional)',
-                  border: OutlineInputBorder(),
-                ),
-                onFieldSubmitted: (_) => _save(),
+              Autocomplete<String>(
+                optionsBuilder: (TextEditingValue textEditingValue) {
+                  final suggestions = ref.read(suggestedNotesProvider(widget.categoryId)).value ?? [];
+                  if (textEditingValue.text.isEmpty) {
+                    return suggestions;
+                  }
+                  return suggestions.where((String option) {
+                    return option.toLowerCase().contains(textEditingValue.text.toLowerCase());
+                  });
+                },
+                onSelected: (String selection) {
+                  _noteController.text = selection;
+                },
+                fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
+                  return TextFormField(
+                    controller: controller,
+                    focusNode: focusNode,
+                    textInputAction: TextInputAction.done,
+                    textCapitalization: TextCapitalization.sentences,
+                    decoration: const InputDecoration(
+                      labelText: 'Nota (opcional)',
+                      border: OutlineInputBorder(),
+                    ),
+                    onChanged: (value) {
+                      _noteController.text = value;
+                    },
+                    onFieldSubmitted: (_) => _save(),
+                  );
+                },
               ),
               const SizedBox(height: 24),
               SizedBox(

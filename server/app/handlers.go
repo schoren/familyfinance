@@ -399,6 +399,28 @@ func (h *Handlers) GetTransactions(c *gin.Context) {
 	c.JSON(http.StatusOK, transactions)
 }
 
+func (h *Handlers) GetSuggestedNotes(c *gin.Context) {
+	householdID := c.Param("household_id")
+	categoryID := c.Param("id")
+
+	var notes []string
+	err := h.db.Model(&Transaction{}).
+		Select("description").
+		Where("household_id = ? AND category_id = ? AND description != ''", householdID, categoryID).
+		Group("description").
+		Order("MAX(created_at) DESC").
+		Limit(50).
+		Pluck("description", &notes).Error
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch suggested notes"})
+		return
+	}
+
+	// Remove empty or redundant notes if any (redundant should be handled by DISTINCT)
+	c.JSON(http.StatusOK, notes)
+}
+
 func (h *Handlers) CreateTransaction(c *gin.Context) {
 	householdID := c.Param("household_id")
 	var transaction Transaction
