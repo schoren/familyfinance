@@ -49,7 +49,7 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.27.1'
+          flutter-version: '3.38.6'
           channel: 'stable'
           cache: true
       
@@ -95,7 +95,7 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.27.1'
+          flutter-version: '3.38.6'
           channel: 'stable'
           cache: true
       
