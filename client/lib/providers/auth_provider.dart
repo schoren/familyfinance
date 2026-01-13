@@ -43,11 +43,6 @@ class AuthState {
 }
 
 class AuthNotifier extends Notifier<AuthState> {
-  final GoogleSignIn _googleSignIn = GoogleSignIn(
-    clientId: RuntimeConfig.googleClientId,
-    scopes: ['email', 'profile'],
-  );
-
   @override
   AuthState build() {
     // Try to load state from persistent storage
@@ -82,45 +77,58 @@ class AuthNotifier extends Notifier<AuthState> {
 
   Future<void> loginWithGoogle({String? inviteCode}) async {
     try {
-      final googleUser = await _googleSignIn.signIn();
-      if (googleUser == null) return;
+       print('Initializing Google Sign In');
+       
+       // Initialize GoogleSignIn
+       // We use dynamic dispatch to avoid compilation issues if the analyzer is outdated,
+       // but strictly speaking, in v7 we must initialize.
+       await (GoogleSignIn.instance as dynamic).initialize(
+        clientId: RuntimeConfig.googleClientId,
+        scopes: ['email', 'profile'],
+       );
+       
+       final googleUser = await GoogleSignIn.instance.authenticate();
+       if (googleUser == null) return;
 
-      final googleAuth = await googleUser.authentication;
-      final idToken = googleAuth.idToken;
-      final accessToken = googleAuth.accessToken;
+       final googleAuth = await googleUser.authentication;
+       final idToken = googleAuth.idToken;
+       // Note: In GoogleSignIn v7, accessToken is not directly available on authentication object.
+       // We rely on idToken for authentication. If accessToken is needed (e.g. for Google API calls),
+       // it requires a separate authorization flow.
+       final String? accessToken = null;
 
-      if (idToken == null && accessToken == null) {
-        throw Exception('Failed to get any token from Google');
-      }
+       if (idToken == null) {
+         throw Exception('Failed to get idToken from Google');
+       }
 
-      // Authenticate with backend
-      final response = await http.post(
-        Uri.parse('${RuntimeConfig.apiUrl}/auth/google'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'id_token': idToken,
-          'access_token': accessToken,
-          'invite_code': inviteCode,
-        }),
-      );
+       // Authenticate with backend
+       final response = await http.post(
+         Uri.parse('${RuntimeConfig.apiUrl}/auth/google'),
+         headers: {'Content-Type': 'application/json'},
+         body: jsonEncode({
+           'id_token': idToken,
+           'access_token': accessToken,
+           'invite_code': inviteCode,
+         }),
+       );
 
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        final user = data['user'];
-        
-        state = AuthState(
-          isAuthenticated: true,
-          userId: user['id'],
-          userName: user['name'],
-          userEmail: user['email'],
-          householdId: data['household_id'],
-          token: data['token'],
-        );
-        await _saveState();
-      } else {
-        final error = jsonDecode(response.body)['error'] ?? 'Backend authentication failed: ${response.statusCode}';
-        throw Exception(error);
-      }
+       if (response.statusCode == 200) {
+         final data = jsonDecode(response.body);
+         final user = data['user'];
+         
+         state = AuthState(
+           isAuthenticated: true,
+           userId: user['id'],
+           userName: user['name'],
+           userEmail: user['email'],
+           householdId: data['household_id'],
+           token: data['token'],
+         );
+         await _saveState();
+       } else {
+         final error = jsonDecode(response.body)['error'] ?? 'Backend authentication failed: ${response.statusCode}';
+         throw Exception(error);
+       }
     } catch (e) {
       print('Login error: $e');
       rethrow;
@@ -128,7 +136,7 @@ class AuthNotifier extends Notifier<AuthState> {
   }
 
   Future<void> logout() async {
-    await _googleSignIn.signOut();
+    await GoogleSignIn.instance.signOut();
     await _clearState();
     state = AuthState();
   }

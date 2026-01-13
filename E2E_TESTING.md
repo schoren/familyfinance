@@ -15,6 +15,8 @@ When `TEST_MODE=true`, the server exposes a `/auth/test-login` endpoint that cre
 
 **⚠️ WARNING**: Never enable `TEST_MODE` in production!
 
+**ℹ️ NOTE**: E2E tests run locally only. They are disabled in GitHub Actions CI because they require a real device/browser which is complex to set up in headless environments. Unit tests (backend + client) run in CI.
+
 ## Running E2E Tests Locally
 
 ### Prerequisites

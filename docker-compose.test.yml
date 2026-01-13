@@ -36,16 +36,16 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
-
-  client:
-    build:
-      context: ./client
-      dockerfile: Dockerfile
-      args:
-        API_URL: http://localhost:8090
-        GOOGLE_CLIENT_ID: test-client-id
-    ports:
-      - "8080:80"
-    depends_on:
-      server:
-        condition: service_healthy
+  # Client not needed for API-only E2E tests
+  # client:
+  #   build:
+  #     context: ./client
+  #     dockerfile: Dockerfile
+  #     args:
+  #       API_URL: http://localhost:8090
+  #       GOOGLE_CLIENT_ID: test-client-id
+  #   ports:
+  #     - "8080:80"
+  #   depends_on:
+  #     server:
+  #       condition: service_healthy

@@ -1,0 +1,161 @@
+import { test, expect } from '@playwright/test';
+
+const API_URL = process.env.API_URL || 'http://localhost:8090';
+
+test.describe('E2E Tests', () => {
+  test('Complete user flow: login, create category, add expense, view summary', async ({ request }) => {
+    // 1. Login with test user
+    const loginResponse = await request.post(`${API_URL}/auth/test-login`, {
+      data: {
+        email: 'e2e-test@example.com',
+        name: 'E2E Test User',
+      },
+    });
+
+    expect(loginResponse.ok()).toBeTruthy();
+    const loginData = await loginResponse.json();
+    const token = loginData.token;
+    const householdId = loginData.household_id;
+
+    expect(token).toBeTruthy();
+    expect(householdId).toBeTruthy();
+    console.log('✅ Logged in successfully');
+
+    // 2. Create a category
+    const categoryResponse = await request.post(
+      `${API_URL}/households/${householdId}/categories`,
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        data: {
+          name: 'Food',
+          monthly_budget: 500.0,
+          is_active: true,
+        },
+      }
+    );
+
+    expect(categoryResponse.ok()).toBeTruthy();
+    const category = await categoryResponse.json();
+    expect(category.name).toBe('Food');
+    expect(category.monthly_budget).toBe(500.0);
+    console.log(`✅ Created category: ${category.name}`);
+
+    // 3. Create an account
+    const accountResponse = await request.post(
+      `${API_URL}/households/${householdId}/accounts`,
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        data: {
+          name: 'Cash',
+          type: 'cash',
+        },
+      }
+    );
+
+    expect(accountResponse.ok()).toBeTruthy();
+    const account = await accountResponse.json();
+    expect(account.name).toBe('Cash');
+    expect(account.type).toBe('cash');
+    console.log(`✅ Created account: ${account.name}`);
+
+    // 4. Create a transaction
+    const transactionResponse = await request.post(
+      `${API_URL}/households/${householdId}/transactions`,
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        data: {
+          category_id: category.id,
+          account_id: account.id,
+          amount: 50.0,
+          date: new Date().toISOString(),
+          note: 'Groceries',
+        },
+      }
+    );
+
+    expect(transactionResponse.ok()).toBeTruthy();
+    const transaction = await transactionResponse.json();
+    expect(transaction.amount).toBe(50.0);
+    expect(transaction.note).toBe('Groceries');
+    console.log(`✅ Created transaction: $${transaction.amount}`);
+
+    // 5. Get monthly summary
+    const now = new Date();
+    const month = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    const summaryResponse = await request.get(
+      `${API_URL}/households/${householdId}/summary/${month}`,
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      }
+    );
+
+    expect(summaryResponse.ok()).toBeTruthy();
+    const summary = await summaryResponse.json();
+
+    expect(summary.total_budget).toBe(500.0);
+    expect(summary.total_spent).toBe(50.0);
+    expect(summary.categories).toHaveLength(1);
+
+    const categorySummary = summary.categories[0];
+    expect(categorySummary.name).toBe('Food');
+    expect(categorySummary.spent).toBe(50.0);
+    expect(categorySummary.remaining).toBe(450.0);
+
+    console.log('✅ Monthly summary verified');
+    console.log(`   Budget: $${summary.total_budget}`);
+    console.log(`   Spent: $${summary.total_spent}`);
+    console.log(`   Remaining: $${categorySummary.remaining}`);
+  });
+
+  test('Second user can create their own household', async ({ request }) => {
+    // Create a second user with different email
+    const loginResponse = await request.post(`${API_URL}/auth/test-login`, {
+      data: {
+        email: 'user2@example.com',
+        name: 'User Two',
+      },
+    });
+
+    expect(loginResponse.ok()).toBeTruthy();
+    const loginData = await loginResponse.json();
+    const token = loginData.token;
+    const householdId = loginData.household_id;
+
+    expect(token).toBeTruthy();
+    expect(householdId).toBeTruthy();
+    console.log(`✅ User 2 created household: ${householdId}`);
+
+    // Verify user 2 can create their own category
+    const categoryResponse = await request.post(
+      `${API_URL}/households/${householdId}/categories`,
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        data: {
+          name: 'User 2 Category',
+          monthly_budget: 200.0,
+          is_active: true,
+        },
+      }
+    );
+
+    expect(categoryResponse.ok()).toBeTruthy();
+    const category = await categoryResponse.json();
+    expect(category.name).toBe('User 2 Category');
+    expect(category.monthly_budget).toBe(200.0);
+    console.log('✅ User 2 created their own category');
+  });
+});

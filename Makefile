@@ -46,9 +46,7 @@ test-e2e: test-up
 		(echo "❌ Server failed to start" && make test-down && exit 1)
 	@echo "✅ Server is ready"
 	@echo ""
-	cd client && flutter pub get
-	cd client && dart run build_runner build --delete-conflicting-outputs
-	cd client && flutter test integration_test/ --dart-define=API_URL=http://localhost:8090
+	cd e2e-tests && npm install && API_URL=http://localhost:8090 npx playwright test
 	@make test-down
 
 # Run all tests
