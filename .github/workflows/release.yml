@@ -82,3 +82,14 @@ jobs:
             schoren/familyfinance-client:${{ steps.get_version.outputs.version }}
           cache-from: type=registry,ref=schoren/familyfinance-client:buildcache
           cache-to: type=registry,ref=schoren/familyfinance-client:buildcache,mode=max
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.get_version.outputs.version }}
+          name: Release ${{ steps.get_version.outputs.version }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
