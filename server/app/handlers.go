@@ -59,6 +59,13 @@ func (h *Handlers) CreateInvitation(c *gin.Context) {
 		return
 	}
 
+	// Check for duplicate pending invitation
+	var existingInvitation Invitation
+	if err := h.db.Where("household_id = ? AND email = ? AND status = ?", householdID, req.Email, "pending").First(&existingInvitation).Error; err == nil {
+		c.JSON(http.StatusConflict, gin.H{"error": "Invitation already pending for this email"})
+		return
+	}
+
 	// Generate a 6-char random hex code
 	b := make([]byte, 3)
 	if _, err := rand.Read(b); err != nil {
@@ -95,25 +102,78 @@ func (h *Handlers) CreateInvitation(c *gin.Context) {
 // MEMBERS
 // ============================================================================
 
+type MemberResponse struct {
+	ID         string `json:"id"`
+	Name       string `json:"name"`
+	Email      string `json:"email"`
+	Status     string `json:"status"` // "active" or "pending"
+	InviteCode string `json:"invite_code,omitempty"`
+}
+
 func (h *Handlers) GetMembers(c *gin.Context) {
 	householdID := c.Param("household_id")
+
+	// 1. Get Users (active members)
 	var users []User
 	if err := h.db.Where("household_id = ?", householdID).Find(&users).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch members"})
 		return
 	}
-	c.JSON(http.StatusOK, users)
+
+	// 2. Get Pending Invitations
+	var invitations []Invitation
+	if err := h.db.Where("household_id = ? AND status = ?", householdID, "pending").Find(&invitations).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch invitations"})
+		return
+	}
+
+	// 3. Combine
+	var response []MemberResponse
+
+	for _, user := range users {
+		response = append(response, MemberResponse{
+			ID:     user.ID,
+			Name:   user.Name,
+			Email:  user.Email,
+			Status: "active",
+		})
+	}
+
+	for _, invite := range invitations {
+		// Invitations only have email, no name yet
+		response = append(response, MemberResponse{
+			ID:         invite.ID,
+			Name:       "Invitado", // Placeholder
+			Email:      invite.Email,
+			Status:     "pending",
+			InviteCode: invite.Code,
+		})
+	}
+
+	c.JSON(http.StatusOK, response)
 }
 
 func (h *Handlers) RemoveMember(c *gin.Context) {
 	householdID := c.Param("household_id")
-	userID := c.Param("user_id")
+	targetID := c.Param("user_id") // Can be user_id or invitation_id
 
-	// Verify user belongs to household
+	// 1. Check if it's an invitation
+	var invitation Invitation
+	if err := h.db.Where("id = ? AND household_id = ?", targetID, householdID).First(&invitation).Error; err == nil {
+		// Found invitation, delete it (hard delete or soft depending on struct, struct has DeletedAt so soft)
+		if err := h.db.Delete(&invitation).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to remove invitation"})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{"message": "Invitation removed"})
+		return
+	}
+
+	// 2. Check if it's a user
 	var user User
-	if err := h.db.Where("id = ? AND household_id = ?", userID, householdID).First(&user).Error; err != nil {
+	if err := h.db.Where("id = ? AND household_id = ?", targetID, householdID).First(&user).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
-			c.JSON(http.StatusNotFound, gin.H{"error": "Member not found"})
+			c.JSON(http.StatusNotFound, gin.H{"error": "Member or invitation not found"})
 		} else {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})
 		}

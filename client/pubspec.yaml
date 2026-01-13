@@ -51,6 +51,8 @@ dependencies:
   drift_flutter: ^0.2.8
   flutter_localizations:
     sdk: flutter
+  google_sign_in_web: ^1.1.0
+  google_identity_services_web: ^0.3.3+1
 
 dev_dependencies:
   flutter_test:

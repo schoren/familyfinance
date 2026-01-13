@@ -396,6 +396,75 @@ func TestHouseholdAndInvitation(t *testing.T) {
 	assert.Equal(t, http.StatusOK, w.Code)
 }
 
+func TestCreateInvitation_Duplicate(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	db := setupTestDB()
+	h := NewHandlers(db)
+
+	r := gin.Default()
+	r.POST("/households/:household_id/invitations", h.CreateInvitation)
+
+	// Create initial invitation
+	invReq := struct{ Email string }{Email: "dup@example.com"}
+	body, _ := json.Marshal(invReq)
+	req, _ := http.NewRequest("POST", "/households/hh-dup/invitations", bytes.NewBuffer(body))
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+	assert.Equal(t, http.StatusCreated, w.Code)
+
+	// Try to create duplicate
+	req, _ = http.NewRequest("POST", "/households/hh-dup/invitations", bytes.NewBuffer(body))
+	w = httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+	assert.Equal(t, http.StatusConflict, w.Code)
+}
+
+func TestGetMembers_IncludesCode(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	db := setupTestDB()
+	h := NewHandlers(db)
+
+	r := gin.Default()
+	r.GET("/households/:household_id/members", h.GetMembers)
+
+	// Seed pending invitation
+	db.Create(&Invitation{ID: "inv1", Code: "SECRET123", HouseholdID: "hh-code", Status: "pending", Email: "pending@example.com"})
+
+	req, _ := http.NewRequest("GET", "/households/hh-code/members", nil)
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	var members []MemberResponse
+	json.Unmarshal(w.Body.Bytes(), &members)
+	assert.Len(t, members, 1)
+	assert.Equal(t, "pending", members[0].Status)
+	assert.Equal(t, "SECRET123", members[0].InviteCode)
+}
+
+func TestRemoveMember_Invitation(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	db := setupTestDB()
+	h := NewHandlers(db)
+
+	r := gin.Default()
+	r.DELETE("/households/:household_id/members/:user_id", h.RemoveMember)
+
+	// Seed invitation
+	db.Create(&Invitation{ID: "inv-to-del", Code: "DEL123", HouseholdID: "hh-del", Status: "pending", Email: "del@example.com"})
+
+	// Delete
+	req, _ := http.NewRequest("DELETE", "/households/hh-del/members/inv-to-del", nil)
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	// Verify deleted
+	var count int64
+	db.Model(&Invitation{}).Where("id = ?", "inv-to-del").Count(&count)
+	assert.Equal(t, int64(0), count)
+}
+
 func TestHandleSync(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	db := setupTestDB()

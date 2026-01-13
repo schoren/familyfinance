@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_sign_in/google_sign_in.dart';
+import 'package:google_sign_in/google_sign_in.dart' as gsi;
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -43,10 +43,25 @@ class AuthState {
 }
 
 class AuthNotifier extends Notifier<AuthState> {
+  String? _pendingInviteCode;
+
+  void setPendingInviteCode(String? code) {
+    _pendingInviteCode = code;
+  }
+
   @override
   AuthState build() {
-    // Try to load state from persistent storage
     _loadState();
+    
+    // Listen to Google Sign In events (v7)
+    gsi.GoogleSignIn.instance.authenticationEvents.listen((gsi.GoogleSignInAuthenticationEvent event) {
+       // Check for sign-in event
+       if (event is gsi.GoogleSignInAuthenticationEventSignIn) {
+         _handleSignIn(event.user);
+       }
+       // We can also handle signOut etc.
+    });
+
     return AuthState();
   }
 
@@ -75,60 +90,77 @@ class AuthNotifier extends Notifier<AuthState> {
     await prefs.remove(_storageKey);
   }
 
+  Future<void> _handleSignIn(gsi.GoogleSignInAccount googleUser) async {
+       try {
+         final googleAuth = await googleUser.authentication;
+         final idToken = googleAuth.idToken;
+         // In v7, accessToken is removed from GoogleSignInAuthentication.
+         // We rely on idToken for backend verification.
+         final String? accessToken = null; 
+
+         if (idToken == null) {
+           print('Failed to get idToken from Google');
+           return;
+         }
+
+         // Authenticate with backend
+         final response = await http.post(
+           Uri.parse('${RuntimeConfig.apiUrl}/auth/google'),
+           headers: {'Content-Type': 'application/json'},
+           body: jsonEncode({
+             'id_token': idToken,
+             'access_token': accessToken,
+             'invite_code': _pendingInviteCode, // Use stored code
+           }),
+         );
+
+         if (response.statusCode == 200) {
+           final data = jsonDecode(response.body);
+           final user = data['user'];
+           
+           state = AuthState(
+             isAuthenticated: true,
+             userId: user['id'],
+             userName: user['name'],
+             userEmail: user['email'],
+             householdId: data['household_id'],
+             token: data['token'],
+           );
+           await _saveState();
+           _pendingInviteCode = null;
+         } else {
+           final error = jsonDecode(response.body)['error'] ?? 'Backend authentication failed: ${response.statusCode}';
+           print('Backend Logic Error: $error');
+         }
+       } catch (e) {
+         print('Backend Auth Error: $e');
+       }
+  }
+
+  Future<void>? _googleSignInInitFuture;
+
+  Future<void> ensureGoogleSignInInitialized() {
+    _googleSignInInitFuture ??= gsi.GoogleSignIn.instance.initialize(
+      clientId: RuntimeConfig.googleClientId,
+    );
+    return _googleSignInInitFuture!;
+  }
+
   Future<void> loginWithGoogle({String? inviteCode}) async {
     try {
+       _pendingInviteCode = inviteCode;
        print('Initializing Google Sign In');
        
-       // Initialize GoogleSignIn
-       // We use dynamic dispatch to avoid compilation issues if the analyzer is outdated,
-       // but strictly speaking, in v7 we must initialize.
-       await (GoogleSignIn.instance as dynamic).initialize(
-        clientId: RuntimeConfig.googleClientId,
-        scopes: ['email', 'profile'],
-       );
+       final googleSignIn = gsi.GoogleSignIn.instance;
        
-       final googleUser = await GoogleSignIn.instance.authenticate();
-       if (googleUser == null) return;
-
-       final googleAuth = await googleUser.authentication;
-       final idToken = googleAuth.idToken;
-       // Note: In GoogleSignIn v7, accessToken is not directly available on authentication object.
-       // We rely on idToken for authentication. If accessToken is needed (e.g. for Google API calls),
-       // it requires a separate authorization flow.
-       final String? accessToken = null;
-
-       if (idToken == null) {
-         throw Exception('Failed to get idToken from Google');
-       }
-
-       // Authenticate with backend
-       final response = await http.post(
-         Uri.parse('${RuntimeConfig.apiUrl}/auth/google'),
-         headers: {'Content-Type': 'application/json'},
-         body: jsonEncode({
-           'id_token': idToken,
-           'access_token': accessToken,
-           'invite_code': inviteCode,
-         }),
-       );
-
-       if (response.statusCode == 200) {
-         final data = jsonDecode(response.body);
-         final user = data['user'];
-         
-         state = AuthState(
-           isAuthenticated: true,
-           userId: user['id'],
-           userName: user['name'],
-           userEmail: user['email'],
-           householdId: data['household_id'],
-           token: data['token'],
-         );
-         await _saveState();
-       } else {
-         final error = jsonDecode(response.body)['error'] ?? 'Backend authentication failed: ${response.statusCode}';
-         throw Exception(error);
-       }
+       // Ensure initialized
+       await ensureGoogleSignInInitialized();
+       
+       // v7: Use authenticate() instead of signIn()
+       // This is for MOBILE/DESKTOP execution or Web if supported (currently not).
+       // If running on Web, this method shouldn't be called if we use the button.
+       // But if called, we try.
+       await googleSignIn.authenticate();
     } catch (e) {
       print('Login error: $e');
       rethrow;
@@ -136,7 +168,11 @@ class AuthNotifier extends Notifier<AuthState> {
   }
 
   Future<void> logout() async {
-    await GoogleSignIn.instance.signOut();
+    try {
+      await gsi.GoogleSignIn.instance.signOut();
+    } catch (e) {
+      print('Google sign out error (ignoring): $e');
+    }
     await _clearState();
     state = AuthState();
   }

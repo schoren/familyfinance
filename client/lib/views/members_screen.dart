@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/data_providers.dart';
 import '../providers/auth_provider.dart';
@@ -64,6 +66,20 @@ class _MembersScreenState extends ConsumerState<MembersScreen> {
     }
   }
 
+  void _copyInviteLink(String code) {
+    String baseUrl;
+    if (kIsWeb) {
+      baseUrl = Uri.base.origin;
+    } else {
+      baseUrl = 'http://localhost:8080'; // Fallback / Dev default
+    }
+    final link = '$baseUrl/invite?code=$code';
+    Clipboard.setData(ClipboardData(text: link));
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Enlace de invitación copiado al portapapeles')),
+    );
+  }
+
   void _showInviteDialog() {
     final emailController = TextEditingController();
 
@@ -72,17 +88,22 @@ class _MembersScreenState extends ConsumerState<MembersScreen> {
       if (email.isEmpty) return;
 
       try {
-        Navigator.pop(context); 
         await ref.read(apiClientProvider).createInvitation(email);
         if (mounted) {
+          Navigator.pop(context);
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Invitación enviada con éxito')),
           );
+          _loadMembers(); // Refresh list
         }
       } catch (e) {
         if (mounted) {
+          String message = 'Error al enviar invitación: $e';
+          if (e.toString().contains('409') || e.toString().contains('Invitation already pending')) {
+            message = 'Este usuario ya tiene una invitación pendiente';
+          }
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error al enviar invitación: $e')),
+            SnackBar(content: Text(message)),
           );
         }
       }
@@ -149,19 +170,42 @@ class _MembersScreenState extends ConsumerState<MembersScreen> {
             itemBuilder: (context, index) {
               final member = members[index];
               final isMe = member['id'] == currentUserId;
+              final status = member['status'] ?? 'active';
+              final isPending = status == 'pending';
+              final inviteCode = member['invite_code'];
 
               return ListTile(
                 leading: CircleAvatar(
-                  child: Text(member['name'][0].toUpperCase()),
+                  backgroundColor: isPending ? Colors.orange : null,
+                  child: isPending 
+                    ? const Icon(Icons.mail, color: Colors.white)
+                    : Text(member['name'][0].toUpperCase()),
                 ),
-                title: Text(member['name'] + (isMe ? ' (Tú)' : '')),
+                title: Text(
+                  member['name'] + (isMe ? ' (Tú)' : '') + (isPending ? ' (Pendiente)' : ''),
+                  style: TextStyle(
+                    fontStyle: isPending ? FontStyle.italic : FontStyle.normal,
+                    color: isPending ? Colors.grey : null,
+                  ),
+                ),
                 subtitle: Text(member['email']),
-                trailing: !isMe
-                    ? IconButton(
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (isPending && inviteCode != null)
+                      IconButton(
+                        icon: const Icon(Icons.copy),
+                        tooltip: 'Copiar enlace',
+                        onPressed: () => _copyInviteLink(inviteCode),
+                      ),
+                    
+                    if (!isMe)
+                      IconButton(
                         icon: const Icon(Icons.delete, color: Colors.red),
                         onPressed: () => _removeMember(member['id'], member['name']),
-                      )
-                    : null,
+                      ),
+                  ],
+                ),
               );
             },
           );
