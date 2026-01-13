@@ -127,6 +127,8 @@ class _ManageCategoryScreenState extends ConsumerState<ManageCategoryScreen> {
               TextFormField(
                 controller: _nameController,
                 textInputAction: TextInputAction.next,
+                autofocus: true,
+                textCapitalization: TextCapitalization.sentences,
                 decoration: const InputDecoration(
                   labelText: 'Nombre',
                   border: OutlineInputBorder(),

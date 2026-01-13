@@ -255,6 +255,17 @@ class MockApiClient extends _i1.Mock implements _i6.ApiClient {
           as _i8.Future<void>);
 
   @override
+  _i8.Future<List<String>> getSuggestedNotes(String? categoryId) =>
+      (super.noSuchMethod(
+            Invocation.method(#getSuggestedNotes, [categoryId]),
+            returnValue: _i8.Future<List<String>>.value(<String>[]),
+            returnValueForMissingStub: _i8.Future<List<String>>.value(
+              <String>[],
+            ),
+          )
+          as _i8.Future<List<String>>);
+
+  @override
   _i8.Future<_i5.MonthlySummary> getMonthlySummary(String? month) =>
       (super.noSuchMethod(
             Invocation.method(#getMonthlySummary, [month]),

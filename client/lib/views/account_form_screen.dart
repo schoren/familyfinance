@@ -156,6 +156,8 @@ class _AccountFormScreenState extends ConsumerState<AccountFormScreen> {
                 TextFormField(
                   controller: _bankController,
                   textInputAction: TextInputAction.done,
+                  autofocus: true,
+                  textCapitalization: TextCapitalization.sentences,
                   decoration: const InputDecoration(
                     labelText: 'Banco',
                     border: OutlineInputBorder(),
@@ -168,6 +170,8 @@ class _AccountFormScreenState extends ConsumerState<AccountFormScreen> {
                 TextFormField(
                   controller: _nameController,
                   textInputAction: TextInputAction.done,
+                  autofocus: true,
+                  textCapitalization: TextCapitalization.sentences,
                   decoration: const InputDecoration(
                     labelText: 'Nombre de la cuenta',
                     border: OutlineInputBorder(),

@@ -725,3 +725,34 @@ func TestDBErrors(t *testing.T) {
 	r.ServeHTTP(w, req)
 	assert.Equal(t, http.StatusInternalServerError, w.Code)
 }
+
+func TestGetSuggestedNotes(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	db := setupTestDB()
+	h := NewHandlers(db)
+	householdID := "test-hh"
+	categoryID := "cat-1"
+
+	// Seed data with duplicate notes and different categories
+	db.Create(&Transaction{ID: "t1", HouseholdID: householdID, CategoryID: categoryID, Description: "Milk", Date: time.Now()})
+	db.Create(&Transaction{ID: "t2", HouseholdID: householdID, CategoryID: categoryID, Description: "Milk", Date: time.Now().Add(time.Minute)})
+	db.Create(&Transaction{ID: "t3", HouseholdID: householdID, CategoryID: categoryID, Description: "Bread", Date: time.Now().Add(2 * time.Minute)})
+	db.Create(&Transaction{ID: "t4", HouseholdID: householdID, CategoryID: "cat-2", Description: "Fuel", Date: time.Now()})
+
+	r := gin.Default()
+	r.GET("/households/:household_id/categories/:id/suggested-notes", h.GetSuggestedNotes)
+
+	req, _ := http.NewRequest("GET", "/households/"+householdID+"/categories/"+categoryID+"/suggested-notes", nil)
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	var notes []string
+	err := json.Unmarshal(w.Body.Bytes(), &notes)
+	assert.NoError(t, err)
+	assert.Len(t, notes, 2)
+	assert.Contains(t, notes, "Milk")
+	assert.Contains(t, notes, "Bread")
+	assert.NotContains(t, notes, "Fuel")
+}

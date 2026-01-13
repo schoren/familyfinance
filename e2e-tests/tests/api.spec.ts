@@ -158,4 +158,56 @@ test.describe('E2E Tests', () => {
     expect(category.monthly_budget).toBe(200.0);
     console.log('✅ User 2 created their own category');
   });
+
+  test('Suggested notes are correctly returned for a category', async ({ request }) => {
+    // 1. Login
+    const loginResponse = await request.post(`${API_URL}/auth/test-login`, {
+      data: { email: 'autocomplete@example.com', name: 'Auto User' },
+    });
+    const loginData = await loginResponse.json();
+    const { token, household_id } = loginData;
+
+    // 2. Create category
+    const catResponse = await request.post(`${API_URL}/households/${household_id}/categories`, {
+      headers: { 'Authorization': `Bearer ${token}` },
+      data: { name: 'AutoCat', monthly_budget: 100 },
+    });
+    const cat = await catResponse.json();
+
+    // 3. Create account
+    const accResponse = await request.post(`${API_URL}/households/${household_id}/accounts`, {
+      headers: { 'Authorization': `Bearer ${token}` },
+      data: { name: 'Cash', type: 'cash' },
+    });
+    const acc = await accResponse.json();
+
+    // 4. Create transactions with notes
+    const notes = ['Pizza', 'Burger', 'Pizza']; // Pizza is duplicate
+    for (const note of notes) {
+      await request.post(`${API_URL}/households/${household_id}/transactions`, {
+        headers: { 'Authorization': `Bearer ${token}` },
+        data: {
+          category_id: cat.id,
+          account_id: acc.id,
+          amount: 10,
+          date: new Date().toISOString(),
+          note: note,
+        },
+      });
+    }
+
+    // 5. Get suggested notes
+    const suggestResponse = await request.get(
+      `${API_URL}/households/${household_id}/categories/${cat.id}/suggested-notes`,
+      { headers: { 'Authorization': `Bearer ${token}` } }
+    );
+
+    expect(suggestResponse.ok()).toBeTruthy();
+    const suggestedNotes = await suggestResponse.json();
+
+    expect(suggestedNotes).toContain('Pizza');
+    expect(suggestedNotes).toContain('Burger');
+    expect(suggestedNotes.length).toBe(2); // Unique notes
+    console.log('✅ Suggested notes API verified');
+  });
 });

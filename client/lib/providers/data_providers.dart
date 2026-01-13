@@ -196,6 +196,7 @@ class ExpensesNotifier extends AsyncNotifier<List<Expense>> {
       final month = '${now.year}-${now.month.toString().padLeft(2, '0')}';
       ref.invalidate(monthlySummaryProvider(month));
       ref.invalidate(currentMonthSummaryProvider);
+      ref.invalidate(suggestedNotesProvider(expense.categoryId));
     } catch (e) {
       if (kDebugMode) print('Failed to add expense: $e');
       rethrow;
@@ -249,6 +250,12 @@ final monthlySummaryProvider = FutureProvider.family<MonthlySummary, String>((re
   final apiClient = ref.watch(apiClientProvider);
   if (apiClient.householdId == null) throw Exception('No household selected');
   return await apiClient.getMonthlySummary(month);
+});
+
+final suggestedNotesProvider = FutureProvider.family<List<String>, String>((ref, categoryId) async {
+  final apiClient = ref.watch(apiClientProvider);
+  if (apiClient.householdId == null) return [];
+  return await apiClient.getSuggestedNotes(categoryId);
 });
 
 final currentMonthSummaryProvider = FutureProvider<MonthlySummary>((ref) async {

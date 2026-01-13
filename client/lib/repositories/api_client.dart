@@ -224,6 +224,18 @@ class ApiClient {
     }
   }
 
+  Future<List<String>> getSuggestedNotes(String categoryId) async {
+    final uri = Uri.parse('$_scopedUrl/categories/$categoryId/suggested-notes');
+    final response = await _client.get(uri, headers: _headers);
+
+    if (response.statusCode == 200) {
+      final List<dynamic> json = jsonDecode(response.body);
+      return json.cast<String>();
+    } else {
+      throw Exception('Failed to fetch suggested notes: ${response.statusCode}');
+    }
+  }
+
   // ============================================================================
   // MONTHLY SUMMARY
   // ============================================================================
