@@ -119,7 +119,8 @@ class AuthNotifier extends Notifier<AuthState> {
         );
         await _saveState();
       } else {
-        throw Exception('Backend authentication failed: ${response.statusCode}');
+        final error = jsonDecode(response.body)['error'] ?? 'Backend authentication failed: ${response.statusCode}';
+        throw Exception(error);
       }
     } catch (e) {
       print('Login error: $e');

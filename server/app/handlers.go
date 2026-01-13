@@ -629,10 +629,11 @@ func (h *Handlers) AuthGoogle(c *gin.Context) {
 	}
 
 	var user User
-	result := h.db.Where("email = ?", email).First(&user)
+	// Check if user exists (including soft deleted)
+	result := h.db.Unscoped().Where("email = ?", email).First(&user)
 
 	if result.Error == gorm.ErrRecordNotFound {
-		// New User
+		// Really New User logic (Create Household, etc.)
 		householdID := ""
 
 		// Check if there is an invite code
@@ -675,6 +676,12 @@ func (h *Handlers) AuthGoogle(c *gin.Context) {
 	} else if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})
 		return
+	} else {
+		// User found (might be deleted)
+		if user.DeletedAt.Valid {
+			c.JSON(http.StatusForbidden, gin.H{"error": "User account has been deleted. Contact support to restore."})
+			return
+		}
 	}
 
 	// Generate JWT

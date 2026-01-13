@@ -19,9 +19,20 @@ class LoginScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 48),
             ElevatedButton.icon(
-              onPressed: () {
+              onPressed: () async {
                 final inviteCode = GoRouterState.of(context).uri.queryParameters['code'];
-                ref.read(authProvider.notifier).loginWithGoogle(inviteCode: inviteCode);
+                try {
+                  await ref.read(authProvider.notifier).loginWithGoogle(inviteCode: inviteCode);
+                } catch (e) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(e.toString().replaceAll('Exception: ', '')),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+                }
               },
               icon: const Icon(Icons.login),
               label: const Text('Login with Google'),
