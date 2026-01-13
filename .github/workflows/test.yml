@@ -1,0 +1,73 @@
+name: Tests
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+  push:
+    branches: [ main, develop ]
+
+jobs:
+  backend-tests:
+    name: Backend Tests (Go)
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+          cache-dependency-path: server/go.sum
+      
+      - name: Install dependencies
+        working-directory: ./server
+        run: go mod download
+      
+      - name: Run tests with coverage
+        working-directory: ./server/app
+        run: |
+          go test -v -coverprofile=coverage.out .
+          go tool cover -func=coverage.out
+      
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./server/app/coverage.out
+          flags: backend
+          fail_ci_if_error: false
+
+  client-tests:
+    name: Client Tests (Flutter)
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.27.1'
+          channel: 'stable'
+          cache: true
+      
+      - name: Install dependencies
+        working-directory: ./client
+        run: flutter pub get
+      
+      - name: Run build_runner
+        working-directory: ./client
+        run: dart run build_runner build --delete-conflicting-outputs
+      
+      - name: Run tests with coverage
+        working-directory: ./client
+        run: flutter test --coverage
+      
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./client/coverage/lcov.info
+          flags: client
+          fail_ci_if_error: false
