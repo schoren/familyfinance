@@ -30,7 +30,6 @@ class HomeScreen extends ConsumerWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Image.asset('assets/logo.png', height: 40),
                     const SizedBox(width: 12),
                     Text(
                       'Keda',
