@@ -21,6 +21,14 @@ func setupTestDB() *gorm.DB {
 	return db
 }
 
+func setupRouter(h *Handlers) *gin.Engine {
+	r := gin.Default()
+	r.GET("/households/:household_id/transactions", h.GetTransactions)
+	r.POST("/households/:household_id/transactions", h.CreateTransaction)
+	r.PUT("/households/:household_id/transactions/:id", h.UpdateTransaction)
+	return r
+}
+
 func TestGetCategories(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	db := setupTestDB()
@@ -797,4 +805,54 @@ func TestTransactionCreatorInfo(t *testing.T) {
 	json.Unmarshal(w.Body.Bytes(), &transactions)
 	assert.Len(t, transactions, 1)
 	assert.Equal(t, "Test User", transactions[0].User.Name)
+}
+
+func TestTransactionTimezone(t *testing.T) {
+	db := setupTestDB()
+	h := &Handlers{db: db}
+	r := setupRouter(h)
+
+	householdID := "test-hh"
+
+	// 1. Create a transaction with a specific timezone offset
+	// Using a layout that includes offset
+	dateStr := "2024-01-13T20:33:52-03:00"
+	body := map[string]any{
+		"amount":      25.0,
+		"date":        dateStr,
+		"category_id": "cat-1",
+		"account_id":  "acc-1",
+		"note":        "TZ Test",
+	}
+	jsonBody, _ := json.Marshal(body)
+	req, _ := http.NewRequest("POST", "/households/"+householdID+"/transactions", bytes.NewBuffer(jsonBody))
+	req.Header.Set("Content-Type", "application/json")
+
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+	assert.Equal(t, http.StatusCreated, w.Code)
+
+	var created Transaction
+	json.Unmarshal(w.Body.Bytes(), &created)
+
+	// Verify it's UTC in the struct/JSON response
+	assert.Equal(t, "UTC", created.Date.Location().String())
+	assert.Equal(t, 23, created.Date.Hour()) // 20:33 -03:00 is 23:33 UTC
+
+	// 2. Fetch it back and verify it's still UTC
+	req, _ = http.NewRequest("GET", "/households/"+householdID+"/transactions", nil)
+	w = httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+
+	var list []Transaction
+	json.Unmarshal(w.Body.Bytes(), &list)
+	found := false
+	for _, tx := range list {
+		if tx.Description == "TZ Test" {
+			assert.Equal(t, "UTC", tx.Date.Location().String())
+			assert.Equal(t, 23, tx.Date.Hour())
+			found = true
+		}
+	}
+	assert.True(t, found)
 }

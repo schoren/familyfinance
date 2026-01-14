@@ -26,10 +26,11 @@ class ExpensesScreen extends ConsumerWidget {
                 data: (categories) {
                   // Filter for current month/year
                   final now = DateTime.now();
-                  final currentMonthExpenses = expenses.where((e) => 
-                    e.date.month == now.month && 
-                    e.date.year == now.year
-                  ).toList();
+                  final currentMonthExpenses = expenses.where((e) {
+                    final localDate = e.date.toLocal();
+                    return localDate.month == now.month && 
+                           localDate.year == now.year;
+                  }).toList();
 
                   if (currentMonthExpenses.isEmpty) {
                     return const Center(child: Text('No hay gastos este mes'));
@@ -51,7 +52,7 @@ class ExpensesScreen extends ConsumerWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              '${DateFormat('dd/MM/yyyy').format(expense.date)} • ${category.name} • ${account.name}',
+                              '${DateFormat('dd/MM/yyyy').format(expense.date.toLocal())} • ${category.name} • ${account.name}',
                               style: Theme.of(context).textTheme.bodySmall,
                             ),
                             if (expense.user != null)

@@ -39,11 +39,12 @@ class CategoryDetailScreen extends ConsumerWidget {
                    // The user didn't specify, but "Budget" usually implies current month.
                    // Let's filter by current month/year to match the budget view.
                    final now = DateTime.now();
-                   final currentMonthExpenses = expenses.where((e) => 
-                     e.categoryId == categoryId && 
-                     e.date.month == now.month && 
-                     e.date.year == now.year
-                   ).toList();
+                   final currentMonthExpenses = expenses.where((e) {
+                     final localDate = e.date.toLocal();
+                     return e.categoryId == categoryId && 
+                            localDate.month == now.month && 
+                            localDate.year == now.year;
+                   }).toList();
                    
                    return Column(
                      children: [
@@ -116,7 +117,7 @@ class CategoryDetailScreen extends ConsumerWidget {
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          '${DateFormat('dd/MM/yyyy').format(expense.date)} • ${account?.name ?? "Cuenta desconocida"}',
+                                          '${DateFormat('dd/MM/yyyy').format(expense.date.toLocal())} • ${account?.name ?? "Cuenta desconocida"}',
                                           style: Theme.of(context).textTheme.bodySmall,
                                         ),
                                         if (expense.user != null)

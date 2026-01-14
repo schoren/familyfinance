@@ -431,6 +431,7 @@ func (h *Handlers) CreateTransaction(c *gin.Context) {
 
 	transaction.ID = uuid.New().String()
 	transaction.HouseholdID = householdID
+	transaction.Date = transaction.Date.UTC()
 
 	userID, _ := c.Get("user_id")
 	if id, ok := userID.(string); ok {
@@ -468,7 +469,7 @@ func (h *Handlers) UpdateTransaction(c *gin.Context) {
 	transaction.AccountID = updates.AccountID
 	transaction.CategoryID = updates.CategoryID
 	transaction.Amount = updates.Amount
-	transaction.Date = updates.Date
+	transaction.Date = updates.Date.UTC()
 	transaction.Description = updates.Description
 
 	if err := h.db.Save(&transaction).Error; err != nil {

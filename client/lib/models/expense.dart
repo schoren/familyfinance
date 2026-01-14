@@ -28,7 +28,15 @@ class Expense {
   factory Expense.fromJson(Map<String, dynamic> json) => _$ExpenseFromJson(json);
   Map<String, dynamic> toJson() {
     final map = _$ExpenseToJson(this);
-    map['date'] = date.toUtc().toIso8601String();
+    if (date.isUtc) {
+      map['date'] = date.toIso8601String();
+    } else {
+      final offset = date.timeZoneOffset;
+      final sign = offset.isNegative ? '-' : '+';
+      final hours = offset.inHours.abs().toString().padLeft(2, '0');
+      final minutes = (offset.inMinutes.abs() % 60).toString().padLeft(2, '0');
+      map['date'] = '${date.toIso8601String()}$sign$hours:$minutes';
+    }
     return map;
   }
 }
