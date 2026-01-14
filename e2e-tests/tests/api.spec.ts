@@ -43,26 +43,23 @@ test.describe('E2E Tests', () => {
     expect(category.monthly_budget).toBe(500.0);
     console.log(`✅ Created category: ${category.name}`);
 
-    // 3. Create an account
-    const accountResponse = await request.post(
+    // 3. Get the auto-created cash account
+    const accountsResponse = await request.get(
       `${API_URL}/households/${householdId}/accounts`,
       {
         headers: {
           'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        data: {
-          name: 'Cash',
-          type: 'cash',
         },
       }
     );
 
-    expect(accountResponse.ok()).toBeTruthy();
-    const account = await accountResponse.json();
-    expect(account.name).toBe('Cash');
+    expect(accountsResponse.ok()).toBeTruthy();
+    const accounts = await accountsResponse.json();
+    const account = accounts.find((a: any) => a.type === 'cash');
+    expect(account).toBeTruthy();
+    expect(account.name).toBe('Efectivo');
     expect(account.type).toBe('cash');
-    console.log(`✅ Created account: ${account.name}`);
+    console.log(`✅ Using auto-created account: ${account.name}`);
 
     // 4. Create a transaction
     const transactionResponse = await request.post(
@@ -174,12 +171,13 @@ test.describe('E2E Tests', () => {
     });
     const cat = await catResponse.json();
 
-    // 3. Create account
-    const accResponse = await request.post(`${API_URL}/households/${household_id}/accounts`, {
+    // 3. Get the auto-created cash account
+    const accountsResponse = await request.get(`${API_URL}/households/${household_id}/accounts`, {
       headers: { 'Authorization': `Bearer ${token}` },
-      data: { name: 'Cash', type: 'cash' },
     });
-    const acc = await accResponse.json();
+    const accounts = await accountsResponse.json();
+    const acc = accounts.find((a: any) => a.type === 'cash');
+    expect(acc).toBeTruthy();
 
     // 4. Create transactions with notes
     const notes = ['Pizza', 'Burger', 'Pizza']; // Pizza is duplicate

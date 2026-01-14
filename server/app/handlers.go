@@ -45,16 +45,7 @@ func (h *Handlers) CreateHousehold(c *gin.Context) {
 		return
 	}
 
-	// Auto-create mandatory cash account
-	cashAccount := Account{
-		ID:          uuid.New().String(),
-		HouseholdID: household.ID,
-		Type:        "cash",
-		Name:        "Efectivo",
-	}
-	if err := h.db.Create(&cashAccount).Error; err != nil {
-		log.Printf("Warning: Failed to create default cash account for household %s: %v", household.ID, err)
-	}
+	h.createDefaultCashAccount(household.ID)
 
 	c.JSON(http.StatusCreated, household)
 }
@@ -301,8 +292,12 @@ func (h *Handlers) CreateAccount(c *gin.Context) {
 	}
 
 	if account.Type == "cash" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Cannot create additional cash accounts"})
-		return
+		var count int64
+		h.db.Model(&Account{}).Where("household_id = ? AND type = ?", householdID, "cash").Count(&count)
+		if count > 0 {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Cannot create additional cash accounts"})
+			return
+		}
 	}
 
 	if account.ID == "" {
@@ -352,6 +347,18 @@ func (h *Handlers) UpdateAccount(c *gin.Context) {
 
 	h.populateAccountDisplayName(&existing)
 	c.JSON(http.StatusOK, existing)
+}
+
+func (h *Handlers) createDefaultCashAccount(householdID string) {
+	cashAccount := Account{
+		ID:          uuid.New().String(),
+		HouseholdID: householdID,
+		Type:        "cash",
+		Name:        "Efectivo",
+	}
+	if err := h.db.Create(&cashAccount).Error; err != nil {
+		log.Printf("Warning: Failed to create default cash account for household %s: %v", householdID, err)
+	}
 }
 
 func (h *Handlers) populateAccountDisplayName(a *Account) {
@@ -799,6 +806,7 @@ func (h *Handlers) AuthGoogle(c *gin.Context) {
 				return
 			}
 			householdID = household.ID
+			h.createDefaultCashAccount(householdID)
 		}
 
 		user = User{

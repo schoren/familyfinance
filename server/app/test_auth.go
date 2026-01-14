@@ -72,6 +72,7 @@ func (h *Handlers) TestLogin(c *gin.Context) {
 			return
 		}
 		householdID = household.ID
+		h.createDefaultCashAccount(householdID)
 	}
 
 	// Create new user
