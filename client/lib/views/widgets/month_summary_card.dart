@@ -89,7 +89,7 @@ class MonthSummaryCard extends StatelessWidget {
               isOverBudget
                   ? 'EXCEDIDO POR ${currencyFormat.format(-remaining)}'
                   : 'QUEDAN ${currencyFormat.format(remaining)}',
-              style: GoogleFonts.jetbrainsMono(
+              style: GoogleFonts.jetBrainsMono(
                 color: isOverBudget ? const Color(0xFFEF4444) : const Color(0xFF22C55E),
                 fontWeight: FontWeight.bold,
                 fontSize: 16,
@@ -121,7 +121,7 @@ class MonthSummaryCard extends StatelessWidget {
         const SizedBox(height: 4),
         Text(
           amount,
-          style: GoogleFonts.jetbrainsMono(
+          style: GoogleFonts.jetBrainsMono(
             fontSize: 20,
             fontWeight: FontWeight.bold,
             color: amountColor,

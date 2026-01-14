@@ -144,7 +144,7 @@ class _NewExpenseScreenState extends ConsumerState<NewExpenseScreen> {
                       children: [
                         Text(
                           currencyFormat.format(remaining),
-                          style: GoogleFonts.jetbrainsMono(
+                          style: GoogleFonts.jetBrainsMono(
                             fontSize: 18,
                             color: const Color(0xFF64748B),
                             decoration: TextDecoration.lineThrough,
@@ -153,7 +153,7 @@ class _NewExpenseScreenState extends ConsumerState<NewExpenseScreen> {
                         const SizedBox(height: 8),
                         Text(
                           currencyFormat.format(result),
-                          style: GoogleFonts.jetbrainsMono(
+                          style: GoogleFonts.jetBrainsMono(
                             fontSize: 48,
                             fontWeight: FontWeight.bold,
                             color: isNegative ? const Color(0xFFEF4444) : const Color(0xFF22C55E),
@@ -174,24 +174,15 @@ class _NewExpenseScreenState extends ConsumerState<NewExpenseScreen> {
                 ),
               ),
               const SizedBox(height: 48),
-              Text(
-                'MONTO',
-                style: GoogleFonts.inter(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                  color: const Color(0xFF64748B),
-                  letterSpacing: 1.0,
-                ),
-              ),
-              const SizedBox(height: 8),
               TextFormField(
                 controller: _amountController,
                 focusNode: _focusNode,
                 autofocus: true,
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 textInputAction: TextInputAction.next,
-                style: GoogleFonts.jetbrainsMono(fontSize: 32, fontWeight: FontWeight.bold),
+                style: GoogleFonts.jetBrainsMono(fontSize: 32, fontWeight: FontWeight.bold),
                 decoration: InputDecoration(
+                  labelText: 'MONTO',
                   prefixText: '\$ ',
                   filled: true,
                   fillColor: Colors.white,
@@ -209,21 +200,12 @@ class _NewExpenseScreenState extends ConsumerState<NewExpenseScreen> {
                 },
               ),
               const SizedBox(height: 24),
-              Text(
-                'CUENTA',
-                style: GoogleFonts.inter(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                  color: const Color(0xFF64748B),
-                  letterSpacing: 1.0,
-                ),
-              ),
-              const SizedBox(height: 8),
               if (accounts.isNotEmpty)
                 DropdownButtonFormField<String>(
                   value: accounts.any((a) => a.id == _selectedAccountId) ? _selectedAccountId : null,
                   style: GoogleFonts.inter(color: const Color(0xFF0F172A), fontSize: 16),
                   decoration: InputDecoration(
+                    labelText: 'CUENTA',
                     filled: true,
                     fillColor: Colors.white,
                     border: OutlineInputBorder(
@@ -294,16 +276,6 @@ class _NewExpenseScreenState extends ConsumerState<NewExpenseScreen> {
                   ),
                 ),
               const SizedBox(height: 24),
-              Text(
-                'NOTA (OPCIONAL)',
-                style: GoogleFonts.inter(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                  color: const Color(0xFF64748B),
-                  letterSpacing: 1.0,
-                ),
-              ),
-              const SizedBox(height: 8),
               Autocomplete<String>(
                 optionsBuilder: (TextEditingValue textEditingValue) {
                   final suggestions = ref.read(suggestedNotesProvider(widget.categoryId)).value ?? [];
@@ -325,6 +297,7 @@ class _NewExpenseScreenState extends ConsumerState<NewExpenseScreen> {
                     textCapitalization: TextCapitalization.sentences,
                     style: GoogleFonts.inter(fontSize: 16),
                     decoration: InputDecoration(
+                      labelText: 'NOTA (OPCIONAL)',
                       filled: true,
                       fillColor: Colors.white,
                       border: OutlineInputBorder(

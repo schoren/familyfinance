@@ -23,13 +23,25 @@ class HomeScreen extends ConsumerWidget {
         child: Column(
           children: [
             DrawerHeader(
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary,
+              decoration: const BoxDecoration(
+                color: Color(0xFFF8FAFC),
               ),
-              child: const Center(
-                child: Text(
-                  'Keda',
-                  style: TextStyle(color: Colors.white, fontSize: 24),
+              child: Center(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.asset('assets/logo.png', height: 40),
+                    const SizedBox(width: 12),
+                    Text(
+                      'Keda',
+                      style: GoogleFonts.inter(
+                        color: const Color(0xFF0F172A),
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: -0.5,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -180,7 +192,7 @@ class HomeScreen extends ConsumerWidget {
                                     FittedBox(
                                       child: Text(
                                         currencyFormat.format(remaining),
-                                        style: GoogleFonts.jetbrainsMono(
+                                        style: GoogleFonts.jetBrainsMono(
                                           fontSize: 24,
                                           color: remaining < 0 ? const Color(0xFFEF4444) : const Color(0xFF0F172A),
                                           fontWeight: FontWeight.w600,
