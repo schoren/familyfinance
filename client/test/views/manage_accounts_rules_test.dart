@@ -1,7 +1,7 @@
-import 'package:family_finance/models/finance_account.dart';
-import 'package:family_finance/models/account_type.dart';
-import 'package:family_finance/providers/data_providers.dart';
-import 'package:family_finance/views/manage_accounts_screen.dart';
+import 'package:keda/models/finance_account.dart';
+import 'package:keda/models/account_type.dart';
+import 'package:keda/providers/data_providers.dart';
+import 'package:keda/views/manage_accounts_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';

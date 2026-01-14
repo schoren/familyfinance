@@ -8,7 +8,7 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/schoren/family-finance/server/app"
+	"github.com/schoren/keda/server/app"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )

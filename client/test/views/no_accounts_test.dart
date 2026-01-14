@@ -1,8 +1,9 @@
-import 'package:family_finance/models/category.dart';
-import 'package:family_finance/models/finance_account.dart';
-import 'package:family_finance/providers/auth_provider.dart';
-import 'package:family_finance/providers/data_providers.dart';
-import 'package:family_finance/views/new_expense_screen.dart';
+import 'package:keda/models/category.dart';
+import 'package:keda/models/finance_account.dart';
+import 'package:keda/models/monthly_summary.dart';
+import 'package:keda/providers/auth_provider.dart';
+import 'package:keda/providers/data_providers.dart';
+import 'package:keda/views/new_expense_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -17,6 +18,12 @@ void main() {
   setUp(() {
     mockApiClient = MockApiClient();
     when(mockApiClient.householdId).thenReturn('hh1');
+    when(mockApiClient.getMonthlySummary(any)).thenAnswer((_) async => MonthlySummary(
+      month: '2026-01',
+      totalBudget: 1000,
+      totalSpent: 0,
+      categories: [],
+    ));
   });
 
   testWidgets('NewExpenseScreen shows "Crear mi primera cuenta" when no accounts exist', (tester) async {
@@ -39,6 +46,9 @@ void main() {
     );
 
     await tester.pumpAndSettle();
+    
+    // Wait for focus delay timer
+    await tester.pump(const Duration(milliseconds: 250));
 
     // Verify button exists
     expect(find.text('Crear mi primera cuenta'), findsOneWidget);

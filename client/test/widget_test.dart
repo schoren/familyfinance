@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:family_finance/views/widgets/month_summary_card.dart';
+import 'package:keda/views/widgets/month_summary_card.dart';
 
 void main() {
   testWidgets('MonthSummaryCard shows correct budget and spent values', (WidgetTester tester) async {
@@ -26,7 +26,7 @@ void main() {
     expect(find.textContaining('400'), findsOneWidget);
     
     // Check for remaining text
-    expect(find.textContaining('Quedan'), findsOneWidget);
+    expect(find.textContaining('QUEDAN'), findsOneWidget);
     expect(find.textContaining('600'), findsOneWidget);
   });
 
@@ -43,7 +43,7 @@ void main() {
     );
 
     // Use find.text to match exactly or be more specific to avoid finding it in the amount text
-    expect(find.textContaining('Excedido por'), findsOneWidget);
+    expect(find.textContaining('EXCEDIDO POR'), findsOneWidget);
     expect(find.textContaining('1,200'), findsOneWidget); // Total spent
     expect(find.textContaining('200'), findsNWidgets(2)); // Both in amount and in "Excedido por"
   });

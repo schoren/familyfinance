@@ -15,11 +15,11 @@ func (h *Handlers) SendInvitationEmail(to, code string) error {
 	appURL := os.Getenv("APP_URL")
 
 	if from == "" {
-		from = "noreply@family-finance.local"
+		from = "noreply@keda.local"
 	}
 
-	subject := "Te han invitado a unirte a un hogar en Family Finance"
-	body := fmt.Sprintf("Hola!\n\nTe han invitado a compartir los gastos de un hogar en Family Finance.\n\nPara unirte, haz click en el siguiente enlace o usa el código de invitación al loguearte: %s\n\nLink: %s/invite?code=%s\n\n¡Te esperamos!", code, appURL, code)
+	subject := "Te han invitado a unirte a un hogar en Keda"
+	body := fmt.Sprintf("Hola!\n\nTe han invitado a compartir los gastos de un hogar en Keda.\n\nPara unirte, haz click en el siguiente enlace o usa el código de invitación al loguearte: %s\n\nLink: %s/invite?code=%s\n\n¡Te esperamos!", code, appURL, code)
 
 	message := []byte(fmt.Sprintf("To: %s\r\n"+
 		"Subject: %s\r\n"+

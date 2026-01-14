@@ -1,4 +1,4 @@
-name: family_finance
+name: keda
 description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -34,6 +34,7 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
+  google_fonts: ^6.2.1
   flutter_riverpod: ^3.1.0
   go_router: ^17.0.1
   intl: ^0.20.2
@@ -95,6 +96,8 @@ flutter:
 
   assets:
     - assets/data/
+    - assets/logo.png
+    - assets/logo_small.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

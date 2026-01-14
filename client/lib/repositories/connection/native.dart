@@ -2,5 +2,5 @@ import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 
 QueryExecutor openConnection() {
-  return driftDatabase(name: 'family_finance_db');
+  return driftDatabase(name: 'keda_db');
 }

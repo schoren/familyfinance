@@ -1,6 +1,6 @@
-import 'package:family_finance/providers/auth_provider.dart';
-import 'package:family_finance/providers/data_providers.dart';
-import 'package:family_finance/views/members_screen.dart';
+import 'package:keda/providers/auth_provider.dart';
+import 'package:keda/providers/data_providers.dart';
+import 'package:keda/views/members_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';

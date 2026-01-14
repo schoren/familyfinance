@@ -1,7 +1,7 @@
 {
   "name": "e2e-tests",
   "version": "1.0.0",
-  "description": "E2E tests for Family Finance app using Playwright",
+  "description": "E2E tests for Keda app using Playwright",
   "scripts": {
     "test": "playwright test",
     "test:headed": "playwright test --headed",

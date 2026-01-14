@@ -1,6 +1,6 @@
 {
-  "name": "family-finance",
+  "name": "keda",
   "version": "0.5.0",
-  "description": "Family Finance project version management",
+  "description": "Keda project version management",
   "private": true
 }

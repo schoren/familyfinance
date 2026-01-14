@@ -12,14 +12,21 @@ import '../views/account_form_screen.dart';
 import '../views/members_screen.dart';
 import '../views/expenses_screen.dart';
 
+import '../views/navigation_shell.dart';
+import '../views/settings_screen.dart';
+
+final _rootNavigatorKey = GlobalKey<NavigatorState>();
+final _shellNavigatorHomeKey = GlobalKey<NavigatorState>(debugLabel: 'shellHome');
+final _shellNavigatorAccountsKey = GlobalKey<NavigatorState>(debugLabel: 'shellAccounts');
+final _shellNavigatorMembersKey = GlobalKey<NavigatorState>(debugLabel: 'shellMembers');
+final _shellNavigatorSettingsKey = GlobalKey<NavigatorState>(debugLabel: 'shellSettings');
+
 final routerProvider = Provider<GoRouter>((ref) {
   print('DEBUG: GoRouter instance created');
-  // Use a stable router by not watching authState here directly for the whole object recreation
-  // Instead, we can use a listenable to trigger refreshes.
-  
   final listenable = _AuthListenable(ref);
 
   return GoRouter(
+    navigatorKey: _rootNavigatorKey,
     initialLocation: '/',
     refreshListenable: listenable,
     debugLogDiagnostics: true,
@@ -29,8 +36,6 @@ final routerProvider = Provider<GoRouter>((ref) {
       
       if (!authState.isAuthenticated) {
         if (loggingIn) return null;
-        
-        // Preserve query parameters (like ?code=...) when redirecting to login
         final query = state.uri.queryParameters;
         if (query.isNotEmpty) {
           return Uri(path: '/login', queryParameters: query).toString();
@@ -43,9 +48,63 @@ final routerProvider = Provider<GoRouter>((ref) {
       return null;
     },
     routes: [
-      GoRoute(
-        path: '/',
-        builder: (context, state) => const HomeScreen(),
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) {
+          return MainNavigationShell(navigationShell: navigationShell);
+        },
+        branches: [
+          StatefulShellBranch(
+            navigatorKey: _shellNavigatorHomeKey,
+            routes: [
+              GoRoute(
+                path: '/',
+                builder: (context, state) => const HomeScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            navigatorKey: _shellNavigatorAccountsKey,
+            routes: [
+              GoRoute(
+                path: '/manage-accounts',
+                builder: (context, state) => const ManageAccountsScreen(),
+                routes: [
+                  GoRoute(
+                    path: 'new',
+                    parentNavigatorKey: _rootNavigatorKey,
+                    builder: (context, state) => const AccountFormScreen(),
+                  ),
+                  GoRoute(
+                    path: 'edit/:accountId',
+                    parentNavigatorKey: _rootNavigatorKey,
+                    builder: (context, state) {
+                      final accountId = state.pathParameters['accountId']!;
+                      return AccountFormScreen(accountId: accountId);
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            navigatorKey: _shellNavigatorMembersKey,
+            routes: [
+              GoRoute(
+                path: '/members',
+                builder: (context, state) => const MembersScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            navigatorKey: _shellNavigatorSettingsKey,
+            routes: [
+              GoRoute(
+                path: '/settings',
+                builder: (context, state) => const SettingsScreen(),
+              ),
+            ],
+          ),
+        ],
       ),
       GoRoute(
         path: '/login',
@@ -83,27 +142,6 @@ final routerProvider = Provider<GoRouter>((ref) {
           final id = state.pathParameters['categoryId'];
           return ManageCategoryScreen(categoryId: id);
         },
-      ),
-      GoRoute(
-        path: '/manage-accounts',
-        builder: (context, state) => const ManageAccountsScreen(),
-        routes: [
-          GoRoute(
-            path: 'new',
-            builder: (context, state) => const AccountFormScreen(),
-          ),
-          GoRoute(
-            path: 'edit/:accountId',
-            builder: (context, state) {
-              final accountId = state.pathParameters['accountId']!;
-              return AccountFormScreen(accountId: accountId);
-            },
-          ),
-        ],
-      ),
-      GoRoute(
-        path: '/members',
-        builder: (context, state) => const MembersScreen(),
       ),
     ],
   );

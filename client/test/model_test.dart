@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:family_finance/models/category.dart';
-import 'package:family_finance/models/expense.dart';
-import 'package:family_finance/models/finance_account.dart';
-import 'package:family_finance/models/account_type.dart';
+import 'package:keda/models/category.dart';
+import 'package:keda/models/expense.dart';
+import 'package:keda/models/finance_account.dart';
+import 'package:keda/models/account_type.dart';
 
 void main() {
   group('Category Model', () {

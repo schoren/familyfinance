@@ -1,11 +1,11 @@
 .PHONY: help test test-backend test-client test-e2e test-all clean dev-up dev-down test-up test-down
 
-TEST_COMPOSE_PROJECT := family-finance-test
+TEST_COMPOSE_PROJECT := keda-test
 TEST_SERVER_PORT := 8091
 
 # Default target
 help:
-	@echo "Family Finance - Test Automation"
+	@echo "Keda - Test Automation"
 	@echo ""
 	@echo "Available targets:"
 	@echo "  make test-backend    - Run backend unit tests with coverage"

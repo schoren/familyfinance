@@ -2,11 +2,11 @@ services:
   db:
     image: postgres:15-alpine
     environment:
-      POSTGRES_DB: family_finance_test
+      POSTGRES_DB: keda_test
       POSTGRES_USER: test_user
       POSTGRES_PASSWORD: test_password
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U test_user -d family_finance_test" ]
+      test: [ "CMD-SHELL", "pg_isready -U test_user -d keda_test" ]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -20,7 +20,7 @@ services:
       DB_PORT: 5432
       DB_USER: test_user
       DB_PASSWORD: test_password
-      DB_NAME: family_finance_test
+      DB_NAME: keda_test
       JWT_SECRET: test_jwt_secret_key_for_e2e_testing
       TEST_MODE: "true"
       PORT: 8090

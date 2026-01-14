@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class MonthSummaryCard extends StatelessWidget {
   final double totalBudget;
@@ -25,9 +26,18 @@ class MonthSummaryCard extends StatelessWidget {
     
     final currencyFormat = NumberFormat.currency(locale: locale, symbol: '\$');
 
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.8),
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 15,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: () => context.push('/expenses'),
@@ -36,10 +46,13 @@ class MonthSummaryCard extends StatelessWidget {
         child: Column(
           children: [
             Text(
-              formattedMonth,
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+              formattedMonth.toUpperCase(),
+              style: GoogleFonts.inter(
+                color: const Color(0xFF64748B),
+                fontWeight: FontWeight.w600,
+                fontSize: 12,
+                letterSpacing: 1.0,
+              ),
             ),
             const SizedBox(height: 16),
             Row(
@@ -64,19 +77,22 @@ class MonthSummaryCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(8),
               child: LinearProgressIndicator(
                 value: (remaining / totalBudget).clamp(0.0, 1.0),
-                minHeight: 12,
-                backgroundColor: Colors.red,
-                valueColor: const AlwaysStoppedAnimation<Color>(Colors.green),
+                minHeight: 8,
+                backgroundColor: const Color(0xFFEF4444).withOpacity(0.2),
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  remaining > 0.2 * totalBudget ? const Color(0xFF22C55E) : const Color(0xFFFACC15),
+                ),
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
             Text(
               isOverBudget
-                  ? 'Excedido por ${currencyFormat.format(-remaining)}'
-                  : 'Quedan ${currencyFormat.format(remaining)}',
-              style: TextStyle(
-                color: isOverBudget ? Colors.red : Colors.green,
+                  ? 'EXCEDIDO POR ${currencyFormat.format(-remaining)}'
+                  : 'QUEDAN ${currencyFormat.format(remaining)}',
+              style: GoogleFonts.jetBrainsMono(
+                color: isOverBudget ? const Color(0xFFEF4444) : const Color(0xFF22C55E),
                 fontWeight: FontWeight.bold,
+                fontSize: 16,
               ),
             ),
           ],
@@ -105,8 +121,8 @@ class MonthSummaryCard extends StatelessWidget {
         const SizedBox(height: 4),
         Text(
           amount,
-          style: TextStyle(
-            fontSize: 18,
+          style: GoogleFonts.jetBrainsMono(
+            fontSize: 20,
             fontWeight: FontWeight.bold,
             color: amountColor,
           ),

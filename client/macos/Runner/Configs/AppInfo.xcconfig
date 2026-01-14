@@ -5,10 +5,10 @@
 // 'flutter create' template.
 
 // The application's name. By default this is also the title of the Flutter window.
-PRODUCT_NAME = family_finance
+PRODUCT_NAME = keda
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = com.familyfinance.familyFinance
+PRODUCT_BUNDLE_IDENTIFIER = com.getkeda.keda
 
 // The copyright displayed in application information
-PRODUCT_COPYRIGHT = Copyright © 2026 com.familyfinance. All rights reserved.
+PRODUCT_COPYRIGHT = Copyright © 2026 com.getkeda. All rights reserved.

@@ -1,4 +1,4 @@
-# Family Finance App
+# Keda App
 
 Una aplicación de Flutter para la gestión de finanzas familiares, centrada en el seguimiento de presupuestos y gastos diarios.
 

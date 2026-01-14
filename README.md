@@ -1,6 +1,6 @@
-# Family Finance
+# Keda
 
-A simple application to manage family finances, allowing expense tracking by categories and collaboration between household members.
+A simple application to manage Keda finances, allowing expense tracking by categories and collaboration between household members.
 
 ## Prerequisites
 

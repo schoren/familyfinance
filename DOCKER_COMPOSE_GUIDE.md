@@ -65,7 +65,7 @@ docker compose -f docker-compose.test.yml down -v
 |---------|-----------|---------|
 | **File** | `docker-compose.yml` | `docker-compose.test.yml` |
 | **DB Port** | 5432 | 5433 |
-| **DB Name** | `family_finance` | `family_finance_test` |
+| **DB Name** | `keda` | `keda_test` |
 | **DB User** | `postgres` | `test_user` |
 | **Mailpit** | ✅ Included | ❌ Not included |
 | **TEST_MODE** | ❌ Disabled | ✅ Enabled |

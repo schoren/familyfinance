@@ -1,10 +1,10 @@
 import 'dart:convert';
-import 'package:family_finance/models/category.dart';
-import 'package:family_finance/models/finance_account.dart';
-import 'package:family_finance/models/expense.dart';
-import 'package:family_finance/models/monthly_summary.dart';
-import 'package:family_finance/models/account_type.dart';
-import 'package:family_finance/repositories/api_client.dart';
+import 'package:keda/models/category.dart';
+import 'package:keda/models/finance_account.dart';
+import 'package:keda/models/expense.dart';
+import 'package:keda/models/monthly_summary.dart';
+import 'package:keda/models/account_type.dart';
+import 'package:keda/repositories/api_client.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';

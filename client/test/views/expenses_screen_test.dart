@@ -1,13 +1,13 @@
-import 'package:family_finance/models/expense.dart';
-import 'package:family_finance/models/user.dart';
-import 'package:family_finance/providers/data_providers.dart';
-import 'package:family_finance/views/expenses_screen.dart';
+import 'package:keda/models/expense.dart';
+import 'package:keda/models/user.dart';
+import 'package:keda/providers/data_providers.dart';
+import 'package:keda/views/expenses_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:family_finance/models/finance_account.dart';
-import 'package:family_finance/models/category.dart';
-import 'package:family_finance/models/account_type.dart';
+import 'package:keda/models/finance_account.dart';
+import 'package:keda/models/category.dart';
+import 'package:keda/models/account_type.dart';
 
 class MockExpensesNotifier extends ExpensesNotifier {
   final List<Expense> data;

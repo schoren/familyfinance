@@ -1,4 +1,4 @@
-package com.familyfinance.family_finance
+package com.getkeda.keda
 
 import io.flutter.embedding.android.FlutterActivity
 

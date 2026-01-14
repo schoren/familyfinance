@@ -21,7 +21,7 @@ services:
       - DB_HOST=db
       - DB_USER=postgres
       - DB_PASSWORD=postgres
-      - DB_NAME=family_finance
+      - DB_NAME=keda
       - DB_PORT=5432
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - JWT_SECRET=${JWT_SECRET}
@@ -51,7 +51,7 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=family_finance
+      - POSTGRES_DB=keda
     ports:
       - "5432:5432"
     volumes:

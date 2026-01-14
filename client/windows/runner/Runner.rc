@@ -89,13 +89,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "com.familyfinance" "\0"
-            VALUE "FileDescription", "family_finance" "\0"
+            VALUE "CompanyName", "com.getkeda" "\0"
+            VALUE "FileDescription", "keda" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "family_finance" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2026 com.familyfinance. All rights reserved." "\0"
-            VALUE "OriginalFilename", "family_finance.exe" "\0"
-            VALUE "ProductName", "family_finance" "\0"
+            VALUE "InternalName", "keda" "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2026 com.getkeda. All rights reserved." "\0"
+            VALUE "OriginalFilename", "keda.exe" "\0"
+            VALUE "ProductName", "keda" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

@@ -34,10 +34,10 @@ jobs:
           build-args: |
             APP_VERSION=${{ steps.meta.outputs.short_tag }}
           tags: |
-            schoren/familyfinance-server:latest
-            schoren/familyfinance-server:${{ steps.meta.outputs.tag }}
-          cache-from: type=registry,ref=schoren/familyfinance-server:buildcache
-          cache-to: type=registry,ref=schoren/familyfinance-server:buildcache,mode=max
+            schoren/keda-server:latest
+            schoren/keda-server:${{ steps.meta.outputs.tag }}
+          cache-from: type=registry,ref=schoren/keda-server:buildcache
+          cache-to: type=registry,ref=schoren/keda-server:buildcache,mode=max
 
       - name: Build and push Client
         uses: docker/build-push-action@v5
@@ -47,7 +47,7 @@ jobs:
           build-args: |
             APP_VERSION=${{ steps.meta.outputs.short_tag }}
           tags: |
-            schoren/familyfinance-client:latest
-            schoren/familyfinance-client:${{ steps.meta.outputs.tag }}
-          cache-from: type=registry,ref=schoren/familyfinance-client:buildcache
-          cache-to: type=registry,ref=schoren/familyfinance-client:buildcache,mode=max
+            schoren/keda-client:latest
+            schoren/keda-client:${{ steps.meta.outputs.tag }}
+          cache-from: type=registry,ref=schoren/keda-client:buildcache
+          cache-to: type=registry,ref=schoren/keda-client:buildcache,mode=max

@@ -6,6 +6,7 @@ import 'providers/data_providers.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,11 +27,30 @@ class MyApp extends ConsumerWidget {
     final router = ref.watch(routerProvider);
 
     return MaterialApp.router(
-      title: 'Family Finance',
+      title: 'Keda',
       theme: ThemeData(
-        primarySwatch: Colors.indigo,
         useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF22C55E),
+          primary: const Color(0xFF22C55E),
+          secondary: const Color(0xFFFACC15),
+          error: const Color(0xFFEF4444),
+          surface: const Color(0xFFF8FAFC),
+        ),
+        scaffoldBackgroundColor: const Color(0xFFF8FAFC),
+        textTheme: GoogleFonts.interTextTheme(
+          Theme.of(context).textTheme,
+        ).copyWith(
+          displayLarge: GoogleFonts.inter(fontWeight: FontWeight.w600),
+          displayMedium: GoogleFonts.inter(fontWeight: FontWeight.w600),
+          displaySmall: GoogleFonts.inter(fontWeight: FontWeight.w600),
+          headlineLarge: GoogleFonts.inter(fontWeight: FontWeight.w600),
+          headlineMedium: GoogleFonts.inter(fontWeight: FontWeight.w600),
+          headlineSmall: GoogleFonts.inter(fontWeight: FontWeight.w600),
+          titleLarge: GoogleFonts.inter(fontWeight: FontWeight.w600),
+          titleMedium: GoogleFonts.inter(fontWeight: FontWeight.w600),
+          titleSmall: GoogleFonts.inter(fontWeight: FontWeight.w600),
+        ),
       ),
       routerConfig: router,
       debugShowCheckedModeBanner: false,
