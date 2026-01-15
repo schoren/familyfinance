@@ -1,0 +1,69 @@
+services:
+  client:
+    build:
+      context: ./client
+      args:
+        APP_VERSION: ${APP_VERSION:-local-dev}
+    environment:
+      - API_URL=${API_URL:-http://localhost:8090}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+    ports:
+      - "8080:80"
+
+  server:
+    build:
+      context: ./server
+      args:
+        APP_VERSION: ${APP_VERSION:-local-dev}
+    ports:
+      - "8090:8090"
+    environment:
+      - DB_HOST=db
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=keda
+      - DB_PORT=5432
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - JWT_SECRET=${JWT_SECRET}
+      - SMTP_HOST=mailpit
+      - SMTP_PORT=1025
+      - SMTP_USER=
+      - SMTP_PASS=
+      - APP_URL=http://localhost:8080
+    depends_on:
+      - db
+      - mailpit
+
+  mailpit:
+    image: axllent/mailpit
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+    environment:
+      - MP_MAX_MESSAGES=100
+      - MP_DATABASE=/data/mailpit.db
+    volumes:
+      - mailpit_data:/data
+
+  db:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=keda
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    restart: always
+    command: tunnel run
+    environment:
+      - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
+
+volumes:
+  postgres_data:
+  mailpit_data:

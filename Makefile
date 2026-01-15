@@ -62,15 +62,15 @@ test: test-all
 # Development environment
 dev-up:
 	@echo "🚀 Starting development environment..."
-	docker compose up -d
+	docker compose --env-file .env.dev -f docker-compose.dev.yml up -d
 	@echo "✅ Development environment started"
-	@echo "   Client: http://localhost:8080"
-	@echo "   Server: http://localhost:8090"
+	@echo "   Client: $$(grep '^APP_URL=' .env.dev | cut -d '=' -f2)"
+	@echo "   Server: $$(grep '^API_URL=' .env.dev | cut -d '=' -f2)"
 	@echo "   Mailpit: http://localhost:8025"
 
 dev-down:
 	@echo "🛑 Stopping development environment..."
-	docker compose down
+	docker compose --env-file .env.dev -f docker-compose.dev.yml down
 
 # Test environment
 test-up:
