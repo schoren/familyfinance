@@ -3,6 +3,8 @@
 TEST_COMPOSE_PROJECT := keda-test
 TEST_SERVER_PORT := 8091
 
+DEV_DOCKER_COMPOSE := docker compose --env-file .env.dev -f docker-compose.yml -f docker-compose.dev.yml
+
 # Default target
 help:
 	@echo "Keda - Test Automation"
@@ -62,15 +64,23 @@ test: test-all
 # Development environment
 dev-up:
 	@echo "🚀 Starting development environment..."
-	docker compose --env-file .env.dev -f docker-compose.dev.yml up -d
+	$(DEV_DOCKER_COMPOSE) up -d
 	@echo "✅ Development environment started"
 	@echo "   Client: $$(grep '^APP_URL=' .env.dev | cut -d '=' -f2)"
 	@echo "   Server: $$(grep '^API_URL=' .env.dev | cut -d '=' -f2)"
 	@echo "   Mailpit: http://localhost:8025"
 
+dev-rebuild:
+	@echo "🔨 Rebuilding development environment..."
+	$(DEV_DOCKER_COMPOSE) up -d --build
+
+dev-restart:
+	@echo "🔨 Restarting development environment..."
+	$(DEV_DOCKER_COMPOSE) restart
+
 dev-down:
 	@echo "🛑 Stopping development environment..."
-	docker compose --env-file .env.dev -f docker-compose.dev.yml down
+	$(DEV_DOCKER_COMPOSE) down
 
 # Test environment
 test-up:
