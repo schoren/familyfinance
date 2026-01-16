@@ -11,6 +11,8 @@ class AuthState {
   final String? userId;
   final String? userName;
   final String? userEmail;
+  final String? userPictureUrl;
+  final String? userColor;
   final String? householdId;
   final String? token;
 
@@ -19,6 +21,8 @@ class AuthState {
     this.userId,
     this.userName,
     this.userEmail,
+    this.userPictureUrl,
+    this.userColor,
     this.householdId,
     this.token,
   });
@@ -28,6 +32,8 @@ class AuthState {
     'userId': userId,
     'userName': userName,
     'userEmail': userEmail,
+    'userPictureUrl': userPictureUrl,
+    'userColor': userColor,
     'householdId': householdId,
     'token': token,
   };
@@ -37,6 +43,8 @@ class AuthState {
     userId: json['userId'],
     userName: json['userName'],
     userEmail: json['userEmail'],
+    userPictureUrl: json['userPictureUrl'],
+    userColor: json['userColor'],
     householdId: json['householdId'],
     token: json['token'],
   );
@@ -123,6 +131,8 @@ class AuthNotifier extends Notifier<AuthState> {
              userId: user['id'],
              userName: user['name'],
              userEmail: user['email'],
+             userPictureUrl: user['picture_url'],
+             userColor: user['color'],
              householdId: data['household_id'],
              token: data['token'],
            );

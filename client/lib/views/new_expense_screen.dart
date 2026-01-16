@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import '../providers/data_providers.dart';
+import '../utils/formatters.dart';
+import '../utils/ios_keyboard_fix.dart';
 import '../models/expense.dart';
 import '../models/category.dart';
 import '../models/finance_account.dart';
@@ -29,8 +32,9 @@ class _NewExpenseScreenState extends ConsumerState<NewExpenseScreen> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(milliseconds: 250), () {
+    Future.delayed(const Duration(milliseconds: 400), () {
       if (mounted) {
+        IOSKeyboardFix.stop();
         _focusNode.requestFocus();
       }
     });
@@ -109,7 +113,7 @@ class _NewExpenseScreenState extends ConsumerState<NewExpenseScreen> {
 
   Widget _buildForm(BuildContext context, Category category, List<FinanceAccount> accounts) {
     final remaining = ref.watch(categoryRemainingProvider(category.id));
-    final currencyFormat = NumberFormat.currency(locale: Localizations.localeOf(context).toString(), symbol: '\$');
+    final locale = Localizations.localeOf(context).toString();
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
@@ -134,7 +138,7 @@ class _NewExpenseScreenState extends ConsumerState<NewExpenseScreen> {
                       return Column(
                         children: [
                           Text(
-                            currencyFormat.format(remaining),
+                            Formatters.formatMoney(remaining, locale),
                             style: GoogleFonts.inter(
                               fontWeight: FontWeight.w600,
                               fontSize: 14,
@@ -144,7 +148,7 @@ class _NewExpenseScreenState extends ConsumerState<NewExpenseScreen> {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            currencyFormat.format(remaining),
+                            Formatters.formatMoney(remaining, locale),
                             style: GoogleFonts.jetBrainsMono(
                               fontSize: 18,
                               color: const Color(0xFF64748B),
@@ -153,7 +157,7 @@ class _NewExpenseScreenState extends ConsumerState<NewExpenseScreen> {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            currencyFormat.format(result),
+                            Formatters.formatMoney(result, locale),
                             style: GoogleFonts.jetBrainsMono(
                               fontSize: 48,
                               fontWeight: FontWeight.bold,

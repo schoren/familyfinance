@@ -32,10 +32,37 @@
 
   <title>keda</title>
   <script src="config.js"></script>
+  <script src="keyboard_fix.js"></script>
+  <script>
+    (function () {
+      const isDev = window.location.hostname === 'localhost' ||
+        window.location.hostname === '127.0.0.1' ||
+        window.location.hostname.includes('app-dev');
+
+      if (isDev) {
+        // Disable Service Worker in development for easier debugging
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.getRegistrations().then(function (registrations) {
+            for (let registration of registrations) {
+              registration.unregister();
+            }
+          });
+        }
+        window.flutterConfiguration = {
+          serviceWorkerSettings: {
+            serviceWorkerVersion: null,
+          },
+        };
+      }
+    })();
+  </script>
   <link rel="manifest" href="manifest.json">
 </head>
 
 <body>
+  <!-- Static input for iOS keyboard priming -->
+  <input id="ios-keyboard-primer" type="text" inputmode="decimal"
+    style="position:fixed; top:0; left:0; width:1px; height:1px; font-size:16px; opacity:0.01; z-index:99999; border:none; outline:none; background:transparent;">
   <script src="flutter_bootstrap.js" async></script>
 </body>
 

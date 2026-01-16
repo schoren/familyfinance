@@ -31,6 +31,8 @@ type User struct {
 	Email       string         `gorm:"type:varchar(255);unique" json:"email"`
 	GoogleID    string         `gorm:"type:varchar(255);index" json:"google_id"`
 	Name        string         `gorm:"type:varchar(255)" json:"name"`
+	PictureURL  string         `gorm:"type:text" json:"picture_url"`
+	Color       string         `gorm:"type:varchar(7)" json:"color"`
 	HouseholdID string         `gorm:"type:varchar(255)" json:"household_id"`
 }
 

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../providers/data_providers.dart';
+import '../utils/formatters.dart';
 import '../models/expense.dart';
 import '../models/category.dart';
 import '../models/user.dart';
@@ -19,7 +20,7 @@ class CategoryDetailScreen extends ConsumerWidget {
     final accountsAsync = ref.watch(accountsProvider);
     final remaining = ref.watch(categoryRemainingProvider(categoryId));
 
-    final currencyFormat = NumberFormat.currency(locale: Localizations.localeOf(context).toString(), symbol: '\$');
+    final locale = Localizations.localeOf(context).toString();
 
     return categoriesAsync.when(
       data: (categories) {
@@ -59,7 +60,7 @@ class CategoryDetailScreen extends ConsumerWidget {
                            child: Column(
                              children: [
                                Text(
-                                 'Presupuesto Mensual: ${currencyFormat.format(category.monthlyBudget)}',
+                                 'Presupuesto Mensual: ${Formatters.formatMoney(category.monthlyBudget, locale)}',
                                  style: Theme.of(context).textTheme.titleMedium,
                                ),
                                const SizedBox(height: 16),
@@ -68,7 +69,7 @@ class CategoryDetailScreen extends ConsumerWidget {
                                  style: Theme.of(context).textTheme.bodyMedium,
                                ),
                                Text(
-                                 currencyFormat.format(remaining),
+                                 Formatters.formatMoney(remaining, locale),
                                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                                    color: remaining < 0 ? Colors.red : Colors.green,
                                    fontWeight: FontWeight.bold,
@@ -162,7 +163,7 @@ class CategoryDetailScreen extends ConsumerWidget {
                                               ],
                                             ),
                                             trailing: Text(
-                                              currencyFormat.format(expense.amount),
+                                               Formatters.formatMoney(expense.amount, locale),
                                               style: const TextStyle(fontWeight: FontWeight.bold),
                                             ),
                                           );

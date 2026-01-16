@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../utils/formatters.dart';
 
 class MonthSummaryCard extends StatelessWidget {
   final double totalBudget;
@@ -24,8 +25,6 @@ class MonthSummaryCard extends StatelessWidget {
     final remaining = totalBudget - totalSpent;
     final isOverBudget = remaining < 0;
     
-    final currencyFormat = NumberFormat.currency(locale: locale, symbol: '\$');
-
     return Container(
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.8),
@@ -61,13 +60,13 @@ class MonthSummaryCard extends StatelessWidget {
                 _buildInfoColumn(
                   context,
                   'Presupuesto',
-                  currencyFormat.format(totalBudget),
+                  Formatters.formatMoney(totalBudget, locale),
                   Colors.green,
                 ),
                 _buildInfoColumn(
                   context,
                   'Gastado',
-                  currencyFormat.format(totalSpent),
+                  Formatters.formatMoney(totalSpent, locale),
                   Colors.red,
                 ),
               ],
@@ -87,8 +86,8 @@ class MonthSummaryCard extends StatelessWidget {
             const SizedBox(height: 12),
             Text(
               isOverBudget
-                  ? 'EXCEDIDO POR ${currencyFormat.format(-remaining)}'
-                  : 'QUEDAN ${currencyFormat.format(remaining)}',
+                  ? 'EXCEDIDO POR ${Formatters.formatMoney(-remaining, locale)}'
+                  : 'QUEDAN ${Formatters.formatMoney(remaining, locale)}',
               style: GoogleFonts.jetBrainsMono(
                 color: isOverBudget ? const Color(0xFFEF4444) : const Color(0xFF22C55E),
                 fontWeight: FontWeight.bold,

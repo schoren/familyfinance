@@ -6,6 +6,8 @@ import '../providers/data_providers.dart';
 import 'package:intl/intl.dart';
 import '../providers/auth_provider.dart';
 import 'widgets/month_summary_card.dart';
+import '../utils/formatters.dart';
+import '../utils/ios_keyboard_fix.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -50,7 +52,7 @@ class HomeScreen extends ConsumerWidget {
                       final category = categories[index];
                       final remaining = ref.watch(categoryRemainingProvider(category.id));
                       final progress = remaining > 0 ? (remaining / category.monthlyBudget) : 0.0;
-                      final currencyFormat = NumberFormat.currency(locale: Localizations.localeOf(context).toString(), symbol: '\$');
+                      final locale = Localizations.localeOf(context).toString();
                       
                       Color progressColor;
                       if (progress > 0.5) {
@@ -77,7 +79,10 @@ class HomeScreen extends ConsumerWidget {
                         child: Stack(
                           children: [
                             InkWell(
-                              onTap: () => context.push('/new-expense/${category.id}'),
+                              onTap: () {
+                                IOSKeyboardFix.prime();
+                                context.push('/new-expense/${category.id}');
+                              },
                               child: Padding(
                                 padding: const EdgeInsets.all(16.0),
                                 child: Column(
@@ -102,7 +107,7 @@ class HomeScreen extends ConsumerWidget {
                                     const Spacer(),
                                     FittedBox(
                                       child: Text(
-                                        currencyFormat.format(remaining),
+                                        Formatters.formatMoney(remaining, locale),
                                         style: GoogleFonts.jetBrainsMono(
                                           fontSize: 24,
                                           color: remaining < 0 ? const Color(0xFFEF4444) : const Color(0xFF0F172A),

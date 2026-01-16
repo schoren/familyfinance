@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../providers/data_providers.dart';
+import '../utils/formatters.dart';
 import '../models/expense.dart';
 import '../models/category.dart';
 import '../models/user.dart';
+import '../widgets/user_avatar.dart';
 
 class ExpensesScreen extends ConsumerWidget {
   const ExpensesScreen({super.key});
@@ -15,7 +17,7 @@ class ExpensesScreen extends ConsumerWidget {
     final accountsAsync = ref.watch(accountsProvider);
     final categoriesAsync = ref.watch(categoriesProvider);
 
-    final currencyFormat = NumberFormat.currency(locale: Localizations.localeOf(context).toString(), symbol: '\$');
+    final locale = Localizations.localeOf(context).toString();
 
     return Scaffold(
       appBar: AppBar(
@@ -74,9 +76,15 @@ class ExpensesScreen extends ConsumerWidget {
                             final timeStr = DateFormat.Hm(Localizations.localeOf(context).toString()).format(expense.date.toLocal());
 
                             return ListTile(
-                              leading: const CircleAvatar(
-                                child: Icon(Icons.receipt_long),
-                              ),
+                              leading: expense.user == null
+                                ? const CircleAvatar(
+                                    child: Icon(Icons.receipt_long),
+                                  )
+                                : UserAvatar(
+                                    pictureUrl: expense.user!.pictureUrl,
+                                    name: expense.user!.name,
+                                    color: expense.user!.color,
+                                  ),
                               title: Text(expense.note ?? 'Sin nota'),
                               subtitle: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -97,7 +105,7 @@ class ExpensesScreen extends ConsumerWidget {
                                 ],
                               ),
                               trailing: Text(
-                                currencyFormat.format(expense.amount),
+                                Formatters.formatMoney(expense.amount, locale),
                                 style: const TextStyle(fontWeight: FontWeight.bold),
                               ),
                             );

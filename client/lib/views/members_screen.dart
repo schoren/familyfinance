@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/data_providers.dart';
 import '../providers/auth_provider.dart';
+import '../widgets/user_avatar.dart';
 
 class MembersScreen extends ConsumerStatefulWidget {
   const MembersScreen({super.key});
@@ -175,12 +176,16 @@ class _MembersScreenState extends ConsumerState<MembersScreen> {
               final inviteCode = member['invite_code'];
 
               return ListTile(
-                leading: CircleAvatar(
-                  backgroundColor: isPending ? Colors.orange : null,
-                  child: isPending 
-                    ? const Icon(Icons.mail, color: Colors.white)
-                    : Text(member['name'][0].toUpperCase()),
-                ),
+                leading: isPending 
+                  ? const CircleAvatar(
+                      backgroundColor: Colors.orange,
+                      child: Icon(Icons.mail, color: Colors.white),
+                    )
+                  : UserAvatar(
+                      pictureUrl: member['picture_url'],
+                      name: member['name'],
+                      color: member['color'],
+                    ),
                 title: Text(
                   member['name'] + (isMe ? ' (Tú)' : '') + (isPending ? ' (Pendiente)' : ''),
                   style: TextStyle(

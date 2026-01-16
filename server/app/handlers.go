@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"math/big"
 	"net/http"
 	"os"
 	"time"
@@ -16,6 +17,19 @@ import (
 	"google.golang.org/api/idtoken"
 	"gorm.io/gorm"
 )
+
+var userColors = []string{
+	"#EF4444", // Red
+	"#F59E0B", // Amber
+	"#10B981", // Emerald
+	"#3B82F6", // Blue
+	"#6366F1", // Indigo
+	"#8B5CF6", // Violet
+	"#EC4899", // Pink
+	"#06B6D4", // Cyan
+	"#F97316", // Orange
+	"#84CC16", // Lime
+}
 
 type Handlers struct {
 	db           *gorm.DB
@@ -108,6 +122,8 @@ type MemberResponse struct {
 	ID         string `json:"id"`
 	Name       string `json:"name"`
 	Email      string `json:"email"`
+	PictureURL string `json:"picture_url"`
+	Color      string `json:"color"`
 	Status     string `json:"status"` // "active" or "pending"
 	InviteCode string `json:"invite_code,omitempty"`
 }
@@ -134,10 +150,12 @@ func (h *Handlers) GetMembers(c *gin.Context) {
 
 	for _, user := range users {
 		response = append(response, MemberResponse{
-			ID:     user.ID,
-			Name:   user.Name,
-			Email:  user.Email,
-			Status: "active",
+			ID:         user.ID,
+			Name:       user.Name,
+			Email:      user.Email,
+			PictureURL: user.PictureURL,
+			Color:      user.Color,
+			Status:     "active",
 		})
 	}
 
@@ -747,7 +765,7 @@ func (h *Handlers) AuthGoogle(c *gin.Context) {
 		log.Println("WARNING: GOOGLE_CLIENT_ID is not set")
 	}
 
-	var email, name, googleID string
+	var email, name, googleID, pictureURL string
 
 	if req.IDToken != "" {
 		payload, err := idtoken.Validate(c.Request.Context(), req.IDToken, googleClientID)
@@ -755,6 +773,9 @@ func (h *Handlers) AuthGoogle(c *gin.Context) {
 			email = payload.Claims["email"].(string)
 			name = payload.Claims["name"].(string)
 			googleID = payload.Subject
+			if pic, ok := payload.Claims["picture"].(string); ok {
+				pictureURL = pic
+			}
 		}
 	}
 
@@ -768,6 +789,7 @@ func (h *Handlers) AuthGoogle(c *gin.Context) {
 		email = userInfo.Email
 		name = userInfo.Name
 		googleID = userInfo.ID
+		pictureURL = userInfo.Picture
 	}
 
 	if email == "" {
@@ -809,11 +831,17 @@ func (h *Handlers) AuthGoogle(c *gin.Context) {
 			h.createDefaultCashAccount(householdID)
 		}
 
+		// Select random color
+		randIdx, _ := rand.Int(rand.Reader, big.NewInt(int64(len(userColors))))
+		color := userColors[randIdx.Int64()]
+
 		user = User{
 			ID:          uuid.New().String(),
 			Email:       email,
 			Name:        name,
 			GoogleID:    googleID,
+			PictureURL:  pictureURL,
+			Color:       color,
 			HouseholdID: householdID,
 		}
 
@@ -829,6 +857,24 @@ func (h *Handlers) AuthGoogle(c *gin.Context) {
 		if user.DeletedAt.Valid {
 			c.JSON(http.StatusForbidden, gin.H{"error": "User account has been deleted. Contact support to restore."})
 			return
+		}
+		// Update user info if it changed
+		needsUpdate := false
+		if user.Name != name {
+			user.Name = name
+			needsUpdate = true
+		}
+		if user.PictureURL != pictureURL && pictureURL != "" {
+			user.PictureURL = pictureURL
+			needsUpdate = true
+		}
+		if user.Color == "" {
+			randIdx, _ := rand.Int(rand.Reader, big.NewInt(int64(len(userColors))))
+			user.Color = userColors[randIdx.Int64()]
+			needsUpdate = true
+		}
+		if needsUpdate {
+			h.db.Save(&user)
 		}
 	}
 
@@ -862,9 +908,10 @@ func (h *Handlers) generateJWT(user User) (string, error) {
 }
 
 type GoogleUserInfo struct {
-	ID    string `json:"id"`
-	Email string `json:"email"`
-	Name  string `json:"name"`
+	ID      string `json:"id"`
+	Email   string `json:"email"`
+	Name    string `json:"name"`
+	Picture string `json:"picture"`
 }
 
 func (h *Handlers) fetchGoogleUserInfo(accessToken string) (*GoogleUserInfo, error) {

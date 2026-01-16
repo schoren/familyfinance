@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../widgets/user_avatar.dart';
 import '../providers/auth_provider.dart';
 import '../providers/data_providers.dart';
 
@@ -9,6 +10,8 @@ class SettingsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final authState = ref.watch(authProvider);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Configuración'),
@@ -19,20 +22,29 @@ class SettingsScreen extends ConsumerWidget {
           Center(
             child: Column(
               children: [
-                const CircleAvatar(
+                UserAvatar(
                   radius: 40,
-                  backgroundColor: Color(0xFF22C55E),
-                  child: Icon(Icons.settings, size: 40, color: Colors.white),
+                  pictureUrl: authState.userPictureUrl,
+                  name: authState.userName ?? 'Usuario',
+                  color: authState.userColor,
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'Configuración',
+                  authState.userName ?? 'Usuario',
                   style: GoogleFonts.inter(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                     color: const Color(0xFF0F172A),
                   ),
                 ),
+                if (authState.userEmail != null)
+                  Text(
+                    authState.userEmail!,
+                    style: GoogleFonts.inter(
+                      fontSize: 14,
+                      color: const Color(0xFF64748B),
+                    ),
+                  ),
               ],
             ),
           ),
