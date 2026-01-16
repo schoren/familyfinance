@@ -69,16 +69,18 @@ async function build() {
 <head>
     <title>KEDA</title>
     <script>
-        // Avoid recursive redirection
+        // Use saved preference or detect from browser
+        var savedLang = localStorage.getItem('selected-lang');
         var path = window.location.pathname;
         var isLocalized = path.split('/').some(function(s) { return s === 'es' || s === 'en'; });
+        
         if (!isLocalized) {
-            var lang = navigator.language || navigator.userLanguage;
-            if (lang.startsWith('es')) {
-                window.location.href = './es/';
-            } else {
-                window.location.href = './en/';
+            var targetLang = savedLang;
+            if (!targetLang) {
+                var browserLang = navigator.language || navigator.userLanguage;
+                targetLang = browserLang.startsWith('es') ? 'es' : 'en';
             }
+            window.location.href = './' + targetLang + '/';
         }
     </script>
     <noscript>

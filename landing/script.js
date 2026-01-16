@@ -18,4 +18,26 @@ document.addEventListener('DOMContentLoaded', () => {
   mobileMenu.querySelectorAll('.nav-link').forEach(link => {
     link.addEventListener('click', toggleMenu);
   });
+
+  // Language Switcher Logic
+  const currentLang = document.documentElement.lang || 'en';
+  const langLinks = document.querySelectorAll('.lang-switcher a');
+
+  langLinks.forEach(link => {
+    const lang = link.getAttribute('data-lang');
+    if (lang === currentLang) {
+      link.classList.add('active');
+    }
+
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (lang === currentLang) return;
+
+      localStorage.setItem('selected-lang', lang);
+      // Redirect to the same path but in the other language
+      // Example: project.com/landing/dist/es/index.html -> project.com/landing/dist/en/index.html
+      const newPath = window.location.pathname.replace(`/${currentLang}/`, `/${lang}/`);
+      window.location.href = newPath + window.location.hash;
+    });
+  });
 });
