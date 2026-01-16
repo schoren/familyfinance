@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
+import '../utils/test_utils.dart';
 
 import '../providers_test.mocks.dart';
 
@@ -38,7 +39,7 @@ void main() {
           apiClientProvider.overrideWithValue(mockApiClient),
           authProvider.overrideWith(() => MockAuthNotifier()), // Default auth state
         ],
-        child: const MaterialApp(home: MembersScreen()),
+        child: createTestApp(home: const MembersScreen()),
       ),
     );
 
@@ -89,7 +90,7 @@ void main() {
           apiClientProvider.overrideWithValue(mockApiClient),
           authProvider.overrideWith(() => MockAuthNotifier()),
         ],
-        child: const MaterialApp(home: MembersScreen()),
+        child: createTestApp(home: const MembersScreen()),
       ),
     );
     await tester.pumpAndSettle();

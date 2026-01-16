@@ -1,0 +1,169 @@
+{
+  "settings": "Settings",
+  "language": "Language",
+  "spanish": "Spanish",
+  "english": "English",
+  "logout": "Logout",
+  "versionInfo": "Version Information",
+  "clientVersion": "Client Version",
+  "serverVersion": "Server Version",
+  "loading": "loading...",
+  "error": "error",
+  "home": "Home",
+  "accounts": "Accounts",
+  "members": "Members",
+  "expenses": "Expenses",
+  "noExpenses": "No recent expenses",
+  "addExpense": "Add Expense",
+  "systemDefault": "System Default",
+  "deleteCategory": "Delete Category",
+  "deleteCategoryConfirm": "Are you sure you want to delete \"{name}\"?",
+  "@deleteCategoryConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "cancel": "Cancel",
+  "delete": "Delete",
+  "viewDetail": "View Detail",
+  "edit": "Edit",
+  "allExpenses": "All Expenses",
+  "noExpensesThisMonth": "No expenses this month",
+  "noNote": "No note",
+  "createdBy": "Created by: {name}",
+  "@createdBy": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "errorLoadingCategories": "Error loading categories",
+  "errorLoadingAccounts": "Error loading accounts",
+  "errorLoadingExpenses": "Error loading expenses",
+  "pleaseSelectAccount": "Please select an account",
+  "categoryNotFound": "Category not found",
+  "remaining": "REMAINING",
+  "amount": "AMOUNT",
+  "enterAmount": "Enter an amount",
+  "invalidAmount": "Invalid amount",
+  "account": "ACCOUNT",
+  "addNewAccount": "Add new account...",
+  "noAccountsCreated": "You don't have any accounts created.",
+  "createFirstAccount": "Create my first account",
+  "noteOptional": "NOTE (OPTIONAL)",
+  "saveExpense": "SAVE EXPENSE",
+  "selectAnAccount": "Select an account",
+  "manageAccounts": "Manage Accounts",
+  "card": "Card",
+  "bankAccount": "Bank Account",
+  "cash": "Cash",
+  "deleteAccount": "Delete Account",
+  "deleteAccountConfirm": "Do you want to delete the account \"{name}\"?",
+  "@deleteAccountConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "editAccount": "Edit Account",
+  "newAccount": "New Account",
+  "type": "Type",
+  "brand": "Brand",
+  "bank": "Bank",
+  "accountName": "Account Name",
+  "enterBank": "Enter the bank",
+  "enterName": "Enter the name",
+  "save": "SAVE",
+  "accountNotFound": "Account not found",
+  "saveError": "Error saving: {error}",
+  "@saveError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "removeMember": "Remove Member",
+  "removeMemberConfirm": "Are you sure you want to remove {name} from the household?",
+  "@removeMemberConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "memberRemoved": "Member removed",
+  "inviteLinkCopied": "Invite link copied to clipboard",
+  "inviteMember": "Invite Member",
+  "invitationSent": "Invitation sent successfully",
+  "invitePending": "This user already has a pending invitation",
+  "inviteError": "Error sending invitation: {error}",
+  "@inviteError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "send": "Send",
+  "householdMembers": "Household Members",
+  "inviteTooltip": "Invite",
+  "youSuffix": " (You)",
+  "pendingSuffix": " (Pending)",
+  "copyLinkTooltip": "Copy link",
+  "categorySaved": "Category saved successfully",
+  "editCategory": "Edit Category",
+  "newCategory": "New Category",
+  "name": "Name",
+  "monthlyBudget": "Monthly Budget",
+  "enterNamePlease": "Please enter a name",
+  "enterBudgetPlease": "Please enter a budget",
+  "invalidNumber": "Enter a valid number",
+  "errorWithDetails": "Error: {error}",
+  "@errorWithDetails": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "loading": "Loading...",
+  "error": "Error",
+  "errorInitializingGoogleSignIn": "Error initializing Google Sign In: {error}",
+  "@errorInitializingGoogleSignIn": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "historyThisMonth": "History (This month)",
+  "noExpensesThisMonth": "No expenses this month",
+  "unknownAccount": "Unknown account",
+  "home": "Home",
+  "accounts": "Accounts",
+  "members": "Members",
+  "budget": "Budget",
+  "spent": "Spent",
+  "remainingLabel": "Remaining",
+  "exceededBy": "EXCEEDED BY {amount}",
+  "@exceededBy": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "remaining": "REMAINING {amount}",
+  "@remaining": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  }
+}

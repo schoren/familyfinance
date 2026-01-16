@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:keda/l10n/app_localizations.dart';
 import '../providers/data_providers.dart';
 import '../utils/formatters.dart';
 import '../utils/ios_keyboard_fix.dart';
@@ -53,7 +54,7 @@ class _NewExpenseScreenState extends ConsumerState<NewExpenseScreen> {
 
     if (_selectedAccountId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Por favor selecciona una cuenta')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.pleaseSelectAccount)),
       );
       return;
     }
@@ -82,15 +83,16 @@ class _NewExpenseScreenState extends ConsumerState<NewExpenseScreen> {
 
     return categoriesAsync.when(
       data: (categories) {
+        final l10n = AppLocalizations.of(context)!;
         final category = categories.firstWhere(
           (c) => c.id == widget.categoryId,
-          orElse: () => Category(id: '', name: 'Cargando...', monthlyBudget: 0),
+          orElse: () => Category(id: '', name: l10n.loading, monthlyBudget: 0),
         );
         
         if (category.id.isEmpty) {
           return Scaffold(
-            appBar: AppBar(title: const Text('Error')),
-            body: const Center(child: Text('Categoría no encontrada')),
+            appBar: AppBar(title: Text(l10n.error)),
+            body: Center(child: Text(l10n.categoryNotFound)),
           );
         }
 
@@ -112,6 +114,7 @@ class _NewExpenseScreenState extends ConsumerState<NewExpenseScreen> {
   }
 
   Widget _buildForm(BuildContext context, Category category, List<FinanceAccount> accounts) {
+    final l10n = AppLocalizations.of(context)!;
     final remaining = ref.watch(categoryRemainingProvider(category.id));
     final locale = Localizations.localeOf(context).toString();
 
@@ -165,7 +168,7 @@ class _NewExpenseScreenState extends ConsumerState<NewExpenseScreen> {
                             ),
                           ),
                           Text(
-                            'RESTANTE',
+                            l10n.remainingLabel,
                             style: GoogleFonts.inter(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
@@ -187,7 +190,7 @@ class _NewExpenseScreenState extends ConsumerState<NewExpenseScreen> {
                   textInputAction: TextInputAction.next,
                   style: GoogleFonts.jetBrainsMono(fontSize: 32, fontWeight: FontWeight.bold),
                   decoration: InputDecoration(
-                    labelText: 'MONTO',
+                    labelText: l10n.amount,
                     prefixText: '\$ ',
                     filled: true,
                     fillColor: Colors.white,
@@ -198,9 +201,9 @@ class _NewExpenseScreenState extends ConsumerState<NewExpenseScreen> {
                     contentPadding: const EdgeInsets.all(20),
                   ),
                   validator: (value) {
-                    if (value == null || value.isEmpty) return 'Ingresa un monto';
+                    if (value == null || value.isEmpty) return l10n.enterAmount;
                     final amount = double.tryParse(value);
-                    if (amount == null || amount <= 0) return 'Monto inválido';
+                    if (amount == null || amount <= 0) return l10n.invalidAmount;
                     return null;
                   },
                 ),
@@ -210,7 +213,7 @@ class _NewExpenseScreenState extends ConsumerState<NewExpenseScreen> {
                   value: accounts.any((a) => a.id == _selectedAccountId) ? _selectedAccountId : null,
                   style: GoogleFonts.inter(color: const Color(0xFF0F172A), fontSize: 16),
                   decoration: InputDecoration(
-                    labelText: 'CUENTA',
+                    labelText: l10n.account,
                     filled: true,
                     fillColor: Colors.white,
                     border: OutlineInputBorder(
@@ -226,14 +229,14 @@ class _NewExpenseScreenState extends ConsumerState<NewExpenseScreen> {
                         child: Text(account.displayName),
                       );
                     }),
-                    const DropdownMenuItem(
+                    DropdownMenuItem(
                       value: _createNewAccountKey,
                       child: Row(
                         children: [
-                          Icon(Icons.add, size: 20, color: Color(0xFF22C55E)),
-                          SizedBox(width: 8),
-                          Text('Añadir nueva cuenta...', 
-                            style: TextStyle(color: Color(0xFF22C55E), fontWeight: FontWeight.bold)),
+                          const Icon(Icons.add, size: 20, color: Color(0xFF22C55E)),
+                          const SizedBox(width: 8),
+                          Text(l10n.addNewAccount, 
+                            style: const TextStyle(color: Color(0xFF22C55E), fontWeight: FontWeight.bold)),
                         ],
                       ),
                     ),
@@ -252,7 +255,7 @@ class _NewExpenseScreenState extends ConsumerState<NewExpenseScreen> {
                       });
                     }
                   },
-                  validator: (value) => (value == null || value == _createNewAccountKey) ? 'Selecciona una cuenta' : null,
+                  validator: (value) => (value == null || value == _createNewAccountKey) ? l10n.selectAnAccount : null,
                 )
               else
                 Container(
@@ -263,7 +266,7 @@ class _NewExpenseScreenState extends ConsumerState<NewExpenseScreen> {
                   ),
                   child: Column(
                     children: [
-                      const Text('No tienes cuentas creadas.'),
+                      Text(l10n.noAccountsCreated),
                       const SizedBox(height: 12),
                       ElevatedButton.icon(
                         onPressed: () async {
@@ -275,7 +278,7 @@ class _NewExpenseScreenState extends ConsumerState<NewExpenseScreen> {
                           }
                         },
                         icon: const Icon(Icons.add),
-                        label: const Text('Crear mi primera cuenta'),
+                        label: Text(l10n.createFirstAccount),
                       ),
                     ],
                   ),
@@ -302,7 +305,7 @@ class _NewExpenseScreenState extends ConsumerState<NewExpenseScreen> {
                     textCapitalization: TextCapitalization.sentences,
                     style: GoogleFonts.inter(fontSize: 16),
                     decoration: InputDecoration(
-                      labelText: 'NOTA (OPCIONAL)',
+                      labelText: l10n.noteOptional,
                       filled: true,
                       fillColor: Colors.white,
                       border: OutlineInputBorder(
@@ -333,7 +336,7 @@ class _NewExpenseScreenState extends ConsumerState<NewExpenseScreen> {
                     elevation: 0,
                   ),
                   child: Text(
-                    'GUARDAR GASTO', 
+                    l10n.saveExpense, 
                     style: GoogleFonts.inter(
                       fontSize: 16, 
                       fontWeight: FontWeight.bold,

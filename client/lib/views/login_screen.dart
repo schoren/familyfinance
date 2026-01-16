@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:keda/l10n/app_localizations.dart';
 import '../providers/auth_provider.dart';
 import '../widgets/google_sign_in_button.dart';
 
@@ -9,6 +10,7 @@ class LoginScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       body: Center(
         child: Column(
@@ -36,7 +38,7 @@ class LoginScreen extends ConsumerWidget {
                       return const CircularProgressIndicator();
                     }
                     if (snapshot.hasError) {
-                       return Text('Error initializing Google Sign In: ${snapshot.error}');
+                       return Text(l10n.errorInitializingGoogleSignIn(snapshot.error.toString()));
                     }
 
                     return buildGoogleSignInButton(

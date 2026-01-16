@@ -8,6 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:keda/models/finance_account.dart';
 import 'package:keda/models/category.dart';
 import 'package:keda/models/account_type.dart';
+import '../utils/test_utils.dart';
 
 class MockExpensesNotifier extends ExpensesNotifier {
   final List<Expense> data;
@@ -59,7 +60,7 @@ void main() {
           categoriesProvider.overrideWith(() => MockCategoriesNotifier(categories)),
           accountsProvider.overrideWith(() => MockAccountsNotifier(accounts)),
         ],
-        child: const MaterialApp(home: ExpensesScreen()),
+        child: createTestApp(home: const ExpensesScreen()),
       ),
     );
 
@@ -115,9 +116,9 @@ void main() {
           categoriesProvider.overrideWith(() => MockCategoriesNotifier(categories)),
           accountsProvider.overrideWith(() => MockAccountsNotifier(accounts)),
         ],
-        child: const MaterialApp(
-          locale: Locale('es', 'AR'),
-          home: ExpensesScreen(),
+        child: createTestApp(
+          locale: const Locale('es', 'AR'),
+          home: const ExpensesScreen(),
         ),
       ),
     );
