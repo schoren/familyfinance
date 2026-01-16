@@ -41,7 +41,7 @@ jobs:
         id: get_version
         run: |
           VERSION=$(jq -r '.version' package.json)
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "version=v$VERSION" >> $GITHUB_OUTPUT
 
   build-server:
     needs: bump
