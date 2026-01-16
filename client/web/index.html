@@ -33,29 +33,6 @@
   <title>keda</title>
   <script src="config.js"></script>
   <script src="keyboard_fix.js"></script>
-  <script>
-    (function () {
-      const isDev = window.location.hostname === 'localhost' ||
-        window.location.hostname === '127.0.0.1' ||
-        window.location.hostname.includes('app-dev');
-
-      if (isDev) {
-        // Disable Service Worker in development for easier debugging
-        if ('serviceWorker' in navigator) {
-          navigator.serviceWorker.getRegistrations().then(function (registrations) {
-            for (let registration of registrations) {
-              registration.unregister();
-            }
-          });
-        }
-        window.flutterConfiguration = {
-          serviceWorkerSettings: {
-            serviceWorkerVersion: null,
-          },
-        };
-      }
-    })();
-  </script>
   <link rel="manifest" href="manifest.json">
 </head>
 
