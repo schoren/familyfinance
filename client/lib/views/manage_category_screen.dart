@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
+import 'package:keda/l10n/app_localizations.dart';
 import '../providers/data_providers.dart';
 import '../models/category.dart';
 
@@ -65,16 +66,16 @@ class _ManageCategoryScreenState extends ConsumerState<ManageCategoryScreen> {
       // Refresh summary as well
       ref.invalidate(currentMonthSummaryProvider);
 
-      if (mounted) {
-        context.pop();
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Categoría guardada exitosamente')),
-        );
-      }
+        if (mounted) {
+          context.pop();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(AppLocalizations.of(context)!.categorySaved)),
+          );
+        }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al guardar: $e')),
+          SnackBar(content: Text(AppLocalizations.of(context)!.saveError(e.toString()))),
         );
       }
     } finally {
@@ -98,15 +99,15 @@ class _ManageCategoryScreenState extends ConsumerState<ManageCategoryScreen> {
           );
           if (category.id.isEmpty) {
             return Scaffold(
-              appBar: AppBar(title: const Text('Error')),
-              body: const Center(child: Text('Categoría no encontrada')),
+              appBar: AppBar(title: Text(AppLocalizations.of(context)!.error)),
+              body: Center(child: Text(AppLocalizations.of(context)!.categoryNotFound)),
             );
           }
           _initializeFromCategory(category);
           return _buildForm(context, isEditing);
         },
         loading: () => const Scaffold(body: Center(child: CircularProgressIndicator())),
-        error: (err, _) => Scaffold(body: Center(child: Text('Error: $err'))),
+        error: (err, _) => Scaffold(body: Center(child: Text(AppLocalizations.of(context)!.errorWithDetails(err.toString())))),
       );
     }
 
@@ -116,7 +117,7 @@ class _ManageCategoryScreenState extends ConsumerState<ManageCategoryScreen> {
   Widget _buildForm(BuildContext context, bool isEditing) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(isEditing ? 'Editar Categoría' : 'Nueva Categoría'),
+        title: Text(isEditing ? AppLocalizations.of(context)!.editCategory : AppLocalizations.of(context)!.newCategory),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -129,13 +130,13 @@ class _ManageCategoryScreenState extends ConsumerState<ManageCategoryScreen> {
                 textInputAction: TextInputAction.next,
                 autofocus: true,
                 textCapitalization: TextCapitalization.sentences,
-                decoration: const InputDecoration(
-                  labelText: 'Nombre',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: AppLocalizations.of(context)!.name,
+                  border: const OutlineInputBorder(),
                 ),
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
-                    return 'Por favor ingresa un nombre';
+                    return AppLocalizations.of(context)!.enterNamePlease;
                   }
                   return null;
                 },
@@ -144,19 +145,19 @@ class _ManageCategoryScreenState extends ConsumerState<ManageCategoryScreen> {
               TextFormField(
                 controller: _budgetController,
                 textInputAction: TextInputAction.done,
-                decoration: const InputDecoration(
-                  labelText: 'Presupuesto Mensual',
+                decoration: InputDecoration(
+                  labelText: AppLocalizations.of(context)!.monthlyBudget,
                   prefixText: '\$ ',
-                  border: OutlineInputBorder(),
+                  border: const OutlineInputBorder(),
                 ),
                 keyboardType: TextInputType.number,
                 onFieldSubmitted: (_) => _save(),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Por favor ingresa un presupuesto';
+                    return AppLocalizations.of(context)!.enterBudgetPlease;
                   }
                   if (double.tryParse(value) == null) {
-                    return 'Ingresa un número válido';
+                    return AppLocalizations.of(context)!.invalidNumber;
                   }
                   return null;
                 },
@@ -175,7 +176,7 @@ class _ManageCategoryScreenState extends ConsumerState<ManageCategoryScreen> {
                         width: 20, 
                         child: CircularProgressIndicator(strokeWidth: 2)
                       )
-                    : const Text('GUARDAR', style: TextStyle(fontSize: 18)),
+                    : Text(AppLocalizations.of(context)!.save, style: const TextStyle(fontSize: 18)),
                 ),
               ),
             ],

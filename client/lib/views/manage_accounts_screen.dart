@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:keda/l10n/app_localizations.dart';
 import '../models/account_type.dart';
 import '../providers/data_providers.dart';
 import '../models/finance_account.dart';
@@ -11,27 +12,33 @@ class ManageAccountsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final accountsAsync = ref.watch(accountsProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Administrar Cuentas'),
+        title: Text(l10n.manageAccounts),
       ),
       body: accountsAsync.when(
         data: (accounts) => ListView.builder(
           itemCount: accounts.length,
           itemBuilder: (context, index) {
             final account = accounts[index];
+            String subtitle;
+            if (account.type == AccountType.card) {
+              subtitle = l10n.card;
+            } else if (account.type == AccountType.bank) {
+              subtitle = l10n.bankAccount;
+            } else {
+              subtitle = l10n.cash;
+            }
+
             return ListTile(
               leading: Icon(
                 account.type == AccountType.card ? Icons.credit_card : (account.type == AccountType.bank ? Icons.account_balance : Icons.money),
                 color: Theme.of(context).colorScheme.primary,
               ),
               title: Text(account.displayName),
-              subtitle: Text(
-                account.type == AccountType.card 
-                  ? "Tarjeta" 
-                  : (account.type == AccountType.bank ? "Cuenta Bancaria" : "Efectivo"),
-              ),
+              subtitle: Text(subtitle),
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -63,19 +70,20 @@ class ManageAccountsScreen extends ConsumerWidget {
   }
 
   void _showDeleteConfirmation(BuildContext context, WidgetRef ref, FinanceAccount account) {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Eliminar Cuenta'),
-        content: Text('¿Deseas eliminar la cuenta "${account.name}"?'),
+        title: Text(l10n.deleteAccount),
+        content: Text(l10n.deleteAccountConfirm(account.name)),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancelar')),
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(l10n.cancel)),
           TextButton(
             onPressed: () async {
               await ref.read(accountsProvider.notifier).deleteAccount(account.id);
               if (ctx.mounted) Navigator.pop(ctx);
             },
-            child: const Text('Eliminar', style: TextStyle(color: Colors.red)),
+            child: Text(l10n.delete, style: const TextStyle(color: Colors.red)),
           ),
         ],
       ),

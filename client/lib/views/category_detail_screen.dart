@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
+import 'package:keda/l10n/app_localizations.dart';
 import '../providers/data_providers.dart';
 import '../utils/formatters.dart';
 import '../models/expense.dart';
-import '../models/category.dart';
-import '../models/user.dart';
 
 class CategoryDetailScreen extends ConsumerWidget {
   final String categoryId;
@@ -20,13 +18,14 @@ class CategoryDetailScreen extends ConsumerWidget {
     final accountsAsync = ref.watch(accountsProvider);
     final remaining = ref.watch(categoryRemainingProvider(categoryId));
 
+    final l10n = AppLocalizations.of(context)!;
     final locale = Localizations.localeOf(context).toString();
 
     return categoriesAsync.when(
       data: (categories) {
         final category = categories.firstWhere(
             (c) => c.id == categoryId,
-            orElse: () => categories.first // Should probably handle better but safe fallback
+            orElse: () => categories.first
         );
 
         return Scaffold(
@@ -37,11 +36,6 @@ class CategoryDetailScreen extends ConsumerWidget {
              data: (expenses) {
                return accountsAsync.when(
                  data: (accounts) {
-                   // Filter expenses for this category
-                   // TODO: We might want to filter by month/year too, similar to "Remaining" logic. 
-                   // For now, let's show all for simplicity or match the existing logic which seemed to imply current month context.
-                   // The user didn't specify, but "Budget" usually implies current month.
-                   // Let's filter by current month/year to match the budget view.
                    final now = DateTime.now();
                    final currentMonthExpenses = expenses.where((e) {
                      final localDate = e.date.toLocal();
@@ -52,7 +46,6 @@ class CategoryDetailScreen extends ConsumerWidget {
                    
                    return Column(
                      children: [
-                       // Summary Card
                        Card(
                          margin: const EdgeInsets.all(16),
                          child: Padding(
@@ -60,12 +53,12 @@ class CategoryDetailScreen extends ConsumerWidget {
                            child: Column(
                              children: [
                                Text(
-                                 'Presupuesto Mensual: ${Formatters.formatMoney(category.monthlyBudget, locale)}',
+                                 '${l10n.monthlyBudget}: ${Formatters.formatMoney(category.monthlyBudget, locale)}',
                                  style: Theme.of(context).textTheme.titleMedium,
                                ),
                                const SizedBox(height: 16),
                                Text(
-                                 'Restante',
+                                 l10n.remainingLabel,
                                  style: Theme.of(context).textTheme.bodyMedium,
                                ),
                                Text(
@@ -94,21 +87,19 @@ class CategoryDetailScreen extends ConsumerWidget {
                          child: Align(
                            alignment: Alignment.centerLeft,
                            child: Text(
-                             'Historial (Este mes)',
+                             l10n.historyThisMonth,
                              style: Theme.of(context).textTheme.titleSmall,
                            ),
                          ),
                        ),
                        
-                       // Expense List
                         Expanded(
                           child: currentMonthExpenses.isEmpty 
-                            ? const Center(child: Text('No hay gastos este mes'))
+                            ? Center(child: Text(l10n.noExpensesThisMonth))
                             : (() {
-                                // Group by day for visual separation
                                 final groupedExpenses = <String, List<Expense>>{};
                                 for (final expense in currentMonthExpenses) {
-                                  final dateKey = DateFormat('yyyy-MM-dd').format(expense.date.toLocal());
+                                  final dateKey = '${expense.date.toLocal().year}-${expense.date.toLocal().month}-${expense.date.toLocal().day}';
                                   groupedExpenses.putIfAbsent(dateKey, () => []).add(expense);
                                 }
 
@@ -119,7 +110,9 @@ class CategoryDetailScreen extends ConsumerWidget {
                                   itemBuilder: (context, index) {
                                     final dateKey = dateKeys[index];
                                     final dayExpenses = groupedExpenses[dateKey]!;
-                                    final displayDate = DateFormat.yMMMMEEEEd(Localizations.localeOf(context).toString()).format(dayExpenses.first.date.toLocal());
+                                    // Custom date formatting to avoid intl date format issues without more research
+                                    final firstDate = dayExpenses.first.date.toLocal();
+                                    final displayDate = '${firstDate.day}/${firstDate.month}/${firstDate.year}';
 
                                     return Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -137,23 +130,23 @@ class CategoryDetailScreen extends ConsumerWidget {
                                         ...dayExpenses.map((expense) {
                                           final accountList = accounts.where((a) => a.id == expense.accountId);
                                           final account = accountList.isNotEmpty ? accountList.first : null;
-                                          final timeStr = DateFormat.Hm(Localizations.localeOf(context).toString()).format(expense.date.toLocal());
+                                          final timeStr = '${expense.date.toLocal().hour}:${expense.date.toLocal().minute.toString().padLeft(2, '0')}';
 
                                           return ListTile(
                                             leading: const CircleAvatar(
                                               child: Icon(Icons.attach_money),
                                             ),
-                                            title: Text(expense.note ?? 'Sin nota'),
+                                            title: Text(expense.note ?? l10n.noNote),
                                             subtitle: Column(
                                               crossAxisAlignment: CrossAxisAlignment.start,
                                               children: [
                                                 Text(
-                                                  '$timeStr • ${account?.name ?? "Cuenta desconocida"}',
+                                                  '$timeStr • ${account?.displayName ?? l10n.unknownAccount}',
                                                   style: Theme.of(context).textTheme.bodySmall,
                                                 ),
                                                 if (expense.user != null)
                                                   Text(
-                                                    'Creado por: ${expense.user!.name}',
+                                                    l10n.createdBy(expense.user!.name),
                                                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                                       fontSize: 10,
                                                       color: Colors.grey,
@@ -167,7 +160,7 @@ class CategoryDetailScreen extends ConsumerWidget {
                                               style: const TextStyle(fontWeight: FontWeight.bold),
                                             ),
                                           );
-                                        }).toList(),
+                                        }),
                                       ],
                                     );
                                   },
@@ -178,11 +171,11 @@ class CategoryDetailScreen extends ConsumerWidget {
                    );
                  },
                  loading: () => const Center(child: CircularProgressIndicator()),
-                 error: (_, __) => const Center(child: Text('Error cargando cuentas')),
+                 error: (_, __) => Center(child: Text(l10n.errorLoadingAccounts)),
                );
              },
              loading: () => const Center(child: CircularProgressIndicator()),
-             error: (_, __) => const Center(child: Text('Error cargando gastos')),
+             error: (_, __) => Center(child: Text(l10n.errorLoadingExpenses)),
           ),
           floatingActionButton: FloatingActionButton(
             onPressed: () => context.push('/new-expense/$categoryId'),
@@ -191,7 +184,7 @@ class CategoryDetailScreen extends ConsumerWidget {
         );
       },
       loading: () => const Scaffold(body: Center(child: CircularProgressIndicator())),
-      error: (err, _) => Scaffold(body: Center(child: Text('Error: $err'))),
+      error: (err, _) => Scaffold(body: Center(child: Text(l10n.errorWithDetails(err.toString())))),
     );
   }
 }

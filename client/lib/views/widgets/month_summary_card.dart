@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:keda/l10n/app_localizations.dart';
 import '../../utils/formatters.dart';
 
 class MonthSummaryCard extends StatelessWidget {
@@ -16,6 +17,7 @@ class MonthSummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final now = DateTime.now();
     final locale = Localizations.localeOf(context).toString();
     final monthName = DateFormat('MMMM yyyy', locale).format(now);
@@ -59,13 +61,13 @@ class MonthSummaryCard extends StatelessWidget {
               children: [
                 _buildInfoColumn(
                   context,
-                  'Presupuesto',
+                  l10n.budget,
                   Formatters.formatMoney(totalBudget, locale),
                   Colors.green,
                 ),
                 _buildInfoColumn(
                   context,
-                  'Gastado',
+                  l10n.spent,
                   Formatters.formatMoney(totalSpent, locale),
                   Colors.red,
                 ),
@@ -86,8 +88,8 @@ class MonthSummaryCard extends StatelessWidget {
             const SizedBox(height: 12),
             Text(
               isOverBudget
-                  ? 'EXCEDIDO POR ${Formatters.formatMoney(-remaining, locale)}'
-                  : 'QUEDAN ${Formatters.formatMoney(remaining, locale)}',
+                  ? l10n.exceededBy(Formatters.formatMoney(-remaining, locale))
+                  : l10n.remaining(Formatters.formatMoney(remaining, locale)),
               style: GoogleFonts.jetBrainsMono(
                 color: isOverBudget ? const Color(0xFFEF4444) : const Color(0xFF22C55E),
                 fontWeight: FontWeight.bold,

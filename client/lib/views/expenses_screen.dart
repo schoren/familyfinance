@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:keda/l10n/app_localizations.dart';
 import '../providers/data_providers.dart';
 import '../utils/formatters.dart';
 import '../models/expense.dart';
-import '../models/category.dart';
-import '../models/user.dart';
 import '../widgets/user_avatar.dart';
 
 class ExpensesScreen extends ConsumerWidget {
@@ -16,12 +15,13 @@ class ExpensesScreen extends ConsumerWidget {
     final expensesAsync = ref.watch(expensesProvider);
     final accountsAsync = ref.watch(accountsProvider);
     final categoriesAsync = ref.watch(categoriesProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     final locale = Localizations.localeOf(context).toString();
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Todos los Gastos'),
+        title: Text(l10n.allExpenses),
       ),
       body: expensesAsync.when(
         data: (expenses) {
@@ -38,7 +38,7 @@ class ExpensesScreen extends ConsumerWidget {
                   }).toList();
 
                   if (currentMonthExpenses.isEmpty) {
-                    return const Center(child: Text('No hay gastos este mes'));
+                    return Center(child: Text(l10n.noExpensesThisMonth));
                   }
 
                   // Group by day for visual separation
@@ -67,7 +67,7 @@ class ExpensesScreen extends ConsumerWidget {
                               style: Theme.of(context).textTheme.titleSmall?.copyWith(
                                 color: Theme.of(context).colorScheme.primary,
                                 fontWeight: FontWeight.bold,
-                              ),
+                                ),
                             ),
                           ),
                           ...dayExpenses.map((expense) {
@@ -85,7 +85,7 @@ class ExpensesScreen extends ConsumerWidget {
                                     name: expense.user!.name,
                                     color: expense.user!.color,
                                   ),
-                              title: Text(expense.note ?? 'Sin nota'),
+                              title: Text(expense.note ?? l10n.noNote),
                               subtitle: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -95,7 +95,7 @@ class ExpensesScreen extends ConsumerWidget {
                                   ),
                                   if (expense.user != null)
                                     Text(
-                                      'Creado por: ${expense.user!.name}',
+                                      l10n.createdBy(expense.user!.name),
                                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                         fontSize: 10,
                                         color: Colors.grey,
@@ -116,15 +116,15 @@ class ExpensesScreen extends ConsumerWidget {
                   );
                 },
                 loading: () => const Center(child: CircularProgressIndicator()),
-                error: (_, __) => const Center(child: Text('Error cargando categorías')),
+                error: (_, __) => Center(child: Text(l10n.errorLoadingCategories)),
               );
             },
             loading: () => const Center(child: CircularProgressIndicator()),
-            error: (_, __) => const Center(child: Text('Error cargando cuentas')),
+            error: (_, __) => Center(child: Text(l10n.errorLoadingAccounts)),
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, __) => const Center(child: Text('Error cargando gastos')),
+        error: (_, __) => Center(child: Text(l10n.errorLoadingExpenses)),
       ),
     );
   }

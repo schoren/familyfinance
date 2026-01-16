@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:keda/l10n/app_localizations.dart';
 import '../providers/data_providers.dart';
 import '../providers/auth_provider.dart';
 import '../widgets/user_avatar.dart';
@@ -29,20 +30,21 @@ class _MembersScreenState extends ConsumerState<MembersScreen> {
   }
 
   Future<void> _removeMember(String memberId, String memberName) async {
+    final l10n = AppLocalizations.of(context)!;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Eliminar Miembro'),
-        content: Text('¿Estás seguro de que quieres eliminar a $memberName del hogar?'),
+        title: Text(l10n.removeMember),
+        content: Text(l10n.removeMemberConfirm(memberName)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancelar'),
+            child: Text(l10n.cancel),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Eliminar'),
+            child: Text(l10n.delete),
           ),
         ],
       ),
@@ -54,13 +56,13 @@ class _MembersScreenState extends ConsumerState<MembersScreen> {
         _loadMembers();
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Miembro eliminado')),
+            SnackBar(content: Text(l10n.memberRemoved)),
           );
         }
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error: $e')),
+            SnackBar(content: Text(l10n.errorWithDetails(e.toString()))),
           );
         }
       }
@@ -77,7 +79,7 @@ class _MembersScreenState extends ConsumerState<MembersScreen> {
     final link = '$baseUrl/invite?code=$code';
     Clipboard.setData(ClipboardData(text: link));
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Enlace de invitación copiado al portapapeles')),
+      SnackBar(content: Text(AppLocalizations.of(context)!.inviteLinkCopied)),
     );
   }
 
@@ -85,6 +87,7 @@ class _MembersScreenState extends ConsumerState<MembersScreen> {
     final emailController = TextEditingController();
 
     void submit() async {
+      final l10n = AppLocalizations.of(context)!;
       final email = emailController.text.trim();
       if (email.isEmpty) return;
 
@@ -93,15 +96,15 @@ class _MembersScreenState extends ConsumerState<MembersScreen> {
         if (mounted) {
           Navigator.pop(context);
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Invitación enviada con éxito')),
+            SnackBar(content: Text(l10n.invitationSent)),
           );
           _loadMembers(); // Refresh list
         }
       } catch (e) {
         if (mounted) {
-          String message = 'Error al enviar invitación: $e';
+          String message = l10n.inviteError(e.toString());
           if (e.toString().contains('409') || e.toString().contains('Invitation already pending')) {
-            message = 'Este usuario ya tiene una invitación pendiente';
+            message = l10n.invitePending;
           }
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(message)),
@@ -110,10 +113,11 @@ class _MembersScreenState extends ConsumerState<MembersScreen> {
       }
     }
 
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Invitar Miembro'),
+        title: Text(l10n.inviteMember),
         content: TextField(
           controller: emailController,
           decoration: const InputDecoration(
@@ -128,11 +132,11 @@ class _MembersScreenState extends ConsumerState<MembersScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancelar'),
+            child: Text(l10n.cancel),
           ),
           ElevatedButton(
             onPressed: submit,
-            child: const Text('Enviar'),
+            child: Text(l10n.send),
           ),
         ],
       ),
@@ -143,13 +147,15 @@ class _MembersScreenState extends ConsumerState<MembersScreen> {
   Widget build(BuildContext context) {
     final currentUserId = ref.watch(authProvider).userId;
 
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Miembros del Hogar'),
+        title: Text(l10n.householdMembers),
         actions: [
           IconButton(
             icon: const Icon(Icons.person_add),
-            tooltip: 'Invitar',
+            tooltip: l10n.inviteTooltip,
             onPressed: _showInviteDialog,
           ),
         ],
@@ -161,7 +167,7 @@ class _MembersScreenState extends ConsumerState<MembersScreen> {
             return const Center(child: CircularProgressIndicator());
           }
           if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
+            return Center(child: Text(AppLocalizations.of(context)!.errorWithDetails(snapshot.error.toString())));
           }
 
           final members = snapshot.data ?? [];
@@ -187,7 +193,7 @@ class _MembersScreenState extends ConsumerState<MembersScreen> {
                       color: member['color'],
                     ),
                 title: Text(
-                  member['name'] + (isMe ? ' (Tú)' : '') + (isPending ? ' (Pendiente)' : ''),
+                  member['name'] + (isMe ? l10n.youSuffix : '') + (isPending ? l10n.pendingSuffix : ''),
                   style: TextStyle(
                     fontStyle: isPending ? FontStyle.italic : FontStyle.normal,
                     color: isPending ? Colors.grey : null,
@@ -200,7 +206,7 @@ class _MembersScreenState extends ConsumerState<MembersScreen> {
                     if (isPending && inviteCode != null)
                       IconButton(
                         icon: const Icon(Icons.copy),
-                        tooltip: 'Copiar enlace',
+                        tooltip: l10n.copyLinkTooltip,
                         onPressed: () => _copyInviteLink(inviteCode),
                       ),
                     

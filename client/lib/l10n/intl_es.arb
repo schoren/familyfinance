@@ -1,0 +1,169 @@
+{
+  "settings": "Configuración",
+  "language": "Idioma",
+  "spanish": "Español",
+  "english": "Inglés",
+  "logout": "Cerrar Sesión",
+  "versionInfo": "Información de Versión",
+  "clientVersion": "Version Cliente",
+  "serverVersion": "Versión Servidor",
+  "loading": "cargando...",
+  "error": "error",
+  "home": "Inicio",
+  "accounts": "Cuentas",
+  "members": "Miembros",
+  "expenses": "Gastos",
+  "noExpenses": "No hay gastos recientes",
+  "addExpense": "Agregar Gasto",
+  "systemDefault": "Sistema",
+  "deleteCategory": "Eliminar Categoría",
+  "deleteCategoryConfirm": "¿Estás seguro de que deseas eliminar \"{name}\"?",
+  "@deleteCategoryConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "cancel": "Cancelar",
+  "delete": "Eliminar",
+  "viewDetail": "Ver Detalle",
+  "edit": "Editar",
+  "allExpenses": "Todos los Gastos",
+  "noExpensesThisMonth": "No hay gastos este mes",
+  "noNote": "Sin nota",
+  "createdBy": "Creado por: {name}",
+  "@createdBy": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "errorLoadingCategories": "Error cargando categorías",
+  "errorLoadingAccounts": "Error cargando cuentas",
+  "errorLoadingExpenses": "Error cargando gastos",
+  "pleaseSelectAccount": "Por favor selecciona una cuenta",
+  "categoryNotFound": "Categoría no encontrada",
+  "remaining": "RESTANTE",
+  "amount": "MONTO",
+  "enterAmount": "Ingresa un monto",
+  "invalidAmount": "Monto inválido",
+  "account": "CUENTA",
+  "addNewAccount": "Añadir nueva cuenta...",
+  "noAccountsCreated": "No tienes cuentas creadas.",
+  "createFirstAccount": "Crear mi primera cuenta",
+  "noteOptional": "NOTA (OPCIONAL)",
+  "saveExpense": "GUARDAR GASTO",
+  "selectAnAccount": "Selecciona una cuenta",
+  "manageAccounts": "Administrar Cuentas",
+  "card": "Tarjeta",
+  "bankAccount": "Cuenta Bancaria",
+  "cash": "Efectivo",
+  "deleteAccount": "Eliminar Cuenta",
+  "deleteAccountConfirm": "¿Deseas eliminar la cuenta \"{name}\"?",
+  "@deleteAccountConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "editAccount": "Editar Cuenta",
+  "newAccount": "Nueva Cuenta",
+  "type": "Tipo",
+  "brand": "Marca",
+  "bank": "Banco",
+  "accountName": "Nombre de la cuenta",
+  "enterBank": "Ingresa el banco",
+  "enterName": "Ingresa el nombre",
+  "save": "GUARDAR",
+  "accountNotFound": "Cuenta no encontrada",
+  "saveError": "Error al guardar: {error}",
+  "@saveError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "removeMember": "Eliminar Miembro",
+  "removeMemberConfirm": "¿Estás seguro de que quieres eliminar a {name} del hogar?",
+  "@removeMemberConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "memberRemoved": "Miembro eliminado",
+  "inviteLinkCopied": "Enlace de invitación copiado al portapapeles",
+  "inviteMember": "Invitar Miembro",
+  "invitationSent": "Invitación enviada con éxito",
+  "invitePending": "Este usuario ya tiene una invitación pendiente",
+  "inviteError": "Error al enviar invitación: {error}",
+  "@inviteError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "send": "Enviar",
+  "householdMembers": "Miembros del Hogar",
+  "inviteTooltip": "Invitar",
+  "youSuffix": " (Tú)",
+  "pendingSuffix": " (Pendiente)",
+  "copyLinkTooltip": "Copiar enlace",
+  "categorySaved": "Categoría guardada exitosamente",
+  "editCategory": "Editar Categoría",
+  "newCategory": "Nueva Categoría",
+  "name": "Nombre",
+  "monthlyBudget": "Presupuesto Mensual",
+  "enterNamePlease": "Por favor ingresa un nombre",
+  "enterBudgetPlease": "Por favor ingresa un presupuesto",
+  "invalidNumber": "Ingresa un número válido",
+  "errorWithDetails": "Error: {error}",
+  "@errorWithDetails": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "loading": "Cargando...",
+  "error": "Error",
+  "errorInitializingGoogleSignIn": "Error al inicializar Google Sign In: {error}",
+  "@errorInitializingGoogleSignIn": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "historyThisMonth": "Historial (Este mes)",
+  "noExpensesThisMonth": "No hay gastos este mes",
+  "unknownAccount": "Cuenta desconocida",
+  "home": "Inicio",
+  "accounts": "Cuentas",
+  "members": "Miembros",
+  "budget": "Presupuesto",
+  "spent": "Gastado",
+  "remainingLabel": "Restante",
+  "exceededBy": "EXCEDIDO POR {amount}",
+  "@exceededBy": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "remaining": "QUEDAN {amount}",
+  "@remaining": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  }
+}

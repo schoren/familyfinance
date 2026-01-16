@@ -2,12 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:keda/l10n/app_localizations.dart';
 import '../providers/data_providers.dart';
-import 'package:intl/intl.dart';
-import '../providers/auth_provider.dart';
-import 'widgets/month_summary_card.dart';
 import '../utils/formatters.dart';
 import '../utils/ios_keyboard_fix.dart';
+import './widgets/month_summary_card.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -16,6 +15,7 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final categoriesAsync = ref.watch(categoriesProvider);
     final (totalBudget, totalSpent) = ref.watch(monthlyTotalsProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       body: Column(
@@ -153,16 +153,16 @@ class HomeScreen extends ConsumerWidget {
                                     showDialog(
                                       context: context,
                                       builder: (ctx) => AlertDialog(
-                                        title: const Text('Eliminar Categoría'),
-                                        content: Text('¿Estás seguro de que deseas eliminar "${category.name}"?'),
+                                        title: Text(l10n.deleteCategory),
+                                        content: Text(l10n.deleteCategoryConfirm(category.name)),
                                         actions: [
-                                          TextButton(onPressed: () => ctx.pop(), child: const Text('Cancelar')),
+                                          TextButton(onPressed: () => ctx.pop(), child: Text(l10n.cancel)),
                                           TextButton(
                                             onPressed: () async {
                                               ctx.pop();
                                               await ref.read(categoriesProvider.notifier).deleteCategory(category.id);
                                             },
-                                            child: const Text('Eliminar', style: TextStyle(color: Colors.red)),
+                                            child: Text(l10n.delete, style: const TextStyle(color: Colors.red)),
                                           ),
                                         ],
                                       ),
@@ -170,20 +170,20 @@ class HomeScreen extends ConsumerWidget {
                                   }
                                 },
                                 itemBuilder: (context) => [
-                                  const PopupMenuItem(
+                                  PopupMenuItem(
                                     value: 'details',
                                     height: 32,
-                                    child: Text('Ver Detalle', style: TextStyle(fontSize: 14)),
+                                    child: Text(l10n.viewDetail, style: const TextStyle(fontSize: 14)),
                                   ),
-                                  const PopupMenuItem(
+                                  PopupMenuItem(
                                     value: 'edit',
                                     height: 32,
-                                    child: Text('Editar', style: TextStyle(fontSize: 14)),
+                                    child: Text(l10n.edit, style: const TextStyle(fontSize: 14)),
                                   ),
-                                  const PopupMenuItem(
+                                  PopupMenuItem(
                                     value: 'delete',
                                     height: 32,
-                                    child: Text('Eliminar', style: TextStyle(fontSize: 14, color: Colors.red)),
+                                    child: Text(l10n.delete, style: const TextStyle(fontSize: 14, color: Colors.red)),
                                   ),
                                 ],
                               ),

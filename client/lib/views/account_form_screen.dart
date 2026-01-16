@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
+import 'package:keda/l10n/app_localizations.dart';
 import '../models/finance_account.dart';
 import '../models/account_type.dart';
 import '../providers/data_providers.dart';
@@ -51,7 +52,7 @@ class _AccountFormScreenState extends ConsumerState<AccountFormScreen> {
     try {
       final newAccount = FinanceAccount(
         id: widget.accountId ?? const Uuid().v4(),
-        name: _selectedType == AccountType.bank ? _nameController.text : (_selectedType == AccountType.cash ? "Efectivo" : _nameController.text),
+        name: _selectedType == AccountType.bank ? _nameController.text : (_selectedType == AccountType.cash ? AppLocalizations.of(context)!.cash : _nameController.text),
         type: _selectedType,
         brand: _selectedType == AccountType.card ? _selectedBrand : null,
         bank: _selectedType == AccountType.card ? _bankController.text : null,
@@ -72,7 +73,7 @@ class _AccountFormScreenState extends ConsumerState<AccountFormScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al guardar: $e')),
+          SnackBar(content: Text(AppLocalizations.of(context)!.saveError(e.toString()))),
         );
       }
     } finally {
@@ -96,8 +97,8 @@ class _AccountFormScreenState extends ConsumerState<AccountFormScreen> {
           );
           if (account.id.isEmpty) {
             return Scaffold(
-              appBar: AppBar(title: const Text('Error')),
-              body: const Center(child: Text('Cuenta no encontrada')),
+              appBar: AppBar(title: Text(AppLocalizations.of(context)!.error)),
+              body: Center(child: Text(AppLocalizations.of(context)!.accountNotFound)),
             );
           }
           _initializeFromAccount(account);
@@ -114,7 +115,7 @@ class _AccountFormScreenState extends ConsumerState<AccountFormScreen> {
   Widget _buildForm(BuildContext context, bool isEditing, AsyncValue<List<FinanceAccount>> accountsAsync) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(isEditing ? 'Editar Cuenta' : 'Nueva Cuenta'),
+        title: Text(isEditing ? AppLocalizations.of(context)!.editAccount : AppLocalizations.of(context)!.newAccount),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -125,15 +126,15 @@ class _AccountFormScreenState extends ConsumerState<AccountFormScreen> {
             children: [
               DropdownButtonFormField<AccountType>(
                 value: _selectedType,
-                decoration: const InputDecoration(
-                  labelText: 'Tipo',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: AppLocalizations.of(context)!.type,
+                  border: const OutlineInputBorder(),
                 ),
                 items: [
                   if (!isEditing && accountsAsync.maybeWhen(data: (accounts) => !accounts.any((a) => a.type == AccountType.cash), orElse: () => true))
-                    const DropdownMenuItem(value: AccountType.cash, child: Text('Efectivo')),
-                  const DropdownMenuItem(value: AccountType.card, child: Text('Tarjeta')),
-                  const DropdownMenuItem(value: AccountType.bank, child: Text('Cuenta Bancaria')),
+                    DropdownMenuItem(value: AccountType.cash, child: Text(AppLocalizations.of(context)!.cash)),
+                  DropdownMenuItem(value: AccountType.card, child: Text(AppLocalizations.of(context)!.card)),
+                  DropdownMenuItem(value: AccountType.bank, child: Text(AppLocalizations.of(context)!.bankAccount)),
                 ],
                 onChanged: (value) {
                   if (value != null) setState(() => _selectedType = value);
@@ -143,9 +144,9 @@ class _AccountFormScreenState extends ConsumerState<AccountFormScreen> {
                 const SizedBox(height: 16),
                 DropdownButtonFormField<String>(
                   value: _selectedBrand,
-                  decoration: const InputDecoration(
-                    labelText: 'Marca',
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    labelText: AppLocalizations.of(context)!.brand,
+                    border: const OutlineInputBorder(),
                   ),
                   items: cardBrands.map((brand) {
                     return DropdownMenuItem(value: brand, child: Text(brand));
@@ -153,7 +154,7 @@ class _AccountFormScreenState extends ConsumerState<AccountFormScreen> {
                   onChanged: (value) {
                     if (value != null) setState(() => _selectedBrand = value);
                   },
-                  validator: (value) => value == null ? 'Selecciona una marca' : null,
+                  validator: (value) => value == null ? AppLocalizations.of(context)!.selectAnAccount : null,
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
@@ -161,11 +162,11 @@ class _AccountFormScreenState extends ConsumerState<AccountFormScreen> {
                   textInputAction: TextInputAction.done,
                   autofocus: true,
                   textCapitalization: TextCapitalization.sentences,
-                  decoration: const InputDecoration(
-                    labelText: 'Banco',
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    labelText: AppLocalizations.of(context)!.bank,
+                    border: const OutlineInputBorder(),
                   ),
-                  validator: (value) => (value == null || value.isEmpty) ? 'Ingresa el banco' : null,
+                  validator: (value) => (value == null || value.isEmpty) ? AppLocalizations.of(context)!.enterBank : null,
                   onFieldSubmitted: (_) => _save(),
                 ),
               ] else if (_selectedType == AccountType.bank) ...[
@@ -175,11 +176,11 @@ class _AccountFormScreenState extends ConsumerState<AccountFormScreen> {
                   textInputAction: TextInputAction.done,
                   autofocus: true,
                   textCapitalization: TextCapitalization.sentences,
-                  decoration: const InputDecoration(
-                    labelText: 'Nombre de la cuenta',
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    labelText: AppLocalizations.of(context)!.accountName,
+                    border: const OutlineInputBorder(),
                   ),
-                  validator: (value) => (value == null || value.isEmpty) ? 'Ingresa el nombre' : null,
+                  validator: (value) => (value == null || value.isEmpty) ? AppLocalizations.of(context)!.enterName : null,
                   onFieldSubmitted: (_) => _save(),
                 ),
               ],
@@ -193,7 +194,7 @@ class _AccountFormScreenState extends ConsumerState<AccountFormScreen> {
                   ),
                   child: _isLoading 
                     ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2))
-                    : const Text('GUARDAR', style: TextStyle(fontSize: 18)),
+                    : Text(AppLocalizations.of(context)!.save, style: const TextStyle(fontSize: 18)),
                 ),
               ),
             ],
