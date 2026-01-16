@@ -90,7 +90,7 @@ a {
     z-index: 1;
 }
 
-/* Buttons */
+/* Atomic Components */
 .btn {
     display: inline-flex;
     align-items: center;
@@ -141,6 +141,32 @@ a {
     align-items: center;
 }
 
+/* Section Header */
+.section-header {
+    text-align: center;
+    margin-bottom: 4rem;
+}
+
+.section-header h2 {
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--primary);
+    margin-bottom: 0.5rem;
+}
+
+.section-divider {
+    width: 40px;
+    height: 4px;
+    background-color: var(--primary);
+    margin: 0 auto;
+    border-radius: 2px;
+}
+
+.section-header.light h2 {
+    color: var(--text-light-muted);
+}
+
 /* Store Badges */
 .store-badges {
     display: flex;
@@ -150,8 +176,7 @@ a {
 }
 
 .store-badge img {
-    height: 48px;
-    /* Slightly larger */
+    height: 44px;
     width: auto;
     border-radius: 8px;
     transition: transform 0.2s, opacity 0.2s;
@@ -190,7 +215,6 @@ a {
         "cta visual";
     grid-template-columns: 1.2fr 0.8fr;
     gap: 0 4rem;
-    /* No vertical gap on desktop between text and cta */
     align-items: center;
 }
 
@@ -223,7 +247,6 @@ a {
     max-width: 500px;
 }
 
-/* CTA Grouping */
 .cta-group {
     display: flex;
     flex-direction: column;
@@ -232,14 +255,14 @@ a {
 
 /* Video Container */
 .video-container-vertical {
-    width: 280px;
+    width: 250px;
     aspect-ratio: 9/16;
     background: #000;
-    border-radius: 40px;
-    border: 10px solid #1e293b;
+    border-radius: 32px;
+    border: 8px solid #1e293b;
     overflow: hidden;
     position: relative;
-    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.6);
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
 }
 
 .video-placeholder {
@@ -250,7 +273,7 @@ a {
     align-items: center;
     justify-content: center;
     color: rgba(255, 255, 255, 0.4);
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     gap: 1rem;
 }
 
@@ -300,7 +323,7 @@ a {
     color: var(--text-light);
 }
 
-/* Hamburger & Mobile Menu */
+/* Hamburger */
 .hamburger {
     display: none;
     flex-direction: column;
@@ -381,9 +404,9 @@ a {
     visibility: visible;
 }
 
-/* Sections */
+/* Content Sections */
 .problem-solution {
-    padding: 9rem 0;
+    padding: 8rem 0;
     background-color: white;
 }
 
@@ -415,7 +438,6 @@ a {
     margin: 0 auto;
 }
 
-/* Animations */
 .floating {
     animation: float 6s ease-in-out infinite;
 }
@@ -445,11 +467,11 @@ a {
 
 /* Features */
 .features {
-    padding: 7rem 0;
+    padding: 8rem 0;
     background-color: var(--light-bg);
 }
 
-.features .container {
+.features-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
     gap: 2rem;
@@ -471,18 +493,29 @@ a {
 
 /* Self Host */
 .self-host-section {
-    padding: 6rem 0;
+    padding: 9rem 0;
     background-color: #F1F5F9;
     text-align: center;
 }
 
 /* Final CTA */
 .final-cta {
-    padding: 10rem 0 6rem;
+    padding: 10rem 0 7rem;
     text-align: center;
     background: var(--dark-bg);
     color: var(--text-light);
     clip-path: polygon(0 15%, 100% 0, 100% 100%, 0 100%);
+}
+
+.final-cta h2 {
+    margin-bottom: 2rem;
+}
+
+.final-cta-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
 }
 
 .cta-buttons {
@@ -536,13 +569,10 @@ footer {
     }
 
     .hero-layout {
-        grid-template-areas:
-            "text"
-            "visual"
-            "cta";
+        grid-template-areas: "text" "visual" "cta";
         grid-template-columns: 1fr;
         text-align: center;
-        gap: 2rem;
+        gap: 2.5rem;
     }
 
     .hero-text {
@@ -556,10 +586,6 @@ footer {
 
     .hero-text h1 {
         font-size: 2.8rem;
-    }
-
-    .hero-subtitle {
-        margin: 0 auto 1.5rem;
     }
 
     .cta-group {
@@ -581,7 +607,7 @@ footer {
     }
 
     .video-container-vertical {
-        width: 200px;
+        width: 220px;
     }
 
     .grid-2 {
