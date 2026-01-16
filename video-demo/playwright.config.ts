@@ -11,7 +11,6 @@ export default defineConfig({
   use: {
     baseURL: 'http://localhost:8085',
     video: 'on',
-    viewport: { width: 390, height: 844 },
     trace: 'off',
     launchOptions: {
       slowMo: 500,
