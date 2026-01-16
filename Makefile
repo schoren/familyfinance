@@ -5,6 +5,9 @@ TEST_SERVER_PORT := 8091
 
 DEV_DOCKER_COMPOSE := docker compose --env-file .env.dev -f docker-compose.yml -f docker-compose.dev.yml
 
+# Use timestamp as version for development to facilitate testing update notifications
+export APP_VERSION ?= dev-$(shell date +%Y%m%d%H%M%S)
+
 # Default target
 help:
 	@echo "Keda - Test Automation"

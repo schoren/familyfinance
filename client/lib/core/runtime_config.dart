@@ -18,4 +18,8 @@ class RuntimeConfig {
     const envValue = String.fromEnvironment('GOOGLE_CLIENT_ID');
     return envValue.isNotEmpty ? envValue : null;
   }
+
+  static String get appVersion {
+    return const String.fromEnvironment('APP_VERSION', defaultValue: 'local-dev');
+  }
 }

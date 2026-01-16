@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart' hide Category;
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/category.dart';
 import '../models/finance_account.dart';
@@ -7,6 +8,7 @@ import '../models/monthly_summary.dart';
 import '../repositories/api_client.dart';
 import '../providers/auth_provider.dart';
 import '../core/runtime_config.dart';
+import '../core/update_logic.dart';
 
 // ============================================================================
 // API CLIENT
@@ -270,4 +272,61 @@ final monthlyTotalsProvider = Provider.autoDispose<(double budget, double spent)
 final serverVersionProvider = FutureProvider<String>((ref) async {
   final apiClient = ref.watch(apiClientProvider);
   return await apiClient.getServerVersion();
+});
+
+// ============================================================================
+// VERSION CHECK
+// ============================================================================
+
+enum UpdateState { upToDate, updateAvailable }
+
+class VersionCheckNotifier extends AsyncNotifier<UpdateState> with WidgetsBindingObserver {
+  @override
+  Future<UpdateState> build() async {
+    WidgetsBinding.instance.addObserver(this);
+    ref.onDispose(() => WidgetsBinding.instance.removeObserver(this));
+
+    // Check once at startup
+    return await _checkWebVersion();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _checkWebVersion();
+    }
+  }
+
+  Future<UpdateState> _checkWebVersion() async {
+    try {
+      final apiClient = ref.read(apiClientProvider);
+      final serverVersion = await apiClient.getServerVersion();
+      final currentVersion = RuntimeConfig.appVersion;
+
+      if (kDebugMode) {
+        print('Version check: current=$currentVersion, server=$serverVersion');
+      }
+
+      if (serverVersion != currentVersion && currentVersion != 'local-dev') {
+        if (kDebugMode) print('Update detected! Forcing auto-reload...');
+        forceAppUpdate();
+        state = const AsyncData(UpdateState.updateAvailable);
+        return UpdateState.updateAvailable;
+      }
+    } catch (e) {
+      if (kDebugMode) print('Failed to check version: $e');
+    }
+    
+    // We don't want to overwrite updateAvailable if a check fails later
+    if (state.value == UpdateState.updateAvailable) {
+      return UpdateState.updateAvailable;
+    }
+
+    state = const AsyncData(UpdateState.upToDate);
+    return UpdateState.upToDate;
+  }
+}
+
+final versionCheckProvider = AsyncNotifierProvider<VersionCheckNotifier, UpdateState>(() {
+  return VersionCheckNotifier();
 });
