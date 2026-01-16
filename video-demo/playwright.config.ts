@@ -1,6 +1,6 @@
 import { defineConfig, devices } from '@playwright/test';
 
-const TIMEOUT = 10_000; // 1 second
+const TIMEOUT = 30_000;
 
 export default defineConfig({
   testDir: './tests',
@@ -11,7 +11,7 @@ export default defineConfig({
   use: {
     baseURL: 'http://localhost:8085',
     video: 'on',
-    viewport: { width: 1280, height: 720 },
+    viewport: { width: 390, height: 844 },
     trace: 'off',
     launchOptions: {
       slowMo: 500,

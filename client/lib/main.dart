@@ -10,10 +10,14 @@ import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:keda/l10n/app_localizations.dart';
 
+import 'package:flutter/rendering.dart';
 import 'dart:js' as js;
+import 'core/runtime_config.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  SemanticsBinding.instance.ensureSemantics();
+  
   usePathUrlStrategy();
   await initializeDateFormatting(null, null);
   runApp(

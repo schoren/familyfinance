@@ -13,46 +13,27 @@ if [[ "${CLIENT_IMAGE}" != "" ]]; then
   echo "Using client image: ${CLIENT_IMAGE}"
 fi
 
-echo "🔨 Starting DB and Server..."
-docker compose -p keda-video-demo -f docker-compose.yml up -d db server
+echo "🔨 Starting containers..."
+docker compose -p keda-video-demo -f docker-compose.yml up -d --remove-orphans
 
-echo "⏳ Waiting for server to be ready..."
-# We wait for server (8092)
-timeout 60 bash -c 'until curl -sf http://localhost:8092/health > /dev/null 2>&1; do sleep 2; done' || \
-    (echo "❌ Server failed to start" && docker compose -p keda-video-demo -f docker-compose.yml down -v && exit 1)
-echo "✅ Server ready at http://localhost:8092"
+echo "⏳ Waiting for client to be ready..."
+# We wait for client (8085) 
+timeout 60 bash -c 'until curl -sf http://localhost:8085 > /dev/null 2>&1; do sleep 2; done' || \
+    (echo "❌ Client failed to start" && docker compose -p keda-video-demo -f docker-compose.yml down -v && exit 1)
+echo "✅ Demo environment ready at http://localhost:8085"
 
-echo "🎬 Recording demo video with Patrol..."
-# Ensure dependencies are up to date
-cd ../client
-flutter pub get
-
-# Run patrol test with video recording
-# Note: Using absolute path to patrol if not in PATH
-PATROL_BIN="$HOME/.pub-cache/bin/patrol"
-if ! command -v patrol &> /dev/null; then
-    if [ -f "$PATROL_BIN" ]; then
-        PATROL="sh $PATROL_BIN" # Sometimes needs sh if not executable or depends on shell
-        PATROL="$PATROL_BIN"
-    else
-        echo "❌ patrol command not found"
-        exit 1
-    fi
-else
-    PATROL="patrol"
-fi
-
-$PATROL test \
-  --target integration_test/demo_test.dart \
-  -d chrome \
-  --web-video on \
-  --web-results-dir ../video-demo/test-results \
-  --dart-define=API_URL=http://localhost:8092 \
-  --dart-define=TEST_MODE=true \
-  --dart-define=TEST_HOUSEHOLD_ID=test-household-id
+echo "🎬 Recording demo video..."
+npm install
+npx playwright test --trace on
+TEST_EXIT_CODE=$?
 
 echo "🛑 Stopping demo environment..."
-cd ../video-demo
 docker compose -p keda-video-demo -f docker-compose.yml down -v
 
-echo "✅ Demo video generated in video-demo/test-results/"
+if [ $TEST_EXIT_CODE -eq 0 ]; then
+  echo "✅ Demo video generated in test-results/"
+else
+  echo "❌ Demo recording failed with exit code $TEST_EXIT_CODE"
+fi
+
+exit $TEST_EXIT_CODE

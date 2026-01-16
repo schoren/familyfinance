@@ -18,7 +18,7 @@ func SeedData(db *gorm.DB, householdID string) error {
 			Name:        "Demo User",
 			GoogleID:    "google-id-1",
 			PictureURL:  "https://lh3.googleusercontent.com/a-/ALV-UjWqgX8g_Xg_Xg_Xg_Xg_Xg_Xg_Xg_Xg=s96-c",
-			Color:       "blue",
+			Color:       getRandomColor(),
 			HouseholdID: householdID,
 		},
 		{
@@ -26,7 +26,7 @@ func SeedData(db *gorm.DB, householdID string) error {
 			Email:       "partner@keda.app",
 			Name:        "Partner",
 			GoogleID:    "google-id-2",
-			Color:       "green",
+			Color:       getRandomColor(),
 			HouseholdID: householdID,
 		},
 		{
@@ -34,7 +34,7 @@ func SeedData(db *gorm.DB, householdID string) error {
 			Email:       "kid@keda.app",
 			Name:        "Kid",
 			GoogleID:    "google-id-3",
-			Color:       "orange",
+			Color:       getRandomColor(),
 			HouseholdID: householdID,
 		},
 	}
@@ -87,10 +87,10 @@ func SeedData(db *gorm.DB, householdID string) error {
 	catTransportID := "cat-transport"
 
 	categories := []Category{
-		{ID: catGroceriesID, Name: "Supermercado", MonthlyBudget: 500.00, IsActive: true, HouseholdID: householdID},
-		{ID: catUtilitiesID, Name: "Servicios", MonthlyBudget: 150.00, IsActive: true, HouseholdID: householdID},
-		{ID: catEntertainmentID, Name: "Entretenimiento", MonthlyBudget: 100.00, IsActive: true, HouseholdID: householdID},
-		{ID: catTransportID, Name: "Transporte", MonthlyBudget: 80.00, IsActive: true, HouseholdID: householdID},
+		{ID: catGroceriesID, Name: "Supermarket", MonthlyBudget: 500.00, IsActive: true, HouseholdID: householdID},
+		{ID: catUtilitiesID, Name: "Utilities", MonthlyBudget: 150.00, IsActive: true, HouseholdID: householdID},
+		{ID: catEntertainmentID, Name: "Entertainment", MonthlyBudget: 100.00, IsActive: true, HouseholdID: householdID},
+		{ID: catTransportID, Name: "Transport", MonthlyBudget: 80.00, IsActive: true, HouseholdID: householdID},
 	}
 
 	for _, c := range categories {
@@ -105,7 +105,7 @@ func SeedData(db *gorm.DB, householdID string) error {
 		// Today
 		{ID: "tx-1", AccountID: walletID, CategoryID: catGroceriesID, UserID: "test-user-id", Amount: 45.50, Date: time.Now(), Description: "Compra semanal", HouseholdID: householdID},
 		{ID: "tx-2", AccountID: bankID, CategoryID: catUtilitiesID, UserID: "test-user-id", Amount: 30.00, Date: time.Now(), Description: "Luz", HouseholdID: householdID},
-		
+
 		// Yesterday
 		{ID: "tx-3", AccountID: walletID, CategoryID: catTransportID, UserID: "user-2", Amount: 5.00, Date: time.Now().AddDate(0, 0, -1), Description: "Uber", HouseholdID: householdID},
 		{ID: "tx-4", AccountID: bankID, CategoryID: catGroceriesID, UserID: "user-2", Amount: 12.30, Date: time.Now().AddDate(0, 0, -1), Description: "Panaderia", HouseholdID: householdID},

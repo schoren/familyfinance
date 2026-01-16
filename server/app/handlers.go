@@ -31,6 +31,12 @@ var userColors = []string{
 	"#84CC16", // Lime
 }
 
+func getRandomColor() string {
+	// Select random color
+	randIdx, _ := rand.Int(rand.Reader, big.NewInt(int64(len(userColors))))
+	return userColors[randIdx.Int64()]
+}
+
 type Handlers struct {
 	db           *gorm.DB
 	googleAPIURL string
@@ -846,17 +852,13 @@ func (h *Handlers) AuthGoogle(c *gin.Context) {
 			h.createDefaultCashAccount(householdID)
 		}
 
-		// Select random color
-		randIdx, _ := rand.Int(rand.Reader, big.NewInt(int64(len(userColors))))
-		color := userColors[randIdx.Int64()]
-
 		user = User{
 			ID:          uuid.New().String(),
 			Email:       email,
 			Name:        name,
 			GoogleID:    googleID,
 			PictureURL:  pictureURL,
-			Color:       color,
+			Color:       getRandomColor(),
 			HouseholdID: householdID,
 		}
 
@@ -884,8 +886,7 @@ func (h *Handlers) AuthGoogle(c *gin.Context) {
 			needsUpdate = true
 		}
 		if user.Color == "" {
-			randIdx, _ := rand.Int(rand.Reader, big.NewInt(int64(len(userColors))))
-			user.Color = userColors[randIdx.Int64()]
+			user.Color = getRandomColor()
 			needsUpdate = true
 		}
 		if needsUpdate {
