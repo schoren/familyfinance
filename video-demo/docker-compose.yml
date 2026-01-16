@@ -2,30 +2,30 @@ services:
   db:
     image: postgres:15-alpine
     environment:
-      POSTGRES_DB: keda_test
-      POSTGRES_USER: test_user
-      POSTGRES_PASSWORD: test_password
+      POSTGRES_DB: keda_demo
+      POSTGRES_USER: demo_user
+      POSTGRES_PASSWORD: demo_password
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U test_user -d keda_test" ]
+      test: [ "CMD-SHELL", "pg_isready -U demo_user -d keda_demo" ]
       interval: 5s
       timeout: 5s
       retries: 5
 
   server:
-    build:
-      context: ./server
-      dockerfile: Dockerfile
+    image: ${SERVER_IMAGE:-keda-server:latest}
     environment:
       DB_HOST: db
       DB_PORT: 5432
-      DB_USER: test_user
-      DB_PASSWORD: test_password
-      DB_NAME: keda_test
-      JWT_SECRET: test_jwt_secret_key_for_e2e_testing
-      TEST_MODE: "true"
+      DB_USER: demo_user
+      DB_PASSWORD: demo_password
+      DB_NAME: keda_demo
+      JWT_SECRET: demo_jwt_secret
       PORT: 8090
+      TEST_MODE: "true"
+      TEST_HOUSEHOLD_ID: test-household-id
+      APP_URL: http://localhost:8085
     ports:
-      - "8091:8090"
+      - "8092:8090"
     depends_on:
       db:
         condition: service_healthy

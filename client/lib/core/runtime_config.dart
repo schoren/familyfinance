@@ -19,6 +19,19 @@ class RuntimeConfig {
     return envValue.isNotEmpty ? envValue : null;
   }
 
+  static bool get testMode {
+    final runtimeValue = getRuntimeTestMode();
+    if (runtimeValue != null) return runtimeValue;
+    return const bool.fromEnvironment('TEST_MODE', defaultValue: false);
+  }
+
+  static String? get testHouseholdId {
+    final runtimeValue = getRuntimeTestHouseholdId();
+    if (runtimeValue != null) return runtimeValue;
+    const envValue = String.fromEnvironment('TEST_HOUSEHOLD_ID');
+    return envValue.isNotEmpty ? envValue : null;
+  }
+
   static String get appVersion {
     return const String.fromEnvironment('APP_VERSION', defaultValue: 'local-dev');
   }

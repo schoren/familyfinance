@@ -88,6 +88,15 @@ dev-down:
 	@echo "🛑 Stopping development environment..."
 	$(DEV_DOCKER_COMPOSE) down
 
+dev-clean:
+	@echo "🧹 Cleaning development environment..."
+	$(DEV_DOCKER_COMPOSE) down -v
+
+build:
+	@echo "🔨 Building images..."
+	cd server && docker build -t keda-server:latest --build-arg APP_VERSION=$(APP_VERSION) .
+	cd client && docker build -t keda-client:latest --build-arg APP_VERSION=$(APP_VERSION) .
+
 # Test environment
 test-up:
 	@echo "🧪 Starting test environment..."

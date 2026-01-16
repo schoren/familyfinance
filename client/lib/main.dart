@@ -12,7 +12,7 @@ import 'package:keda/l10n/app_localizations.dart';
 
 import 'dart:js' as js;
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   usePathUrlStrategy();
   await initializeDateFormatting(null, null);

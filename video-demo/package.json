@@ -1,0 +1,11 @@
+{
+  "name": "keda-video-demo",
+  "version": "1.0.0",
+  "description": "Automated demo video generation for Keda",
+  "scripts": {
+    "test": "npx playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.40.0"
+  }
+}

@@ -6,3 +6,6 @@ server/app/coverage.out
 landing/.env
 landing/node_modules
 landing/dist
+
+video-demo/node_modules
+video-demo/test-results

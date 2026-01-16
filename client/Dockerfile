@@ -18,7 +18,7 @@ COPY . .
 ARG APP_VERSION=local-dev
 # Build web with cache for pub-cache
 RUN --mount=type=cache,target=/root/.pub-cache \
-  flutter build web --dart-define=APP_VERSION=$APP_VERSION
+  flutter build web --dart-define=APP_VERSION=$APP_VERSION --pwa-strategy=none
 
 RUN sed -i "s|APP_VERSION_PLACEHOLD|$APP_VERSION|g" build/web/index.html
 
@@ -56,4 +56,4 @@ RUN echo 'server { \
 EXPOSE 80
 
 # Replace placeholders with actual environment variables at runtime
-CMD ["/bin/sh", "-c", "sed -i 's|API_URL_PLACEHOLD|'\"${API_URL:-http://localhost:8090}\"'|g; s|GOOGLE_CLIENT_ID_PLACEHOLD|'\"${GOOGLE_CLIENT_ID:-}\"'|g' /usr/share/nginx/html/config.js && nginx -g 'daemon off;'"]
+CMD ["/bin/sh", "-c", "sed -i \"s|API_URL_PLACEHOLD|${API_URL:-http://localhost:8090}|g; s|GOOGLE_CLIENT_ID_PLACEHOLD|${GOOGLE_CLIENT_ID:-}|g; s|TEST_MODE_PLACEHOLD|${TEST_MODE:-false}|g; s|TEST_HOUSEHOLD_ID_PLACEHOLD|${TEST_HOUSEHOLD_ID:-}|g\" /usr/share/nginx/html/config.js && nginx -g 'daemon off;'"]

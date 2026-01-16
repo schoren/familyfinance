@@ -9,6 +9,9 @@ services:
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
     ports:
       - "8080:80"
+    depends_on:
+      server:
+        condition: service_healthy
 
   server:
     build:
@@ -30,9 +33,16 @@ services:
       - SMTP_USER=
       - SMTP_PASS=
       - APP_URL=http://localhost:8080
+    healthcheck:
+      test: [ "CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8090/health" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     depends_on:
-      - db
-      - mailpit
+      db:
+        condition: service_healthy
+      mailpit:
+        condition: service_started
 
   mailpit:
     image: axllent/mailpit
@@ -56,6 +66,11 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d keda" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 volumes:
   postgres_data:

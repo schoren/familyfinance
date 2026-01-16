@@ -59,6 +59,22 @@ class AuthNotifier extends Notifier<AuthState> {
 
   @override
   AuthState build() {
+    // _loadState(); // Moved to after testMode check
+    
+    if (RuntimeConfig.testMode) {
+      state = AuthState(
+        isAuthenticated: true,
+        userId: 'test-user-id',
+        userName: 'Test User',
+        userEmail: 'test@example.com',
+        userPictureUrl: null,
+        userColor: 'blue',
+        householdId: RuntimeConfig.testHouseholdId ?? 'test-household-id',
+        token: 'test-mode-dummy-token',
+      );
+      return state;
+    }
+    
     _loadState();
     
     // Listen to Google Sign In events (v7)
@@ -173,6 +189,40 @@ class AuthNotifier extends Notifier<AuthState> {
        await googleSignIn.authenticate();
     } catch (e) {
       print('Login error: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> loginTestUser() async {
+    try {
+      final response = await http.post(
+        Uri.parse('${RuntimeConfig.apiUrl}/auth/test-login'),
+         headers: {'Content-Type': 'application/json'},
+         body: jsonEncode({
+           'email': 'demo@keda.app',
+           'name': 'Demo User',
+         }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final user = data['user'];
+        state = AuthState(
+          isAuthenticated: true,
+          userId: user['id'],
+          userName: user['name'],
+          userEmail: user['email'],
+          userPictureUrl: user['picture_url'],
+          userColor: user['color'],
+          householdId: data['household_id'],
+          token: data['token'],
+        );
+        await _saveState();
+      } else {
+        throw Exception('Failed to login as test user: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Test login error: $e');
       rethrow;
     }
   }

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:keda/l10n/app_localizations.dart';
 import '../providers/auth_provider.dart';
 import '../widgets/google_sign_in_button.dart';
+import '../core/runtime_config.dart';
 
 class LoginScreen extends ConsumerWidget {
   const LoginScreen({super.key});
@@ -62,6 +63,16 @@ class LoginScreen extends ConsumerWidget {
                 );
               }
             ),
+            if (RuntimeConfig.appVersion.contains('demo') || RuntimeConfig.appVersion.contains('dev'))
+              Padding(
+                padding: const EdgeInsets.only(top: 16.0),
+                child: ElevatedButton(
+                  onPressed: () {
+                     ref.read(authProvider.notifier).loginTestUser();
+                  },
+                  child: const Text('Demo Login'),
+                ),
+              ),
           ],
         ),
       ),

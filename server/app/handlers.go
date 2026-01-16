@@ -709,6 +709,21 @@ func (h *Handlers) JWTMiddleware() gin.HandlerFunc {
 			secret = "default_secret_change_me"
 		}
 
+		// Bypass for TEST_MODE
+		if os.Getenv("TEST_MODE") == "true" && tokenString == "test-mode-dummy-token" {
+			// Use configured test household or default
+			householdID := os.Getenv("TEST_HOUSEHOLD_ID")
+			if householdID == "" {
+				householdID = "test-household-id"
+			}
+
+			// Set context with test user details
+			c.Set("user_id", "test-user-id")
+			c.Set("household_id", householdID)
+			c.Next()
+			return
+		}
+
 		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 			return []byte(secret), nil
 		})

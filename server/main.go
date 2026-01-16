@@ -124,4 +124,15 @@ func initDB() {
 	if err := db.AutoMigrate(app.Entities...); err != nil {
 		log.Fatalf("Could not run migrations: %v", err)
 	}
+
+	// Seed data if in TEST_MODE
+	if os.Getenv("TEST_MODE") == "true" {
+		householdID := os.Getenv("TEST_HOUSEHOLD_ID")
+		if householdID == "" {
+			householdID = "test-household-id"
+		}
+		if err := app.SeedData(db, householdID); err != nil {
+			log.Printf("⚠️  Failed to seed data: %v", err)
+		}
+	}
 }
