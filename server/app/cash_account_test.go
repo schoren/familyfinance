@@ -39,7 +39,7 @@ func TestMandatoryCashAccountRules(t *testing.T) {
 	json.Unmarshal(w.Body.Bytes(), &accounts)
 	assert.Len(t, accounts, 1)
 	assert.Equal(t, "cash", accounts[0].Type)
-	assert.Equal(t, "Efectivo", accounts[0].Name)
+	assert.Equal(t, "Cash", accounts[0].Name)
 	cashAccountID := accounts[0].ID
 
 	// 2. Verify we cannot create another cash account

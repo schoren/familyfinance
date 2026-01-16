@@ -57,7 +57,7 @@ test.describe('E2E Tests', () => {
     const accounts = await accountsResponse.json();
     const account = accounts.find((a: any) => a.type === 'cash');
     expect(account).toBeTruthy();
-    expect(account.name).toBe('Efectivo');
+    expect(account.name).toBe('Cash');
     expect(account.type).toBe('cash');
     console.log(`✅ Using auto-created account: ${account.name}`);
 

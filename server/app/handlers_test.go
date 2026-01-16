@@ -268,11 +268,11 @@ func TestAccountDisplayNames(t *testing.T) {
 		account  Account
 		expected string
 	}{
-		{"Cash", Account{Type: "cash"}, "Efectivo"},
+		{"Cash", Account{Type: "cash"}, "Cash"},
 		{"Card Brand & Bank", Account{Type: "card", Brand: &brand, Bank: &bank}, "Visa - Chase"},
 		{"Card Brand only", Account{Type: "card", Brand: &brand}, "Visa"},
 		{"Card Bank only", Account{Type: "card", Bank: &bank}, "Chase"},
-		{"Card Basic", Account{Type: "card"}, "Tarjeta"},
+		{"Card Basic", Account{Type: "card"}, "Card"},
 		{"Bank Account", Account{Type: "bank", Name: "Savings"}, "Savings"},
 		{"Default", Account{Type: "other", Name: "Other"}, "Other"},
 	}
