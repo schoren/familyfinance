@@ -5,6 +5,7 @@ import 'package:keda/views/manage_accounts_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import '../utils/test_utils.dart';
 
 class MockAccountsNotifier extends AccountsNotifier {
   final List<FinanceAccount> data;
@@ -25,7 +26,7 @@ void main() {
         overrides: [
           accountsProvider.overrideWith(() => MockAccountsNotifier(accounts)),
         ],
-        child: const MaterialApp(home: ManageAccountsScreen()),
+        child: createTestApp(home: const ManageAccountsScreen()),
       ),
     );
 

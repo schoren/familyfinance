@@ -5,6 +5,7 @@ import 'package:keda/views/category_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import '../utils/test_utils.dart';
 import 'package:keda/models/finance_account.dart';
 import 'package:keda/models/category.dart';
 import 'package:keda/models/account_type.dart';
@@ -60,7 +61,7 @@ void main() {
           categoriesProvider.overrideWith(() => MockCategoriesNotifier(categories)),
           accountsProvider.overrideWith(() => MockAccountsNotifier(accounts)),
         ],
-        child: MaterialApp(
+        child: createTestApp(
           home: CategoryDetailScreen(categoryId: categoryId),
         ),
       ),
@@ -119,7 +120,7 @@ void main() {
           categoriesProvider.overrideWith(() => MockCategoriesNotifier(categories)),
           accountsProvider.overrideWith(() => MockAccountsNotifier(accounts)),
         ],
-        child: MaterialApp(
+        child: createTestApp(
           locale: const Locale('es', 'AR'),
           home: CategoryDetailScreen(categoryId: categoryId),
         ),

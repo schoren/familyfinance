@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
+import '../utils/test_utils.dart';
 
 import '../providers_test.mocks.dart';
 
@@ -39,8 +40,8 @@ void main() {
           apiClientProvider.overrideWithValue(mockApiClient),
           authProvider.overrideWith(() => MockAuthNotifier()),
         ],
-        child: const MaterialApp(
-          home: NewExpenseScreen(categoryId: categoryId),
+        child: createTestApp(
+          home: const NewExpenseScreen(categoryId: categoryId),
         ),
       ),
     );
