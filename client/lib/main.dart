@@ -8,6 +8,8 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'dart:js' as js;
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   usePathUrlStrategy();
@@ -17,6 +19,9 @@ void main() async {
       child: MyApp(),
     ),
   );
+  
+  // Hide splash screen
+  js.context.callMethod('hideSplash');
 }
 
 class MyApp extends ConsumerWidget {
