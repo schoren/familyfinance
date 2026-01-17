@@ -1,6 +1,6 @@
 {
   "name": "keda",
-  "version": "0.12.0",
+  "version": "0.12.1",
   "description": "Keda project version management",
   "private": true
 }
