@@ -114,16 +114,21 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+      - name: Cache node_modules
+        uses: actions/cache@v4
         with:
-          node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: video-demo/package-lock.json
+          path: video-demo/node_modules
+          key: ${{ runner.os }}-node-video-${{ hashFiles('video-demo/package-lock.json') }}
 
       - name: Run video generation
-        working-directory: ./video-demo
-        run: ./run.sh
+        uses: addnab/docker-run-action@v3
+        with:
+          image: mcr.microsoft.com/playwright:v1.49.1-noble
+          options: -v /var/run/docker.sock:/var/run/docker.sock -v ${{ github.workspace }}:/work -e SERVER_IMAGE -e CLIENT_IMAGE
+          run: |
+            cd /work/video-demo
+            npm ci
+            ./run.sh
         env:
           SERVER_IMAGE: schoren/keda-server:${{ needs.bump.outputs.version }}
           CLIENT_IMAGE: schoren/keda-client:${{ needs.bump.outputs.version }}
