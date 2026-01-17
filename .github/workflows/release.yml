@@ -6,11 +6,11 @@ on:
       bump_type:
         description: 'Version bump type'
         required: true
-        default: 'patch'
+        default: 'minor'
         type: choice
         options:
-          - minor
           - patch
+          - minor
           - major
 
 permissions:
@@ -124,20 +124,28 @@ jobs:
         uses: actions/cache@v4
         with:
           path: video-demo/node_modules
-          key: ${{ runner.os }}-node-video-${{ hashFiles('video-demo/package-lock.json') }}
+          key: ${{ runner.os }}-node-video-demo-${{ hashFiles('video-demo/package-lock.json') }}
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('video-demo/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
+
+      - name: Install Playwright dependencies (Cache Check)
+        working-directory: ./video-demo
+        run: |
+          if [ ! -d "node_modules" ]; then npm ci; fi
+          npx playwright install --with-deps chromium
 
       - name: Run video generation
-        uses: addnab/docker-run-action@v3
-        with:
-          image: mcr.microsoft.com/playwright:v1.49.1-noble
-          options: -v /var/run/docker.sock:/var/run/docker.sock -v ${{ github.workspace }}:/work -e SERVER_IMAGE -e CLIENT_IMAGE
-          run: |
-            cd /work/video-demo
-            npm ci
-            ./run.sh
+        working-directory: ./video-demo
         env:
           SERVER_IMAGE: schoren/keda-server:${{ needs.bump.outputs.version }}
           CLIENT_IMAGE: schoren/keda-client:${{ needs.bump.outputs.version }}
+        run: ./run.sh
 
       - name: Upload video artifact
         uses: actions/upload-artifact@v4
