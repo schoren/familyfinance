@@ -44,12 +44,14 @@ class ManageAccountsScreen extends ConsumerWidget {
                 children: [
                   IconButton(
                     icon: Icon(Icons.edit, color: account.type == AccountType.cash ? Colors.grey : Colors.blue),
+                    tooltip: l10n.edit,
                     onPressed: account.type == AccountType.cash 
                       ? null 
                       : () => context.push('/manage-accounts/edit/${account.id}'),
                   ),
                   IconButton(
                     icon: Icon(Icons.delete, color: account.type == AccountType.cash ? Colors.grey : Colors.red),
+                    tooltip: l10n.delete,
                     onPressed: account.type == AccountType.cash 
                       ? null 
                       : () => _showDeleteConfirmation(context, ref, account),
@@ -64,6 +66,7 @@ class ManageAccountsScreen extends ConsumerWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => context.push('/manage-accounts/new'),
+        tooltip: l10n.newAccount,
         child: const Icon(Icons.add),
       ),
     );

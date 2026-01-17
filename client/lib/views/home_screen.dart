@@ -143,6 +143,7 @@ class HomeScreen extends ConsumerWidget {
                               right: -4,
                               child: PopupMenuButton<String>(
                                 icon: const Icon(Icons.more_vert, size: 18, color: Colors.grey),
+                                tooltip: l10n.edit,
                                 padding: EdgeInsets.zero,
                                 onSelected: (value) {
                                   if (value == 'details') {
@@ -205,6 +206,7 @@ class HomeScreen extends ConsumerWidget {
         onPressed: () {
           context.push('/manage-category/new');
         },
+        tooltip: l10n.newCategory,
         child: const Icon(Icons.add),
       ),
     );

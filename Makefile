@@ -52,12 +52,14 @@ test-client:
 # E2E tests
 test-e2e: test-up
 	@echo "🧪 Running E2E integration tests..."
-	@echo "⏳ Waiting for server to be ready..."
+	@echo "⏳ Waiting for server and client to be ready..."
 	@timeout 60 bash -c 'until curl -sf http://localhost:$(TEST_SERVER_PORT)/health > /dev/null 2>&1; do sleep 2; done' || \
 		(echo "❌ Server failed to start" && make test-down && exit 1)
-	@echo "✅ Server is ready"
+	@timeout 60 bash -c 'until curl -sf http://localhost:8081 > /dev/null 2>&1; do sleep 2; done' || \
+		(echo "❌ Client failed to start" && make test-down && exit 1)
+	@echo "✅ Services are ready"
 	@echo ""
-	cd e2e-tests && npm install && API_URL=http://localhost:$(TEST_SERVER_PORT) npx playwright test
+	cd e2e-tests && npm install && API_URL=http://localhost:$(TEST_SERVER_PORT) APP_URL=http://localhost:8081 npx playwright test --trace on
 	@make test-down
 
 # Run all tests

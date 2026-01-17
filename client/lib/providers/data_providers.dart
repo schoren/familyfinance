@@ -193,13 +193,13 @@ class ExpensesNotifier extends AsyncNotifier<List<Expense>> {
   Future<void> addExpense(Expense expense) async {
     final apiClient = ref.read(apiClientProvider);
     await apiClient.createTransaction(expense);
-    _refreshAll();
+    _refreshAll(expense.categoryId);
   }
 
   Future<void> updateExpense(Expense expense) async {
     final apiClient = ref.read(apiClientProvider);
     await apiClient.updateTransaction(expense.id, expense);
-    _refreshAll();
+    _refreshAll(expense.categoryId);
   }
 
   Future<void> deleteExpense(String id) async {
@@ -208,12 +208,15 @@ class ExpensesNotifier extends AsyncNotifier<List<Expense>> {
     _refreshAll();
   }
 
-  void _refreshAll() {
+  void _refreshAll([String? categoryId]) {
     ref.invalidateSelf();
     ref.invalidate(currentMonthSummaryProvider);
     final now = DateTime.now();
     final month = '${now.year}-${now.month.toString().padLeft(2, '0')}';
     ref.invalidate(monthlySummaryProvider(month));
+    if (categoryId != null) {
+      ref.invalidate(suggestedNotesProvider(categoryId));
+    }
   }
 }
 
