@@ -135,8 +135,32 @@ jobs:
         if: always()
         run: docker compose -f docker-compose.test.yml down -v
 
+  build-images-cache:
+    name: Build ${{ matrix.image }} Image (Cache)
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - image: server
+            context: ./server
+          - image: client
+            context: ./client
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Build and push to cache
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ matrix.context }}
+          push: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
   video-demo-test:
     name: Video Demo Test (Playwright)
+    needs: build-images-cache
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -145,7 +169,7 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build Server Image (Cache)
+      - name: Load Server Image from Cache
         uses: docker/build-push-action@v5
         with:
           context: ./server
@@ -153,9 +177,8 @@ jobs:
           load: true
           tags: keda-server:latest
           cache-from: type=gha
-          cache-to: type=gha,mode=max
 
-      - name: Build Client Image (Cache)
+      - name: Load Client Image from Cache
         uses: docker/build-push-action@v5
         with:
           context: ./client
@@ -163,7 +186,6 @@ jobs:
           load: true
           tags: keda-client:latest
           cache-from: type=gha
-          cache-to: type=gha,mode=max
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
