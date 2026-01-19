@@ -30,6 +30,19 @@ class SettingsNotifier extends Notifier<AppSettings> {
 
   Future<void> _init() async {
     _prefs = await SharedPreferences.getInstance();
+    
+    // URL parameter takes precedence
+    try {
+      final uri = Uri.base;
+      final langParam = uri.queryParameters['lang'];
+      if (langParam != null && langParam.isNotEmpty) {
+        state = state.copyWith(locale: Locale(langParam));
+        return;
+      }
+    } catch (_) {
+      // Ignore if Uri.base is not available or fails
+    }
+
     final languageCode = _prefs.getString(_languageKey);
     if (languageCode != null) {
       state = state.copyWith(locale: Locale(languageCode));

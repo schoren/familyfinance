@@ -65,6 +65,7 @@ class ManageAccountsScreen extends ConsumerWidget {
         error: (err, stack) => Center(child: Text('Error: $err')),
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: 'manage_accounts_fab',
         onPressed: () => context.push('/manage-accounts/new'),
         tooltip: l10n.newAccount,
         child: const Icon(Icons.add),

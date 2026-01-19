@@ -166,6 +166,7 @@ class AuthNotifier extends Notifier<AuthState> {
   Future<void>? _googleSignInInitFuture;
 
   Future<void> ensureGoogleSignInInitialized() {
+    if (RuntimeConfig.testMode) return Future.value();
     _googleSignInInitFuture ??= gsi.GoogleSignIn.instance.initialize(
       clientId: RuntimeConfig.googleClientId,
     );

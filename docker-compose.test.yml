@@ -36,18 +36,17 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
-
-  client:
-    image: ${CLIENT_IMAGE:-keda-client:latest}
-    build:
-      context: ./client
-      dockerfile: Dockerfile
-    environment:
-      - API_URL=http://localhost:8091
-      - TEST_MODE=true
-      - TEST_HOUSEHOLD_ID=test-household-id
-    ports:
-      - "8081:80"
-    depends_on:
-      server:
-        condition: service_healthy
+  # client:
+  #   image: ${CLIENT_IMAGE:-keda-client:latest}
+  #   build:
+  #     context: ./client
+  #     dockerfile: Dockerfile
+  #   environment:
+  #     - API_URL=http://localhost:8091
+  #     - TEST_MODE=true
+  #     - TEST_HOUSEHOLD_ID=test-household-id
+  #   ports:
+  #     - "8081:80"
+  #   depends_on:
+  #     server:
+  #       condition: service_healthy

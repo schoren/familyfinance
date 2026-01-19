@@ -74,23 +74,20 @@ test-integration: test-up
 	@pkill -f "chromedriver" > /dev/null 2>&1 || true
 	@echo "🚀 Starting chromedriver locally via npx..."
 	@npx chromedriver --port=4444 > /dev/null 2>&1 & CHROME_PID=$$!; \
+	trap "echo '🛑 Stopping chromedriver...'; kill $$CHROME_PID > /dev/null 2>&1 || true; make test-down; exit" EXIT INT TERM; \
 	echo "⏳ Waiting for chromedriver to be ready..."; \
 	timeout 10 bash -c 'until curl -sf http://localhost:4444/status > /dev/null 2>&1; do sleep 1; done' || \
-		(echo "❌ chromedriver failed to start. Make sure you have Node.js installed." && kill $$CHROME_PID > /dev/null 2>&1; exit 1); \
+		(echo "❌ chromedriver failed to start. Make sure you have Node.js installed." && exit 1); \
 	echo "✅ chromedriver is ready"; \
-	cd client && flutter drive \
+	(cd client && flutter drive \
 		--driver=test_driver/integration_test.dart \
 		--target=integration_test/app_test.dart \
 		-d chrome \
 		--headless \
 		--web-port=8082 \
-		--dart-define=API_URL=http://localhost:8091 \
-		--dart-define=TEST_MODE=true; \
-	RET=$$?; \
-	echo "🛑 Stopping chromedriver..."; \
-	kill $$CHROME_PID > /dev/null 2>&1 || true; \
-	make test-down; \
-	exit $$RET
+		--dart-define=API_URL=http://127.0.0.1:8091 \
+		--dart-define=TEST_HOUSEHOLD_ID=test-household-id \
+		--dart-define=TEST_MODE=true)
 
 # Run all tests
 test-all: test-backend test-client test-integration test-e2e
