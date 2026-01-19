@@ -16,7 +16,9 @@ import 'core/runtime_config.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  SemanticsBinding.instance.ensureSemantics();
+  if (!RuntimeConfig.testMode) {
+    SemanticsBinding.instance.ensureSemantics();
+  }
   
   usePathUrlStrategy();
   await initializeDateFormatting(null, null);

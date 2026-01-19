@@ -111,7 +111,7 @@ void main() {
       // Open type dropdown
       // Select "Bank Account"
       print('DEBUG: Selecting Bank Account from dropdown');
-      await tester.tap(find.text('Type'));
+      await tester.tap(find.byType(DropdownButtonFormField<AccountType>));
       await tester.pumpAndSettle();
       logScreenText();
       await tester.tap(find.text('Bank Account').last);
