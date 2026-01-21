@@ -31,6 +31,26 @@ The fastest way to get started is using the included `Makefile`:
 
 This project uses a `Makefile` to centralize all common tasks.
 
+### Android Development
+
+1.  **Setup Environment**:
+    Run the setup script to install Java and configure the Android SDK:
+    ```bash
+    make android-setup
+    ```
+
+2.  **Run on Device/Emulator**:
+    Connect a device or start an emulator, then run:
+    ```bash
+    make android-run
+    ```
+
+3.  **Build APK**:
+    ```bash
+    make android-build   # Debug
+    make android-release # Release
+    ```
+
 ### Testing
 We maintain a comprehensive test suite covering all layers:
 ```bash

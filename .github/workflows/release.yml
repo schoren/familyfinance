@@ -113,6 +113,42 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+  release-android:
+    needs: bump
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+      
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.38.6'
+          channel: 'stable'
+          cache: true
+      
+      - name: Install dependencies
+        working-directory: ./client
+        run: flutter pub get
+      
+      - name: Build APK (Release)
+        working-directory: ./client
+        run: flutter build apk --release --build-name=${{ needs.bump.outputs.version }} --build-number=${{ github.run_number }}
+      
+      - name: Upload Release APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: keda_android_${{ needs.bump.outputs.version }}.apk
+          path: client/build/app/outputs/flutter-apk/app-release.apk
+
   generate-video:
     needs: [bump, build-server, build-client]
     runs-on: ubuntu-latest
@@ -154,7 +190,7 @@ jobs:
           path: video-demo/test-results/demo.webm
 
   publish-release:
-    needs: [bump, build-server, build-client, generate-video]
+    needs: [bump, build-server, build-client, generate-video, release-android]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -166,12 +202,20 @@ jobs:
           path: .
           merge-multiple: true
 
+      - name: Download APK artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: keda_android_${{ needs.bump.outputs.version }}.apk
+          path: .
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ needs.bump.outputs.version }}
           name: Release ${{ needs.bump.outputs.version }}
-          files: demo.webm
+          files: |
+            demo.webm
+            keda_android_${{ needs.bump.outputs.version }}.apk
           draft: false
           prerelease: false
           generate_release_notes: true

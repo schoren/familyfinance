@@ -54,6 +54,13 @@ help:
 	@echo "    make clean           - Clean all test artifacts and containers"
 	@echo "    make help            - Show this help message"
 	@echo ""
+	@echo "  📱 Android"
+	@echo "    make android-setup   - Setup Android environment (Java, SDK)"
+	@echo "    make android-build   - Build Android APK (debug)"
+	@echo "    make android-release - Build Android APK (release)"
+	@echo "    make android-run     - Run Android app on connected device/emulator"
+	@echo "    make android-clean   - Clean Android build artifacts"
+	@echo ""
 
 # Backend tests
 test-backend:
@@ -225,3 +232,24 @@ landing-build:
 landing-serve: landing-build
 	@echo "🚀 Serving landing page at http://localhost:3000"
 	npx serve landing/dist -l 3000
+
+# Android Targets
+android-setup:
+	@echo "🤖 Setting up Android environment..."
+	@./scripts/setup_android.sh
+
+android-build:
+	@echo "🔨 Building Android APK (Debug)..."
+	cd client && flutter build apk --debug
+
+android-release:
+	@echo "🚀 Building Android APK (Release)..."
+	cd client && flutter build apk --release
+
+android-run:
+	@echo "📱 Running on Android device..."
+	cd client && flutter run -d android
+
+android-clean:
+	@echo "🧹 Cleaning Android build..."
+	cd client && flutter clean
