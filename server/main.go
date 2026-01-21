@@ -100,7 +100,9 @@ func main() {
 	}
 	log.Printf("Server version: %s", Version)
 	log.Printf("Server running on port %s", port)
-	r.Run(":" + port)
+	if err := r.Run(":" + port); err != nil {
+		log.Fatalf("Failed to run server: %v", err)
+	}
 }
 
 func initDB() {

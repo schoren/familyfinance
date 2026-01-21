@@ -345,8 +345,10 @@ func TestJWTMiddleware(t *testing.T) {
 	r.ServeHTTP(w, req)
 	assert.Equal(t, http.StatusUnauthorized, w.Code)
 
-	// 3. Valid Token but wrong HouseholdID
-	user := User{ID: "u1", HouseholdID: "hh1"}
+	// 3. Valid Token but wrong HouseholdID IN TOKEN vs URL
+	// Note: The user MUST exist in the DB now for the middleware to proceed to the household check
+	user := User{ID: "u1", HouseholdID: "hh1", Email: "u1@test.com", Name: "U1"}
+	db.Create(&user)
 	token, _ := h.generateJWT(user)
 
 	req, _ = http.NewRequest("GET", "/protected/hh2", nil)
@@ -355,12 +357,31 @@ func TestJWTMiddleware(t *testing.T) {
 	r.ServeHTTP(w, req)
 	assert.Equal(t, http.StatusForbidden, w.Code)
 
-	// 4. Valid Token and correct HouseholdID
+	// 4. Valid Token and correct HouseholdID (Success Case)
 	req, _ = http.NewRequest("GET", "/protected/hh1", nil)
 	req.Header.Set("Authorization", "Bearer "+token)
 	w = httptest.NewRecorder()
 	r.ServeHTTP(w, req)
 	assert.Equal(t, http.StatusOK, w.Code)
+
+	// 5. User Soft-Deleted (Revoked Access)
+	db.Delete(&user) // Soft delete
+	req, _ = http.NewRequest("GET", "/protected/hh1", nil)
+	req.Header.Set("Authorization", "Bearer "+token)
+	w = httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+	assert.Equal(t, http.StatusUnauthorized, w.Code)
+
+	// 6. User Changed Household (DB says hh2, Token says hh1)
+	// Restore user first
+	db.Unscoped().Model(&user).Update("deleted_at", nil) // Un-delete
+	db.Model(&user).Update("household_id", "hh2")        // Change household
+
+	req, _ = http.NewRequest("GET", "/protected/hh1", nil)
+	req.Header.Set("Authorization", "Bearer "+token) // Token still has hh1
+	w = httptest.NewRecorder()
+	r.ServeHTTP(w, req) // Matches token vs URL, but fails DB check
+	assert.Equal(t, http.StatusForbidden, w.Code)
 }
 
 func TestHouseholdAndInvitation(t *testing.T) {

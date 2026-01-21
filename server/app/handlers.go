@@ -742,8 +742,24 @@ func (h *Handlers) JWTMiddleware() gin.HandlerFunc {
 
 		claims := token.Claims.(jwt.MapClaims)
 		tokenHouseholdID := claims["household_id"].(string)
+		userID := claims["user_id"].(string)
 
-		// Check if the household_id in the URL matches the one in the token
+		// 1. Verify user exists and is active (not soft-deleted)
+		var user User
+		if err := h.db.First(&user, "id = ?", userID).Error; err != nil {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "User no longer exists or access revoked"})
+			c.Abort()
+			return
+		}
+
+		// 2. Verify user still belongs to the household in the token
+		if user.HouseholdID != tokenHouseholdID {
+			c.JSON(http.StatusForbidden, gin.H{"error": "User is no longer a member of this household"})
+			c.Abort()
+			return
+		}
+
+		// 3. Check if the household_id in the URL matches the verified household_id
 		urlHouseholdID := c.Param("household_id")
 		if urlHouseholdID != "" && urlHouseholdID != tokenHouseholdID {
 			c.JSON(http.StatusForbidden, gin.H{"error": "Access denied to this household"})
@@ -751,7 +767,7 @@ func (h *Handlers) JWTMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		c.Set("user_id", claims["user_id"])
+		c.Set("user_id", userID)
 		c.Set("household_id", tokenHouseholdID)
 
 		c.Next()

@@ -36,6 +36,20 @@ test-backend:
 	@echo "📊 Coverage report:"
 	cd server/app && go tool cover -func=coverage.out
 
+# Security Check
+security-check:
+	@echo "🛡️  Running security check..."
+	@if command -v gosec >/dev/null 2>&1; then \
+		gosec -fmt=golint ./server/...; \
+	elif docker info >/dev/null 2>&1; then \
+		echo "Using Docker for gosec..."; \
+		docker run --rm -it -w /app -v $(PWD)/server:/app securego/gosec /app/...; \
+	else \
+		echo "⚠️  gosec not found and Docker not available. Please install gosec: go install github.com/securego/gosec/v2/cmd/gosec@latest"; \
+		exit 1; \
+	fi
+
+
 # Client tests
 test-client:
 	@echo "🧪 Running client tests..."
@@ -61,7 +75,7 @@ test-e2e: test-up
 	@make test-down
 
 # Run all tests
-test-all: test-backend test-client test-e2e
+test-all: test-backend test-client test-e2e security-check
 	@echo ""
 	@echo "✅ All tests completed successfully!"
 
