@@ -116,7 +116,7 @@ class AuthNotifier extends Notifier<AuthState> {
 
   Future<void> _handleSignIn(gsi.GoogleSignInAccount googleUser) async {
        try {
-         final googleAuth = await googleUser.authentication;
+         final googleAuth = googleUser.authentication;
          final idToken = googleAuth.idToken;
          // In v7, accessToken is removed from GoogleSignInAuthentication.
          // We rely on idToken for backend verification.

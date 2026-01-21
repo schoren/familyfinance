@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'runtime_config_stub.dart' if (dart.library.html) 'runtime_config_web.dart' if (dart.library.js) 'runtime_config_web.dart';
 
 class RuntimeConfig {

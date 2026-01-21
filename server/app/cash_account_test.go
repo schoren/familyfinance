@@ -36,7 +36,8 @@ func TestMandatoryCashAccountRules(t *testing.T) {
 	w = httptest.NewRecorder()
 	r.ServeHTTP(w, req)
 	var accounts []Account
-	json.Unmarshal(w.Body.Bytes(), &accounts)
+	err := json.Unmarshal(w.Body.Bytes(), &accounts)
+	assert.NoError(t, err)
 	assert.Len(t, accounts, 1)
 	assert.Equal(t, "cash", accounts[0].Type)
 	assert.Equal(t, "Cash", accounts[0].Name)

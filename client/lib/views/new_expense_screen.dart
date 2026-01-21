@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
 import 'package:keda/l10n/app_localizations.dart';
 import '../providers/data_providers.dart';
 import '../utils/formatters.dart';
@@ -210,7 +208,7 @@ class _NewExpenseScreenState extends ConsumerState<NewExpenseScreen> {
               const SizedBox(height: 24),
               if (accounts.isNotEmpty)
                 DropdownButtonFormField<String>(
-                  value: accounts.any((a) => a.id == _selectedAccountId) ? _selectedAccountId : null,
+                  initialValue: accounts.any((a) => a.id == _selectedAccountId) ? _selectedAccountId : null,
                   style: GoogleFonts.inter(color: const Color(0xFF0F172A), fontSize: 16),
                   decoration: InputDecoration(
                     labelText: l10n.account,

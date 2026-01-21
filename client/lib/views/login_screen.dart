@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:keda/l10n/app_localizations.dart';
 import '../providers/auth_provider.dart';
 import '../widgets/google_sign_in_button.dart';
-import '../core/runtime_config.dart';
 
 class LoginScreen extends ConsumerWidget {
   const LoginScreen({super.key});

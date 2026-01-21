@@ -125,7 +125,7 @@ class _AccountFormScreenState extends ConsumerState<AccountFormScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               DropdownButtonFormField<AccountType>(
-                value: _selectedType,
+                initialValue: _selectedType,
                 decoration: InputDecoration(
                   labelText: AppLocalizations.of(context)!.type,
                   border: const OutlineInputBorder(),
@@ -143,7 +143,7 @@ class _AccountFormScreenState extends ConsumerState<AccountFormScreen> {
               if (_selectedType == AccountType.card) ...[
                 const SizedBox(height: 16),
                 DropdownButtonFormField<String>(
-                  value: _selectedBrand,
+                  initialValue: _selectedBrand,
                   decoration: InputDecoration(
                     labelText: AppLocalizations.of(context)!.brand,
                     border: const OutlineInputBorder(),

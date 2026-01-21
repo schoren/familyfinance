@@ -36,7 +36,9 @@ test-backend:
 	@echo "📊 Coverage report:"
 	cd server/app && go tool cover -func=coverage.out
 
-security-check: security-check-gosec security-check-client security-check-server
+security-check: security-check-gosec security-check-client security-check-server security-check-mobsf security-check-landing
+
+lint: lint-backend lint-client
 
 # Security Check
 security-check-gosec:
@@ -74,6 +76,37 @@ security-check-server:
 		exit 1; \
 	fi
 
+# MobSF Security Check (Source Code)
+security-check-mobsf:
+	@echo "🛡️  Running MobSF static analysis..."
+	@if docker info >/dev/null 2>&1; then \
+		echo "Using Docker for mobsfscan..."; \
+		docker run --rm -v $(PWD):/code opensecurity/mobsfscan:latest /code; \
+	else \
+		echo "⚠️  Docker not available. Skipping MobSF scan."; \
+		exit 1; \
+	fi
+
+# Server Linting
+lint-backend:
+	@echo "🔍 Running Go linters..."
+	@if command -v golangci-lint >/dev/null 2>&1; then \
+		cd server && golangci-lint run ./...; \
+	else \
+		echo "⚠️  golangci-lint not found. Skipping."; \
+		exit 1; \
+	fi
+
+# Client Linting
+lint-client:
+	@echo "🔍 Running Flutter analyzer..."
+	cd client && flutter analyze || echo "⚠️  Flutter analyzer found issues. Please review details above."
+
+# Landing Page Security
+security-check-landing:
+	@echo "🛡️  Running npm audit for landing page..."
+	cd landing && npm audit
+
 # Client tests
 test-client:
 	@echo "🧪 Running client tests..."
@@ -99,7 +132,7 @@ test-e2e: test-up
 	@make test-down
 
 # Run all tests
-test-all: test-backend test-client test-e2e security-check client-security-check server-security-check
+test-all: test-backend test-client test-e2e security-check lint
 	@echo ""
 	@echo "✅ All tests completed successfully!"
 

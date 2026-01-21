@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/router.dart';
-import 'providers/data_providers.dart';
 import 'providers/settings_provider.dart';
 
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -12,7 +11,6 @@ import 'package:keda/l10n/app_localizations.dart';
 
 import 'package:flutter/rendering.dart';
 import 'dart:js' as js;
-import 'core/runtime_config.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

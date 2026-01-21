@@ -121,7 +121,3 @@ func SeedData(db *gorm.DB, householdID string) error {
 	log.Println("✅ Database seeded successfully")
 	return nil
 }
-
-func stringPtr(s string) *string {
-	return &s
-}

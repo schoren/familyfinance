@@ -951,7 +951,7 @@ func (h *Handlers) fetchGoogleUserInfo(accessToken string) (*GoogleUserInfo, err
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("failed to fetch user info: %v", resp.Status)

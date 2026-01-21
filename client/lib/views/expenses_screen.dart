@@ -110,7 +110,7 @@ class ExpensesScreen extends ConsumerWidget {
                                 style: const TextStyle(fontWeight: FontWeight.bold),
                               ),
                             );
-                          }).toList(),
+                          }),
                         ],
                       );
                     },
