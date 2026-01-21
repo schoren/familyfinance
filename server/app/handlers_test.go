@@ -647,6 +647,12 @@ func TestMoreErrorPaths(t *testing.T) {
 	r.ServeHTTP(w, req)
 	assert.Equal(t, http.StatusBadRequest, w.Code)
 
+	// 5b. Create Invitation invalid email
+	req, _ = http.NewRequest("POST", "/households/hh1/invitations", bytes.NewBufferString(`{"email":"not-an-email"}`))
+	w = httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+
 	// 6. Create Account invalid JSON
 	r.POST("/households/:household_id/accounts", h.CreateAccount)
 	req, _ = http.NewRequest("POST", "/households/hh1/accounts", bytes.NewBufferString("{bad}"))

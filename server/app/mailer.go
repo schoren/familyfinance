@@ -2,6 +2,7 @@ package app
 
 import (
 	"fmt"
+	"net/mail"
 	"net/smtp"
 	"os"
 )
@@ -21,10 +22,13 @@ func (h *Handlers) SendInvitationEmail(to, code string) error {
 	subject := "Te han invitado a unirte a un hogar en Keda"
 	body := fmt.Sprintf("Hola!\n\nTe han invitado a compartir los gastos de un hogar en Keda.\n\nPara unirte, haz click en el siguiente enlace o usa el código de invitación al loguearte: %s\n\nLink: %s/invite?code=%s\n\n¡Te esperamos!", code, appURL, code)
 
+	toAddr := mail.Address{Address: to}
 	message := []byte(fmt.Sprintf("To: %s\r\n"+
 		"Subject: %s\r\n"+
+		"MIME-Version: 1.0\r\n"+
+		"Content-Type: text/plain; charset=\"utf-8\"\r\n"+
 		"\r\n"+
-		"%s\r\n", to, subject, body))
+		"%s\r\n", toAddr.String(), subject, body))
 
 	auth := smtp.PlainAuth("", user, pass, host)
 
