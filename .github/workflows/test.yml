@@ -90,7 +90,7 @@ jobs:
         with:
           args: '-no-fail -fmt sarif -out results.sarif ./server/...'
       - name: Upload SARIF file
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: results.sarif
 
@@ -113,7 +113,7 @@ jobs:
           exit-code: '0'
           ignore-unfixed: true
       - name: Upload SARIF file
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: trivy-results-client.sarif
 
@@ -136,7 +136,7 @@ jobs:
           exit-code: '0'
           ignore-unfixed: true
       - name: Upload SARIF file
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: trivy-results-server.sarif
 
@@ -153,7 +153,7 @@ jobs:
         with:
           args: '. --sarif --output results.sarif || true'
       - name: Upload SARIF file
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: results.sarif
 
