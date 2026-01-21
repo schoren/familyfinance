@@ -28,10 +28,9 @@ class HomeScreen extends ConsumerWidget {
             // Invalidate providers
             ref.invalidate(monthlySummaryProvider(month));
             
+            // Only refresh what home screen actually uses
             await Future.wait([
               ref.refresh(categoriesProvider.future),
-              ref.refresh(expensesProvider.future),
-              ref.refresh(accountsProvider.future),
               ref.refresh(monthlySummaryProvider(month).future),
             ]);
           },
