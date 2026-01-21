@@ -250,8 +250,9 @@ android-run:
 	@echo "📱 Ensuring Android device/emulator is ready..."
 	@./scripts/ensure_emulator.sh
 	@echo "📱 Running on Android device..."
-	@DEVICE_ID=$$(flutter devices | grep "•" | grep -E "mobile|android" | grep -vE "desktop|web|offline" | head -n 1 | awk -F'•' '{print $$2}' | xargs); \
-	cd client && flutter run -d $$DEVICE_ID
+	@set -a && . ./.env.dev && set +a && \
+	DEVICE_ID=$$(flutter devices | grep "•" | grep -E "mobile|android" | grep -vE "desktop|web|offline" | head -n 1 | awk -F'•' '{print $$2}' | xargs); \
+	cd client && flutter run -d $$DEVICE_ID --dart-define=GOOGLE_CLIENT_ID=$$GOOGLE_CLIENT_ID
 
 android-clean:
 	@echo "🧹 Cleaning Android build..."
