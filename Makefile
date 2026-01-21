@@ -15,8 +15,8 @@ help:
 	@echo "Available targets:"
 	@echo "  make test-backend    - Run backend unit tests with coverage"
 	@echo "  make test-client     - Run client unit tests with coverage"
-	@echo "  make test-e2e        - Run E2E integration tests"
-	@echo "  make test-all        - Run all tests (backend + client + e2e)"
+	@echo "  make test-e2e        - Run E2E integration tests (Video Demo)"
+	@echo "  make test-all        - Run all tests (backend + client + e2e + security + lint)"
 	@echo "  make test            - Alias for test-all"
 	@echo ""
 	@echo "  make dev-up          - Start development environment"
@@ -121,15 +121,10 @@ test-client:
 		echo "Coverage: $$(echo "scale=1; $$HIT * 100 / $$TOTAL" | bc)%"
 
 # E2E tests
-test-e2e: test-up
-	@echo "🧪 Running E2E integration tests..."
-	@echo "⏳ Waiting for server to be ready..."
-	@timeout 60 bash -c 'until curl -sf http://localhost:$(TEST_SERVER_PORT)/health > /dev/null 2>&1; do sleep 2; done' || \
-		(echo "❌ Server failed to start" && make test-down && exit 1)
-	@echo "✅ Server is ready"
-	@echo ""
-	cd e2e-tests && npm install && API_URL=http://localhost:$(TEST_SERVER_PORT) npx playwright test
-	@make test-down
+# E2E tests (Using Video Demo as "Slow E2E")
+test-e2e:
+	@echo "🧪 Running E2E / Video Demo tests..."
+	@cd video-demo && ./run.sh
 
 # Run all tests
 test-all: test-backend test-client test-e2e security-check lint

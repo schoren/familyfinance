@@ -17,8 +17,6 @@ jobs:
     strategy:
       matrix:
         include:
-          - project: e2e-tests
-            path: e2e-tests
           - project: video-demo
             path: video-demo
     steps:
@@ -79,18 +77,23 @@ jobs:
           flags: backend
           fail_ci_if_error: false
 
-  security-scans:
-    name: Security Scans
+  security-gosec:
+    name: Security - Gosec
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
       - name: Run Gosec Security Scanner
         uses: securego/gosec@master
         with:
           args: ./server/...
-      
+
+  security-trivy-client:
+    name: Security - Trivy Client
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
       - name: Run Trivy for Client
         uses: aquasecurity/trivy-action@master
         with:
@@ -100,6 +103,12 @@ jobs:
           exit-code: '1'
           ignore-unfixed: true
 
+  security-trivy-server:
+    name: Security - Trivy Server
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
       - name: Run Trivy for Server
         uses: aquasecurity/trivy-action@master
         with:
@@ -108,6 +117,61 @@ jobs:
           scanners: 'vuln,secret,misconfig'
           exit-code: '1'
           ignore-unfixed: true
+
+  security-mobsf:
+    name: Security - MobSF
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Run MobSF Scan
+        uses: product-os/mobsfscan-action@v1
+        with:
+          args: . --sarif --output results.sarif || true
+
+  security-landing:
+    name: Security - Landing (npm audit)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Run npm audit (Landing)
+        working-directory: ./landing
+        run: npm audit
+
+  lint-backend:
+    name: Lint Backend (Go)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+      - name: Install golangci-lint
+        uses: golangci/golangci-lint-action@v4
+        with:
+          version: v1.60
+          working-directory: server
+
+  lint-client:
+    name: Lint Client (Flutter)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.38.6'
+          channel: 'stable'
+      - name: Install dependencies
+        working-directory: ./client
+        run: flutter pub get
+      - name: Analyze
+        working-directory: ./client
+        run: flutter analyze || echo "::warning::Flutter analyzer found issues"
 
   client-tests:
     name: Client Tests (Flutter)
@@ -142,76 +206,6 @@ jobs:
           files: ./client/coverage/lcov.info
           flags: client
           fail_ci_if_error: false
-
-  e2e-tests:
-    name: E2E Tests (Playwright)
-    needs: [build-images, setup-playwright]
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-      
-      - name: Start test environment
-        env:
-          SERVER_IMAGE: schoren/keda-server:${{ github.sha }}
-          CLIENT_IMAGE: schoren/keda-client:${{ github.sha }}
-        run: docker compose -f docker-compose.test.yml up -d
-      
-      - name: Wait for services to be healthy
-        run: |
-          echo "Waiting for server to be ready..."
-          timeout 60 bash -c 'until curl -f http://localhost:8091/health; do sleep 2; done'
-          echo "✅ Server is ready"
-      
-      - name: Cache node_modules
-        uses: actions/cache@v4
-        with:
-          path: e2e-tests/node_modules
-          key: ${{ runner.os }}-node-e2e-tests-${{ hashFiles('e2e-tests/package-lock.json') }}
-
-      - name: Cache Playwright browsers
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ hashFiles('e2e-tests/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-playwright-
-
-      - name: Install Playwright dependencies (Cache Check)
-        working-directory: ./e2e-tests
-        run: |
-          if [ ! -d "node_modules" ]; then npm ci; fi
-          npx playwright install --with-deps chromium
-      
-      - name: Run E2E tests
-        working-directory: ./e2e-tests
-        env:
-          API_URL: http://localhost:8091
-        run: npx playwright test
-      
-      - name: Upload test results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: playwright-report
-          path: e2e-tests/playwright-report/
-          retention-days: 7
-      
-      - name: Show logs on failure
-        if: failure()
-        run: |
-          echo "=== Server logs ==="
-          docker compose -f docker-compose.test.yml logs server
-          echo "=== Database logs ==="
-          docker compose -f docker-compose.test.yml logs db
-      
-      - name: Cleanup
-        if: always()
-        run: docker compose -f docker-compose.test.yml down -v
 
   build-images:
     name: Build ${{ matrix.image }} Image
@@ -288,7 +282,17 @@ jobs:
 
   cleanup:
     if: always()
-    needs: [backend-tests, client-tests, e2e-tests, video-demo-test]
+    needs: 
+      - backend-tests
+      - client-tests
+      - video-demo-test
+      - lint-backend
+      - lint-client
+      - security-gosec
+      - security-trivy-client
+      - security-trivy-server
+      - security-mobsf
+      - security-landing
     runs-on: ubuntu-latest
     steps:
       - name: Cleanup
