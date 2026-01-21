@@ -85,6 +85,8 @@ test-integration: test-up
 		-d chrome \
 		--headless \
 		--web-port=8082 \
+		--no-keep-app-running \
+		--timeout 600 \
 		--dart-define=API_URL=http://127.0.0.1:8091 \
 		--dart-define=TEST_HOUSEHOLD_ID=test-household-id \
 		--dart-define=TEST_MODE=true)

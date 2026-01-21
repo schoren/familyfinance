@@ -1,4 +1,4 @@
-FROM golang:1.24-alpine AS builder
+FROM golang:1.24 AS builder
 
 WORKDIR /app
 COPY go.mod go.sum ./
@@ -6,7 +6,7 @@ RUN go mod download
 
 COPY . .
 ARG APP_VERSION=local-dev
-RUN go build -o server -ldflags "-X main.Version=${APP_VERSION}" .
+RUN CGO_ENABLED=0 go build -o server -ldflags "-X main.Version=${APP_VERSION}" .
 
 FROM alpine:latest
 
