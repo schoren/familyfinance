@@ -55,5 +55,27 @@ RUN echo 'server { \
 # Expose port 80
 EXPOSE 80
 
+# Hardening: Healthcheck
+HEALTHCHECK --interval=30s --timeout=3s \
+  CMD wget --quiet --tries=1 --spider http://localhost:80/ || exit 1
+
+# Hardening: Run as non-root user
+# Nginx alpine image has 'nginx' user built-in.
+# We need to give ownership of /usr/share/nginx/html to nginx user
+# And also permissions for /var/run/nginx.pid and /var/cache/nginx
+RUN chown -R nginx:nginx /usr/share/nginx/html && \
+  chmod -R 755 /usr/share/nginx/html && \
+  mkdir -p /var/cache/nginx && \
+  chown -R nginx:nginx /var/cache/nginx && \
+  mkdir -p /var/log/nginx && \
+  chown -R nginx:nginx /var/log/nginx && \
+  touch /var/run/nginx.pid && \
+  chown -R nginx:nginx /var/run/nginx.pid
+
+# Switch to non-root user
+USER nginx
+
 # Replace placeholders with actual environment variables at runtime
+# Using a temp file strategy because we can't sed in place as easily without read/write issues if not careful, 
+# but sed -i works if we own the file.
 CMD ["/bin/sh", "-c", "sed -i \"s|API_URL_PLACEHOLD|${API_URL:-http://localhost:8090}|g; s|GOOGLE_CLIENT_ID_PLACEHOLD|${GOOGLE_CLIENT_ID:-}|g; s|TEST_MODE_PLACEHOLD|${TEST_MODE:-false}|g; s|TEST_HOUSEHOLD_ID_PLACEHOLD|${TEST_HOUSEHOLD_ID:-}|g\" /usr/share/nginx/html/config.js && nginx -g 'daemon off;'"]
