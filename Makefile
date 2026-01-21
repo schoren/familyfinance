@@ -36,8 +36,10 @@ test-backend:
 	@echo "📊 Coverage report:"
 	cd server/app && go tool cover -func=coverage.out
 
+security-check: security-check-gosec security-check-client security-check-server
+
 # Security Check
-security-check:
+security-check-gosec:
 	@echo "🛡️  Running security check..."
 	@if command -v gosec >/dev/null 2>&1; then \
 		gosec -fmt=golint ./server/...; \
@@ -51,11 +53,22 @@ security-check:
 
 
 # Client Security Check
-client-security-check:
+security-check-client:
 	@echo "🛡️  Running client security check..."
 	@if docker info >/dev/null 2>&1; then \
 		echo "Using Docker for Trivy..."; \
 		docker run --rm -v $(PWD)/client:/app -w /app aquasec/trivy:latest fs . --scanners vuln,secret,misconfig; \
+	else \
+		echo "⚠️  Docker not available. Skipping Trivy scan."; \
+		exit 1; \
+	fi
+
+# Server Security Check (Container/FS)
+security-check-server:
+	@echo "🛡️  Running server container security check..."
+	@if docker info >/dev/null 2>&1; then \
+		echo "Using Docker for Trivy..."; \
+		docker run --rm -v $(PWD)/server:/app -w /app aquasec/trivy:latest fs . --scanners vuln,secret,misconfig; \
 	else \
 		echo "⚠️  Docker not available. Skipping Trivy scan."; \
 		exit 1; \
@@ -86,7 +99,7 @@ test-e2e: test-up
 	@make test-down
 
 # Run all tests
-test-all: test-backend test-client test-e2e security-check
+test-all: test-backend test-client test-e2e security-check client-security-check server-security-check
 	@echo ""
 	@echo "✅ All tests completed successfully!"
 

@@ -100,6 +100,15 @@ jobs:
           exit-code: '1'
           ignore-unfixed: true
 
+      - name: Run Trivy for Server
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: './server'
+          scanners: 'vuln,secret,misconfig'
+          exit-code: '1'
+          ignore-unfixed: true
+
   client-tests:
     name: Client Tests (Flutter)
     runs-on: ubuntu-latest
