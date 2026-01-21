@@ -33,11 +33,15 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
       if (lang === currentLang) return;
 
-      localStorage.setItem('selected-lang', lang);
-      // Redirect to the same path but in the other language
-      // Example: project.com/landing/dist/es/index.html -> project.com/landing/dist/en/index.html
-      const newPath = window.location.pathname.replace(`/${currentLang}/`, `/${lang}/`);
-      window.location.href = newPath + window.location.hash;
+      const allowedLangs = ['en', 'es'];
+      if (allowedLangs.includes(lang)) {
+        localStorage.setItem('selected-lang', lang);
+        // Redirect to the same path but in the other language
+        // Example: project.com/landing/dist/es/index.html -> project.com/landing/dist/en/index.html
+        const url = new URL(window.location.href);
+        url.pathname = url.pathname.replace(`/${currentLang}/`, `/${lang}/`);
+        window.location.href = url.toString();
+      }
     });
   });
 });
