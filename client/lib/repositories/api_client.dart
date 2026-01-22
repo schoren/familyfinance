@@ -56,6 +56,13 @@ class ApiClient {
     }
     return headers;
   }
+  void _logResponse(String method, Uri uri, int statusCode, String body) {
+    print('🌐 HTTP $method: $uri');
+    if (body != null) {
+      print('📤 Request body: $body');
+    }
+    print('📥 Response [$statusCode]: $body');
+  }
 
   // ============================================================================
   // CATEGORIES
@@ -64,6 +71,7 @@ class ApiClient {
   Future<List<Category>> getCategories() async {
     final uri = Uri.parse('$_scopedUrl/categories');
     final response = await _client.get(uri, headers: _headers);
+    _logResponse('GET', uri, response.statusCode, response.body);
 
     if (response.statusCode == 200) {
       final List<dynamic> json = jsonDecode(response.body);
@@ -119,6 +127,7 @@ class ApiClient {
   Future<List<FinanceAccount>> getAccounts() async {
     final uri = Uri.parse('$_scopedUrl/accounts');
     final response = await _client.get(uri, headers: _headers);
+    _logResponse('GET', uri, response.statusCode, response.body);
 
     if (response.statusCode == 200) {
       final List<dynamic> json = jsonDecode(response.body);
@@ -176,6 +185,7 @@ class ApiClient {
       queryParameters: month != null ? {'month': month} : null,
     );
     final response = await _client.get(uri, headers: _headers);
+    _logResponse('GET', uri, response.statusCode, response.body);
 
     if (response.statusCode == 200) {
       final List<dynamic> json = jsonDecode(response.body);
@@ -243,6 +253,7 @@ class ApiClient {
   Future<MonthlySummary> getMonthlySummary(String month) async {
     final uri = Uri.parse('$_scopedUrl/summary/$month');
     final response = await _client.get(uri, headers: _headers);
+    _logResponse('GET', uri, response.statusCode, response.body);
 
     if (response.statusCode == 200) {
       return MonthlySummary.fromJson(jsonDecode(response.body) as Map<String, dynamic>);

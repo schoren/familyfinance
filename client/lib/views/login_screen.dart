@@ -16,11 +16,35 @@ class LoginScreen extends ConsumerWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            // Logo
+            Container(
+              width: 120,
+              height: 120,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(60),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 15,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
+              ),
+              padding: const EdgeInsets.all(10),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(50),
+                child: Image.asset(
+                  'assets/logo.png',
+                  fit: BoxFit.contain,
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
             const Text(
               'Keda',
               style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 48),
             const SizedBox(height: 48),
             // Set invite code if present (needed for web flow)
             Builder(

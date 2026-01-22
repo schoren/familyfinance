@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:google_sign_in/google_sign_in.dart' as gsi;
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -9,6 +10,7 @@ import '../core/runtime_config.dart';
 
 class AuthState {
   final bool isAuthenticated;
+  final bool isInitialLoading;
   final String? userId;
   final String? userName;
   final String? userEmail;
@@ -19,6 +21,7 @@ class AuthState {
 
   AuthState({
     this.isAuthenticated = false,
+    this.isInitialLoading = false,
     this.userId,
     this.userName,
     this.userEmail,
@@ -27,6 +30,31 @@ class AuthState {
     this.householdId,
     this.token,
   });
+
+  AuthState copyWith({
+    bool? isAuthenticated,
+    bool? isInitialLoading,
+    String? userId,
+    String? userName,
+    String? userEmail,
+    String? userPictureUrl,
+    String? userColor,
+    String? householdId,
+    String? token,
+  }) {
+    return AuthState(
+      isAuthenticated: isAuthenticated ?? this.isAuthenticated,
+      isInitialLoading: isInitialLoading ?? this.isInitialLoading,
+      userId: userId ?? this.userId,
+      userName: userName ?? this.userName,
+      userEmail: userEmail ?? this.userEmail,
+      userPictureUrl: userPictureUrl ?? this.userPictureUrl,
+      userColor: userColor ?? this.userColor,
+      householdId: householdId ?? this.householdId,
+      token: token ?? this.token,
+    );
+  }
+
 
   Map<String, dynamic> toJson() => {
     'isAuthenticated': isAuthenticated,
@@ -65,6 +93,7 @@ class AuthNotifier extends Notifier<AuthState> {
     if (RuntimeConfig.testMode) {
       state = AuthState(
         isAuthenticated: true,
+        isInitialLoading: false,
         userId: 'test-user-id',
         userName: 'Test User',
         userEmail: 'test@example.com',
@@ -87,8 +116,9 @@ class AuthNotifier extends Notifier<AuthState> {
        // We can also handle signOut etc.
     });
 
-    return AuthState();
+    return AuthState(isInitialLoading: true);
   }
+
 
   static const _storageKey = 'auth_state';
 
@@ -98,12 +128,16 @@ class AuthNotifier extends Notifier<AuthState> {
     if (jsonString != null) {
       try {
         final data = jsonDecode(jsonString);
-        state = AuthState.fromJson(data);
+        state = AuthState.fromJson(data).copyWith(isInitialLoading: false);
       } catch (e) {
         debugPrint('Error loading auth state: $e');
+        state = state.copyWith(isInitialLoading: false);
       }
+    } else {
+      state = state.copyWith(isInitialLoading: false);
     }
   }
+
 
   Future<void> _saveState() async {
     final prefs = await SharedPreferences.getInstance();
@@ -169,6 +203,7 @@ class AuthNotifier extends Notifier<AuthState> {
   Future<void> ensureGoogleSignInInitialized() {
     _googleSignInInitFuture ??= gsi.GoogleSignIn.instance.initialize(
       clientId: RuntimeConfig.googleClientId,
+      serverClientId: RuntimeConfig.googleClientId, // Required for Android
     );
     return _googleSignInInitFuture!;
   }

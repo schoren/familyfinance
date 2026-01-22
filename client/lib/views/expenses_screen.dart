@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:keda/l10n/app_localizations.dart';
+import '../widgets/premium_refresh_indicator.dart';
 import '../providers/data_providers.dart';
 import '../utils/formatters.dart';
 import '../models/expense.dart';
@@ -39,7 +40,25 @@ class ExpensesScreen extends ConsumerWidget {
                   }).toList();
 
                   if (currentMonthExpenses.isEmpty) {
-                    return Center(child: Text(l10n.noExpensesThisMonth));
+                    return PremiumRefreshIndicator(
+                      onRefresh: () async {
+                        await Future.wait([
+                          ref.refresh(expensesProvider.future),
+                          ref.refresh(accountsProvider.future),
+                          ref.refresh(categoriesProvider.future),
+                        ]);
+                      },
+                      child: ListView(
+                        children: [
+                          Center(
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Text(l10n.noExpensesThisMonth),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
                   }
 
                   // Group by day for visual separation
@@ -51,69 +70,79 @@ class ExpensesScreen extends ConsumerWidget {
 
                   final dateKeys = groupedExpenses.keys.toList();
 
-                  return ListView.builder(
-                    itemCount: dateKeys.length,
-                    itemBuilder: (context, index) {
-                      final dateKey = dateKeys[index];
-                      final dayExpenses = groupedExpenses[dateKey]!;
-                      final displayDate = DateFormat.yMMMMEEEEd(Localizations.localeOf(context).toString()).format(dayExpenses.first.date.toLocal());
-
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-                            child: Text(
-                              displayDate,
-                              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                                color: Theme.of(context).colorScheme.primary,
-                                fontWeight: FontWeight.bold,
-                                ),
-                            ),
-                          ),
-                          ...dayExpenses.map((expense) {
-                            final account = accounts.firstWhere((a) => a.id == expense.accountId, orElse: () => accounts.first);
-                            final category = categories.firstWhere((c) => c.id == expense.categoryId, orElse: () => categories.first);
-                            final timeStr = DateFormat.Hm(Localizations.localeOf(context).toString()).format(expense.date.toLocal());
-
-                            return ListTile(
-                              leading: expense.user == null
-                                ? const CircleAvatar(
-                                    child: Icon(Icons.receipt_long),
-                                  )
-                                : UserAvatar(
-                                    pictureUrl: expense.user!.pictureUrl,
-                                    name: expense.user!.name,
-                                    color: expense.user!.color,
-                                  ),
-                              title: Text(expense.note ?? l10n.noNote),
-                              subtitle: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    '$timeStr • ${category.name} • ${account.getLocalizedDisplayName(l10n)}',
-                                    style: Theme.of(context).textTheme.bodySmall,
-                                  ),
-                                  if (expense.user != null)
-                                    Text(
-                                      l10n.createdBy(expense.user!.name),
-                                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                        fontSize: 10,
-                                        color: Colors.grey,
-                                        fontStyle: FontStyle.italic,
-                                      ),
-                                    ),
-                                ],
-                              ),
-                              trailing: Text(
-                                Formatters.formatMoney(expense.amount, locale),
-                                style: const TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            );
-                          }),
-                        ],
-                      );
+                  return PremiumRefreshIndicator(
+                    onRefresh: () async {
+                      await Future.wait([
+                        ref.refresh(expensesProvider.future),
+                        ref.refresh(accountsProvider.future),
+                        ref.refresh(categoriesProvider.future),
+                      ]);
                     },
+                    child: ListView.builder(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      itemCount: dateKeys.length,
+                      itemBuilder: (context, index) {
+                        final dateKey = dateKeys[index];
+                        final dayExpenses = groupedExpenses[dateKey]!;
+                        final displayDate = DateFormat.yMMMMEEEEd(Localizations.localeOf(context).toString()).format(dayExpenses.first.date.toLocal());
+
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                              child: Text(
+                                displayDate,
+                                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  fontWeight: FontWeight.bold,
+                                  ),
+                              ),
+                            ),
+                            ...dayExpenses.map((expense) {
+                              final account = accounts.firstWhere((a) => a.id == expense.accountId, orElse: () => accounts.first);
+                              final category = categories.firstWhere((c) => c.id == expense.categoryId, orElse: () => categories.first);
+                              final timeStr = DateFormat.Hm(Localizations.localeOf(context).toString()).format(expense.date.toLocal());
+
+                              return ListTile(
+                                leading: expense.user == null
+                                  ? const CircleAvatar(
+                                      child: Icon(Icons.receipt_long),
+                                    )
+                                  : UserAvatar(
+                                      pictureUrl: expense.user!.pictureUrl,
+                                      name: expense.user!.name,
+                                      color: expense.user!.color,
+                                    ),
+                                title: Text(expense.note ?? l10n.noNote),
+                                subtitle: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '$timeStr • ${category.name} • ${account.getLocalizedDisplayName(l10n)}',
+                                      style: Theme.of(context).textTheme.bodySmall,
+                                    ),
+                                    if (expense.user != null)
+                                      Text(
+                                        l10n.createdBy(expense.user!.name),
+                                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                          fontSize: 10,
+                                          color: Colors.grey,
+                                          fontStyle: FontStyle.italic,
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                                trailing: Text(
+                                  Formatters.formatMoney(expense.amount, locale),
+                                  style: const TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              );
+                            }),
+                          ],
+                        );
+                      },
+                    ),
                   );
                 },
                 loading: () => const Center(child: CircularProgressIndicator()),

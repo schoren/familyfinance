@@ -1,0 +1,2 @@
+void hideSplash() {}
+void configureUrlStrategy() {}

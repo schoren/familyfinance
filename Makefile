@@ -27,6 +27,7 @@ help:
 	@echo "    make test-backend    - Run backend unit tests with coverage"
 	@echo "    make test-client     - Run client unit tests with coverage"
 	@echo "    make test-e2e        - Run E2E integration tests (Video Demo)"
+	@echo "    make test-android-integration - Run Android integration tests (needs emulator)"
 	@echo ""
 	@echo "  🔍 Code Quality"
 	@echo "    make lint            - Run all linters (backend + client)"
@@ -53,6 +54,13 @@ help:
 	@echo "  🧹 Maintenance"
 	@echo "    make clean           - Clean all test artifacts and containers"
 	@echo "    make help            - Show this help message"
+	@echo ""
+	@echo "  📱 Android"
+	@echo "    make android-setup   - Setup Android environment (Java, SDK)"
+	@echo "    make android-build   - Build Android APK (debug)"
+	@echo "    make android-release - Build Android APK (release)"
+	@echo "    make android-run     - Run Android app on connected device/emulator"
+	@echo "    make android-clean   - Clean Android build artifacts"
 	@echo ""
 
 # Backend tests
@@ -153,6 +161,16 @@ test-e2e:
 	@echo "🧪 Running E2E / Video Demo tests..."
 	@cd video-demo && ./run.sh
 
+# Android Integration tests
+test-android-integration:
+	@echo "🧪 Running Android Integration tests..."
+	@./scripts/ensure_emulator.sh
+	@cd client && flutter test integration_test/app_test.dart \
+		--dart-define=API_URL=http://10.0.2.2:8090 \
+		--dart-define=TEST_MODE=true \
+		--dart-define=INTEGRATION_TEST=true \
+		--dart-define=MOCK_DATA=true
+
 # Run all tests
 test-all: test-backend test-client test-e2e security-check lint
 	@echo ""
@@ -225,3 +243,28 @@ landing-build:
 landing-serve: landing-build
 	@echo "🚀 Serving landing page at http://localhost:3000"
 	npx serve landing/dist -l 3000
+
+# Android Targets
+android-setup:
+	@echo "🤖 Setting up Android environment..."
+	@./scripts/setup_android.sh
+
+android-build:
+	@echo "🔨 Building Android APK (Debug)..."
+	cd client && flutter build apk --debug
+
+android-release:
+	@echo "🚀 Building Android APK (Release)..."
+	cd client && flutter build apk --release
+
+android-run:
+	@echo "📱 Ensuring Android device/emulator is ready..."
+	@./scripts/ensure_emulator.sh
+	@echo "📱 Running on Android device..."
+	@set -a && . ./.env.dev && set +a && \
+	DEVICE_ID=$$(flutter devices | grep "•" | grep -E "mobile|android" | grep -vE "desktop|web|offline" | head -n 1 | awk -F'•' '{print $$2}' | xargs); \
+	cd client && flutter run -d $$DEVICE_ID --dart-define=GOOGLE_CLIENT_ID=$$GOOGLE_CLIENT_ID --dart-define=API_URL=$$API_URL
+
+android-clean:
+	@echo "🧹 Cleaning Android build..."
+	cd client && flutter clean

@@ -8,6 +8,7 @@ import '../models/monthly_summary.dart';
 import '../repositories/api_client.dart';
 import '../providers/auth_provider.dart';
 import '../core/runtime_config.dart';
+import '../models/account_type.dart';
 import '../core/update_logic.dart';
 
 // ============================================================================
@@ -34,6 +35,12 @@ class CategoriesNotifier extends AsyncNotifier<List<Category>> {
   }
 
   Future<List<Category>> _fetchFromServer() async {
+    if (const bool.fromEnvironment('MOCK_DATA')) {
+      return [
+        Category(id: 'cat-1', name: 'Food', monthlyBudget: 500),
+        Category(id: 'cat-2', name: 'Rent', monthlyBudget: 1200),
+      ];
+    }
     final apiClient = ref.watch(apiClientProvider);
     try {
       if (apiClient.householdId == null) return [];
@@ -111,6 +118,12 @@ class AccountsNotifier extends AsyncNotifier<List<FinanceAccount>> {
   }
 
   Future<List<FinanceAccount>> _fetchFromServer() async {
+    if (const bool.fromEnvironment('MOCK_DATA')) {
+      return [
+        FinanceAccount(id: 'acc-1', name: 'Bank Account', displayName: 'Bank Account', type: AccountType.bank),
+        FinanceAccount(id: 'acc-2', name: 'Credit Card', displayName: 'Credit Card', type: AccountType.card),
+      ];
+    }
     final apiClient = ref.watch(apiClientProvider);
     try {
       if (apiClient.householdId == null) return [];
@@ -178,6 +191,9 @@ class ExpensesNotifier extends AsyncNotifier<List<Expense>> {
   }
 
   Future<List<Expense>> _fetchFromServer() async {
+    if (const bool.fromEnvironment('MOCK_DATA')) {
+      return [];
+    }
     final apiClient = ref.watch(apiClientProvider);
     try {
       if (apiClient.householdId == null) return [];
@@ -226,6 +242,17 @@ final expensesProvider = AsyncNotifierProvider<ExpensesNotifier, List<Expense>>(
 // ============================================================================
 
 final monthlySummaryProvider = FutureProvider.family<MonthlySummary, String>((ref, month) async {
+  if (const bool.fromEnvironment('MOCK_DATA')) {
+    return MonthlySummary(
+      month: month,
+      totalBudget: 1700,
+      totalSpent: 450,
+      categories: [
+        CategorySummary(id: 'cat-1', name: 'Food', budget: 500, spent: 450, remaining: 50),
+        CategorySummary(id: 'cat-2', name: 'Rent', budget: 1200, spent: 0, remaining: 1200),
+      ],
+    );
+  }
   final apiClient = ref.watch(apiClientProvider);
   if (apiClient.householdId == null) throw Exception('No household selected');
   return await apiClient.getMonthlySummary(month);

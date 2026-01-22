@@ -52,6 +52,7 @@ dependencies:
   google_identity_services_web: ^0.3.3+1
   flutter_web_plugins:
     sdk: flutter
+  custom_refresh_indicator: ^3.0.0
 
 dev_dependencies:
   flutter_test:
@@ -75,7 +76,7 @@ dev_dependencies:
 flutter_launcher_icons:
   android: "launcher_icon"
   ios: true
-  image_path: "web/icons/icon-512.png"
+  image_path: "assets/logo.png"
   min_sdk_android: 21 # android min sdk min:21, default 21
   remove_alpha_ios: true
 

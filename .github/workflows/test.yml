@@ -186,8 +186,38 @@ jobs:
           version: v2.6.1
           working-directory: server
 
+  warmup-client-caches:
+    name: Setup Android & Flutter Cache
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+          cache: 'gradle'
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.38.6'
+          channel: 'stable'
+          cache: true
+      - name: Cache Flutter dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.pub-cache
+          key: ${{ runner.os }}-pub-${{ hashFiles('client/pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-
+      - name: Install dependencies
+        working-directory: ./client
+        run: flutter pub get
+
   lint-client:
     name: Lint Client (Flutter)
+    needs: [warmup-client-caches]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -197,6 +227,14 @@ jobs:
         with:
           flutter-version: '3.38.6'
           channel: 'stable'
+      - name: Cache Flutter dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.pub-cache
+          key: ${{ runner.os }}-pub-${{ hashFiles('client/pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-
+
       - name: Install dependencies
         working-directory: ./client
         run: flutter pub get
@@ -206,6 +244,7 @@ jobs:
 
   client-tests:
     name: Client Tests (Flutter)
+    needs: [warmup-client-caches]
     runs-on: ubuntu-latest
     
     steps:
@@ -237,6 +276,51 @@ jobs:
           files: ./client/coverage/lcov.info
           flags: client
           fail_ci_if_error: false
+
+  build-android:
+    name: Build Android APK
+    needs: [warmup-client-caches]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+          cache: 'gradle'
+      
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.38.6'
+          channel: 'stable'
+          cache: true
+      
+      - name: Cache Flutter dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.pub-cache
+          key: ${{ runner.os }}-pub-${{ hashFiles('client/pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-
+
+      - name: Install dependencies
+        working-directory: ./client
+        run: flutter pub get
+      
+      - name: Build APK (Debug)
+        working-directory: ./client
+        run: flutter build apk --debug
+      
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug.apk
+          path: client/build/app/outputs/flutter-apk/app-debug.apk
+          retention-days: 7
 
   build-images:
     name: Build ${{ matrix.image }} Image
@@ -311,6 +395,57 @@ jobs:
           path: video-demo/test-results/demo.webm
           retention-days: 7
 
+  android-integration-test:
+    name: Android Integration Test (Headless)
+    needs: [warmup-client-caches]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+          cache: 'gradle'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.38.6'
+          channel: 'stable'
+          cache: true
+
+      - name: Cache Flutter dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.pub-cache
+          key: ${{ runner.os }}-pub-${{ hashFiles('client/pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-
+
+      - name: Install dependencies
+        working-directory: ./client
+        run: flutter pub get
+
+      - name: Run Integration Tests (Headless Emulator)
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 29
+          target: google_apis
+          arch: x86_64
+          profile: Nexus 6
+          working-directory: ./client
+          script: flutter test integration_test/app_test.dart --dart-define=TEST_MODE=true --dart-define=INTEGRATION_TEST=true --dart-define=MOCK_DATA=true
+
   cleanup:
     if: always()
     needs: 
@@ -324,6 +459,8 @@ jobs:
       - security-trivy-server
       - security-mobsf
       - security-landing
+      - android-integration-test
+      - build-android
     runs-on: ubuntu-latest
     steps:
       - name: Cleanup
