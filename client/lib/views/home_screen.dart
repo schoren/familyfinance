@@ -223,11 +223,12 @@ class HomeScreen extends ConsumerWidget {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, stack) => Center(child: Text('Error: $err')),
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           context.push('/manage-category/new');
         },
-        child: const Icon(Icons.add),
+        label: Text(l10n.newCategory),
+        icon: const Icon(Icons.add),
       ),
     );
   }

@@ -232,15 +232,40 @@ test-quick: test-backend test-client
 	@echo ""
 	@echo "✅ Quick tests completed!"
 
-# Landing page
-landing-build:
+# Landing Page
+landing-build: docs-build
 	@echo "🏗️  Building landing page..."
 	cd landing && npm install && npm run build
+	@echo "📦 Integrating documentation into landing page..."
+	mkdir -p landing/dist/en/docs landing/dist/es/docs
+	cp -r docs/.vitepress/dist/en/* landing/dist/en/docs/ 2>/dev/null || cp -r docs/.vitepress/dist/* landing/dist/en/docs/
+	cp -r docs/.vitepress/dist/es/* landing/dist/es/docs/ 2>/dev/null || true
 	@echo "✅ Landing page built in landing/dist"
 
 landing-serve: landing-build
 	@echo "🚀 Serving landing page at http://localhost:3000"
 	npx serve landing/dist -l 3000
+
+# Documentation
+docs-build:
+	@echo "🏗️  Building documentation..."
+	cd docs && npm install && npx vitepress build
+	@echo "✅ Documentation built in docs/.vitepress/dist"
+
+docs-serve:
+	@echo "🚀 Serving documentation locally..."
+	cd docs && npx vitepress dev --port 3001
+
+# Assets Generation
+generate-assets:
+	@echo "🎬 Generating visual assets (screenshots/videos)..."
+	cd preview-generator && ./run.sh
+	@echo "📦 Moving assets to documentation and landing..."
+	mkdir -p docs/public/assets landing/assets
+	cp preview-generator/generated-assets/*.png docs/public/assets/
+	cp preview-generator/generated-assets/*.webm docs/public/assets/ 2>/dev/null || true
+	cp preview-generator/generated-assets/dashboard.png landing/assets/ 2>/dev/null || true
+	@echo "✅ Assets generated and distributed."
 
 # Android Targets
 android-setup:
