@@ -227,5 +227,5 @@ jobs:
     needs: [bump, publish-release]
     uses: ./.github/workflows/deploy-landing.yml
     with:
-      demo_video_url: https://github.com/schoren/keda/releases/download/${{ needs.bump.outputs.version }}/demo.webm
+      release_tag: ${{ needs.bump.outputs.version }}
     secrets: inherit
