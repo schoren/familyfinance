@@ -14,6 +14,8 @@ import '../views/expenses_screen.dart';
 
 import '../views/navigation_shell.dart';
 import '../views/settings_screen.dart';
+import '../views/initial_splash_screen.dart';
+
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorHomeKey = GlobalKey<NavigatorState>(debugLabel: 'shellHome');
@@ -27,13 +29,19 @@ final routerProvider = Provider<GoRouter>((ref) {
 
   return GoRouter(
     navigatorKey: _rootNavigatorKey,
-    initialLocation: '/',
+    initialLocation: '/splash',
     refreshListenable: listenable,
+
     debugLogDiagnostics: true,
     redirect: (context, state) {
       final authState = ref.read(authProvider);
       final loggingIn = state.matchedLocation == '/login';
+      final splashing = state.matchedLocation == '/splash';
       
+      if (authState.isInitialLoading) {
+        return splashing ? null : '/splash';
+      }
+
       if (!authState.isAuthenticated) {
         if (loggingIn) return null;
         final query = state.uri.queryParameters;
@@ -42,9 +50,10 @@ final routerProvider = Provider<GoRouter>((ref) {
         }
         return '/login';
       }
-      if (loggingIn) {
+      if (loggingIn || splashing) {
         return '/';
       }
+
       return null;
     },
     routes: [
@@ -143,7 +152,12 @@ final routerProvider = Provider<GoRouter>((ref) {
           return ManageCategoryScreen(categoryId: id);
         },
       ),
+      GoRoute(
+        path: '/splash',
+        builder: (context, state) => const InitialSplashScreen(),
+      ),
     ],
+
   );
 });
 
