@@ -20,8 +20,8 @@ jobs:
     strategy:
       matrix:
         include:
-          - project: video-demo
-            path: video-demo
+          - project: preview-generator
+            path: preview-generator
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -349,7 +349,7 @@ jobs:
           push: true
           tags: schoren/keda-${{ matrix.image }}:${{ github.sha }}
 
-  video-demo-test:
+  preview-generator-test:
     name: Video Demo Test (Playwright)
     needs: [build-images, setup-playwright]
     runs-on: ubuntu-latest
@@ -363,25 +363,25 @@ jobs:
       - name: Cache node_modules
         uses: actions/cache@v4
         with:
-          path: video-demo/node_modules
-          key: ${{ runner.os }}-node-video-demo-${{ hashFiles('video-demo/package-lock.json') }}
+          path: preview-generator/node_modules
+          key: ${{ runner.os }}-node-preview-generator-${{ hashFiles('preview-generator/package-lock.json') }}
 
       - name: Cache Playwright browsers
         uses: actions/cache@v4
         with:
           path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ hashFiles('video-demo/package-lock.json') }}
+          key: ${{ runner.os }}-playwright-${{ hashFiles('preview-generator/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-playwright-
 
       - name: Install Playwright dependencies (Cache Check)
-        working-directory: ./video-demo
+        working-directory: ./preview-generator
         run: |
           if [ ! -d "node_modules" ]; then npm ci; fi
           npx playwright install --with-deps chromium
 
       - name: Run video generation
-        working-directory: ./video-demo
+        working-directory: ./preview-generator
         env:
           SERVER_IMAGE: schoren/keda-server:${{ github.sha }}
           CLIENT_IMAGE: schoren/keda-client:${{ github.sha }}
@@ -392,7 +392,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: marketing-assets
-          path: video-demo/generated-assets/
+          path: preview-generator/generated-assets/
           retention-days: 7
 
   android-integration-test:
@@ -451,7 +451,7 @@ jobs:
     needs: 
       - backend-tests
       - client-tests
-      - video-demo-test
+      - preview-generator-test
       - lint-backend
       - lint-client
       - security-gosec

@@ -1,5 +1,5 @@
 {
-  "name": "keda-video-demo",
+  "name": "keda-preview-generator",
   "version": "1.0.0",
   "description": "Automated demo video generation for Keda",
   "scripts": {

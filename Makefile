@@ -26,7 +26,7 @@ help:
 	@echo "    make test-quick      - Run backend + client tests (skip slow E2E)"
 	@echo "    make test-backend    - Run backend unit tests with coverage"
 	@echo "    make test-client     - Run client unit tests with coverage"
-	@echo "    make test-e2e        - Run E2E integration tests (Video Demo)"
+	@echo "    make test-e2e        - Run E2E integration tests (Preview Generator)"
 	@echo "    make test-android-integration - Run Android integration tests (needs emulator)"
 	@echo ""
 	@echo "  🔍 Code Quality"
@@ -155,11 +155,9 @@ test-client:
 		echo "Hit Lines: $$HIT" && \
 		echo "Coverage: $$(echo "scale=1; $$HIT * 100 / $$TOTAL" | bc)%"
 
-# E2E tests
-# E2E tests (Using Video Demo as "Slow E2E")
 test-e2e:
-	@echo "🧪 Running E2E / Video Demo tests..."
-	@cd video-demo && ./run.sh
+	@echo "🧪 Running E2E / Preview Generator tests..."
+	@cd preview-generator && ./run.sh
 
 # Android Integration tests
 test-android-integration:

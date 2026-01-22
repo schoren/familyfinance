@@ -159,25 +159,25 @@ jobs:
       - name: Cache node_modules
         uses: actions/cache@v4
         with:
-          path: video-demo/node_modules
-          key: ${{ runner.os }}-node-video-demo-${{ hashFiles('video-demo/package-lock.json') }}
+          path: preview-generator/node_modules
+          key: ${{ runner.os }}-node-preview-generator-${{ hashFiles('preview-generator/package-lock.json') }}
 
       - name: Cache Playwright browsers
         uses: actions/cache@v4
         with:
           path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ hashFiles('video-demo/package-lock.json') }}
+          key: ${{ runner.os }}-playwright-${{ hashFiles('preview-generator/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-playwright-
 
       - name: Install Playwright dependencies (Cache Check)
-        working-directory: ./video-demo
+        working-directory: ./preview-generator
         run: |
           if [ ! -d "node_modules" ]; then npm ci; fi
           npx playwright install --with-deps chromium
 
       - name: Run video generation
-        working-directory: ./video-demo
+        working-directory: ./preview-generator
         env:
           SERVER_IMAGE: schoren/keda-server:${{ needs.bump.outputs.version }}
           CLIENT_IMAGE: schoren/keda-client:${{ needs.bump.outputs.version }}
@@ -187,7 +187,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: release-assets
-          path: video-demo/generated-assets/
+          path: preview-generator/generated-assets/
 
   publish-release:
     needs: [bump, build-server, build-client, generate-video, release-android]

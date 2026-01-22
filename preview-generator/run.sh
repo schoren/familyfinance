@@ -14,7 +14,7 @@ fi
 
 echo "🎥 Starting demo environment..."
 # Ensure cleanup of any previous run
-docker compose -p keda-video-demo -f docker-compose.yml down -v 2>/dev/null || true
+docker compose -p keda-preview-generator -f docker-compose.yml down -v 2>/dev/null || true
 
 # Pull images if they are remote tags, otherwise just use local
 if [[ "${SERVER_IMAGE}" != "" ]]; then
@@ -25,12 +25,12 @@ if [[ "${CLIENT_IMAGE}" != "" ]]; then
 fi
 
 echo "🔨 Starting containers..."
-docker compose -p keda-video-demo -f docker-compose.yml up -d --remove-orphans
+docker compose -p keda-preview-generator -f docker-compose.yml up -d --remove-orphans
 
 echo "⏳ Waiting for client to be ready..."
 # We wait for client (8085) 
 timeout 60 bash -c 'until curl -sf http://localhost:8085 > /dev/null 2>&1; do sleep 2; done' || \
-    (echo "❌ Client failed to start" && docker compose -p keda-video-demo -f docker-compose.yml down -v && exit 1)
+    (echo "❌ Client failed to start" && docker compose -p keda-preview-generator -f docker-compose.yml down -v && exit 1)
 echo "✅ Demo environment ready at http://localhost:8085"
 
 echo "🎬 Recording demo video..."
@@ -40,7 +40,7 @@ TEST_EXIT_CODE=$?
 set -e
 
 echo "🛑 Stopping demo environment..."
-docker compose -p keda-video-demo -f docker-compose.yml down -v
+docker compose -p keda-preview-generator -f docker-compose.yml down -v
 
 if [ $TEST_EXIT_CODE -eq 0 ]; then
   echo "✅ Assets generated."

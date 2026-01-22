@@ -1,3 +1,5 @@
+.DS_Store
+**/.DS_Store
 .env
 .env.dev
 server/server
@@ -7,6 +9,6 @@ landing/.env
 landing/node_modules
 landing/dist
 
-video-demo/node_modules
-video-demo/test-results
-video-demo/generated-assets
+preview-generator/node_modules
+preview-generator/test-results
+preview-generator/generated-assets
