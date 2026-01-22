@@ -4,6 +4,7 @@ const TIMEOUT = 120_000;
 
 export default defineConfig({
   testDir: './tests',
+  outputDir: './generated-assets',
   timeout: TIMEOUT,
   workers: 1,
   reporter: 'list',
@@ -14,7 +15,8 @@ export default defineConfig({
     trace: 'off',
     launchOptions: {
       slowMo: 1000,
-    }
+    },
+    screenshot: 'only-on-failure',
   },
 
   projects: [
@@ -26,6 +28,4 @@ export default defineConfig({
       },
     },
   ],
-
-  testMatch: 'demo.spec.ts',
 });

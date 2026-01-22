@@ -387,12 +387,12 @@ jobs:
           CLIENT_IMAGE: schoren/keda-client:${{ github.sha }}
         run: ./run.sh
 
-      - name: Upload video artifact
+      - name: Upload marketing assets
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: demo-video
-          path: video-demo/test-results/demo.webm
+          name: marketing-assets
+          path: video-demo/generated-assets/
           retention-days: 7
 
   android-integration-test:

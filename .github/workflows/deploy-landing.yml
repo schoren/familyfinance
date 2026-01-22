@@ -2,22 +2,18 @@
 name: Deploy Landing Page to Pages
 
 on:
-  push:
-    branches: ["main"]
-    paths:
-      - "landing/**"
-
+  # Keep workflow_dispatch and workflow_call for manual/automated triggers
   workflow_dispatch:
     inputs:
-      demo_video_url:
-        description: 'URL for the demo video'
+      release_tag:
+        description: 'Release tag to download assets from (e.g. v1.0.0)'
         required: false
         type: string
 
   workflow_call:
     inputs:
-      demo_video_url:
-        description: 'URL for the demo video'
+      release_tag:
+        description: 'Release tag to download assets from (e.g. v1.0.0)'
         required: false
         type: string
 
@@ -44,6 +40,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Download Assets from Release
+        if: ${{ inputs.release_tag != '' }}
+        run: |
+          mkdir -p landing/assets
+          gh release download ${{ inputs.release_tag }} --pattern "*.png" --pattern "*.webm" --dir landing/assets --clobber
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -61,7 +65,6 @@ jobs:
           APP_URL: ${{ vars.APP_URL || 'https://app.getkeda.app' }}
           GITHUB_REPO_URL: ${{ vars.GITHUB_REPO_URL || 'https://github.com/schoren/keda' }}
           CONTACT_EMAIL: ${{ vars.CONTACT_EMAIL || 'info@getkeda.app' }}
-          DEMO_VIDEO_URL: ${{ inputs.demo_video_url }}
 
       - name: Setup Pages
         uses: actions/configure-pages@v5

@@ -183,11 +183,11 @@ jobs:
           CLIENT_IMAGE: schoren/keda-client:${{ needs.bump.outputs.version }}
         run: ./run.sh
 
-      - name: Upload video artifact
+      - name: Upload release assets
         uses: actions/upload-artifact@v4
         with:
-          name: release-video
-          path: video-demo/test-results/demo.webm
+          name: release-assets
+          path: video-demo/generated-assets/
 
   publish-release:
     needs: [bump, build-server, build-client, generate-video, release-android]
@@ -195,10 +195,10 @@ jobs:
     permissions:
       contents: write
     steps:
-      - name: Download video artifact
+      - name: Download release assets
         uses: actions/download-artifact@v4
         with:
-          name: release-video
+          name: release-assets
           path: .
           merge-multiple: true
 
@@ -214,7 +214,8 @@ jobs:
           tag_name: ${{ needs.bump.outputs.version }}
           name: Release ${{ needs.bump.outputs.version }}
           files: |
-            demo.webm
+            *.webm
+            *.png
             keda_android_${{ needs.bump.outputs.version }}.apk
           draft: false
           prerelease: false
@@ -226,5 +227,5 @@ jobs:
     needs: [bump, publish-release]
     uses: ./.github/workflows/deploy-landing.yml
     with:
-      demo_video_url: https://github.com/schoren/keda/releases/download/${{ needs.bump.outputs.version }}/demo.webm
+      release_tag: ${{ needs.bump.outputs.version }}
     secrets: inherit

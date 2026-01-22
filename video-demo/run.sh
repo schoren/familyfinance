@@ -43,18 +43,29 @@ echo "🛑 Stopping demo environment..."
 docker compose -p keda-video-demo -f docker-compose.yml down -v
 
 if [ $TEST_EXIT_CODE -eq 0 ]; then
-  echo "✅ Demo video generated."
-  # Playwright saves videos in test-results/<test-name>/video.webm
-  # We find the first .webm file in test-results
-  VIDEO_PATH=$(find test-results -name "*.webm" | head -n 1)
-  if [ -n "$VIDEO_PATH" ]; then
-    echo "📦 Moving video from $VIDEO_PATH to test-results/demo.webm"
-    cp "$VIDEO_PATH" test-results/demo.webm
-  else
-    echo "⚠️ Could not find generated video file in test-results/"
-  fi
+  echo "✅ Assets generated."
+  # Playwright saves assets in generated-assets/<test-name>/video.webm or screenshot.png
+  
+  # 1. Handle videos: rename them to a clean test name to avoid collisions
+  # Format is usually: [file-slug]-[title-slug]-[project-name]
+  # We try to keep only the [file-slug] part.
+  find generated-assets -mindepth 2 -name "*.webm" | while read -r video; do
+    DIR_NAME=$(basename "$(dirname "$video")")
+    # Remove everything starting from the first capital letter (start of title slug or project)
+    # OR from a 5-char hex hash which Playwright sometimes inserts
+    CLEAN_NAME=$(echo "$DIR_NAME" | sed 's/-[A-Z].*//; s/-[0-9a-f]\{5\}.*//')
+    cp "$video" "generated-assets/${CLEAN_NAME}.webm"
+  done
+
+  # 2. Handle screenshots: consolidated in the root
+  find generated-assets -mindepth 2 -name "*.png" -exec cp {} generated-assets/ \;
+  
+  # 3. Cleanup: remove individual test directories
+  find generated-assets -mindepth 1 -maxdepth 1 -type d -exec rm -rf {} +
+
+  echo "📦 Assets consolidated and cleaned up in generated-assets/"
 else
-  echo "❌ Demo recording failed with exit code $TEST_EXIT_CODE"
+  echo "❌ Asset generation failed with exit code $TEST_EXIT_CODE"
 fi
 
 exit $TEST_EXIT_CODE
