@@ -186,8 +186,38 @@ jobs:
           version: v2.6.1
           working-directory: server
 
+  warmup-client-caches:
+    name: Setup Android & Flutter Cache
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+          cache: 'gradle'
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.38.6'
+          channel: 'stable'
+          cache: true
+      - name: Cache Flutter dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.pub-cache
+          key: ${{ runner.os }}-pub-${{ hashFiles('client/pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-
+      - name: Install dependencies
+        working-directory: ./client
+        run: flutter pub get
+
   lint-client:
     name: Lint Client (Flutter)
+    needs: [warmup-client-caches]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -214,6 +244,7 @@ jobs:
 
   client-tests:
     name: Client Tests (Flutter)
+    needs: [warmup-client-caches]
     runs-on: ubuntu-latest
     
     steps:
@@ -248,6 +279,7 @@ jobs:
 
   build-android:
     name: Build Android APK
+    needs: [warmup-client-caches]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -363,28 +395,9 @@ jobs:
           path: video-demo/test-results/demo.webm
           retention-days: 7
 
-  cleanup:
-    if: always()
-    needs: 
-      - backend-tests
-      - client-tests
-      - video-demo-test
-      - lint-backend
-      - lint-client
-      - security-gosec
-      - security-trivy-client
-      - security-trivy-server
-      - security-mobsf
-      - security-landing
-      - android-integration-test
-      - build-android
-    runs-on: ubuntu-latest
-    steps:
-      - name: Cleanup
-        run: echo "Done"
-
   android-integration-test:
     name: Android Integration Test (Headless)
+    needs: [warmup-client-caches]
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -432,3 +445,23 @@ jobs:
           profile: Nexus 6
           working-directory: ./client
           script: flutter test integration_test/app_test.dart --dart-define=TEST_MODE=true --dart-define=INTEGRATION_TEST=true --dart-define=MOCK_DATA=true
+
+  cleanup:
+    if: always()
+    needs: 
+      - backend-tests
+      - client-tests
+      - video-demo-test
+      - lint-backend
+      - lint-client
+      - security-gosec
+      - security-trivy-client
+      - security-trivy-server
+      - security-mobsf
+      - security-landing
+      - android-integration-test
+      - build-android
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cleanup
+        run: echo "Done"
