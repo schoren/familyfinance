@@ -60,7 +60,10 @@ if [ $TEST_EXIT_CODE -eq 0 ]; then
   # 2. Handle screenshots: consolidated in the root
   find generated-assets -mindepth 2 -name "*.png" -exec cp {} generated-assets/ \;
   
-  echo "📦 Assets consolidated in generated-assets/"
+  # 3. Cleanup: remove individual test directories
+  find generated-assets -mindepth 1 -maxdepth 1 -type d -exec rm -rf {} +
+
+  echo "📦 Assets consolidated and cleaned up in generated-assets/"
 else
   echo "❌ Asset generation failed with exit code $TEST_EXIT_CODE"
 fi
