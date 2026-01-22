@@ -35,7 +35,7 @@ class CategoriesNotifier extends AsyncNotifier<List<Category>> {
   }
 
   Future<List<Category>> _fetchFromServer() async {
-    if (RuntimeConfig.testMode) {
+    if (const bool.fromEnvironment('MOCK_DATA')) {
       return [
         Category(id: 'cat-1', name: 'Food', monthlyBudget: 500),
         Category(id: 'cat-2', name: 'Rent', monthlyBudget: 1200),
@@ -118,7 +118,7 @@ class AccountsNotifier extends AsyncNotifier<List<FinanceAccount>> {
   }
 
   Future<List<FinanceAccount>> _fetchFromServer() async {
-    if (RuntimeConfig.testMode) {
+    if (const bool.fromEnvironment('MOCK_DATA')) {
       return [
         FinanceAccount(id: 'acc-1', name: 'Bank Account', displayName: 'Bank Account', type: AccountType.bank),
         FinanceAccount(id: 'acc-2', name: 'Credit Card', displayName: 'Credit Card', type: AccountType.card),
@@ -191,7 +191,7 @@ class ExpensesNotifier extends AsyncNotifier<List<Expense>> {
   }
 
   Future<List<Expense>> _fetchFromServer() async {
-    if (RuntimeConfig.testMode) {
+    if (const bool.fromEnvironment('MOCK_DATA')) {
       return [];
     }
     final apiClient = ref.watch(apiClientProvider);
@@ -242,7 +242,7 @@ final expensesProvider = AsyncNotifierProvider<ExpensesNotifier, List<Expense>>(
 // ============================================================================
 
 final monthlySummaryProvider = FutureProvider.family<MonthlySummary, String>((ref, month) async {
-  if (RuntimeConfig.testMode) {
+  if (const bool.fromEnvironment('MOCK_DATA')) {
     return MonthlySummary(
       month: month,
       totalBudget: 1700,

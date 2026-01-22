@@ -24,7 +24,7 @@ class MyScrollBehavior extends MaterialScrollBehavior {
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  if (!RuntimeConfig.testMode) {
+  if (kIsWeb || !const bool.fromEnvironment('INTEGRATION_TEST')) {
     SemanticsBinding.instance.ensureSemantics();
   }
   

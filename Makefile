@@ -167,7 +167,9 @@ test-android-integration:
 	@./scripts/ensure_emulator.sh
 	@cd client && flutter test integration_test/app_test.dart \
 		--dart-define=API_URL=http://10.0.2.2:8090 \
-		--dart-define=TEST_MODE=true
+		--dart-define=TEST_MODE=true \
+		--dart-define=INTEGRATION_TEST=true \
+		--dart-define=MOCK_DATA=true
 
 # Run all tests
 test-all: test-backend test-client test-e2e security-check lint

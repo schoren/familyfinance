@@ -399,4 +399,4 @@ jobs:
           arch: x86_64
           profile: Nexus 6
           working-directory: ./client
-          script: flutter test integration_test/app_test.dart --dart-define=TEST_MODE=true
+          script: flutter test integration_test/app_test.dart --dart-define=TEST_MODE=true --dart-define=INTEGRATION_TEST=true --dart-define=MOCK_DATA=true
