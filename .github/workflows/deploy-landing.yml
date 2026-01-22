@@ -2,13 +2,7 @@
 name: Deploy Landing Page to Pages
 
 on:
-  release:
-    types: [published]
-  push:
-    tags:
-      - 'v*'
   # Keep workflow_dispatch and workflow_call for manual/automated triggers
-
   workflow_dispatch:
     inputs:
       demo_video_url:
