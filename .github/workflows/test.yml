@@ -377,6 +377,7 @@ jobs:
       - security-mobsf
       - security-landing
       - android-integration-test
+      - build-android
     runs-on: ubuntu-latest
     steps:
       - name: Cleanup
