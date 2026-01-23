@@ -158,7 +158,7 @@ jobs:
           name: keda_android_${{ needs.bump.outputs.version }}.apk
           path: client/build/app/outputs/flutter-apk/app-release.apk
 
-  generate-video:
+  generate-previews:
     needs: [bump, build-server, build-client]
     runs-on: ubuntu-latest
     steps:
@@ -199,7 +199,7 @@ jobs:
           path: preview-generator/generated-assets/
 
   publish-release:
-    needs: [bump, build-server, build-client, generate-video, release-android]
+    needs: [bump, build-server, build-client, generate-previews, release-android]
     runs-on: ubuntu-latest
     permissions:
       contents: write

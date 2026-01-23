@@ -43,8 +43,8 @@ jobs:
       - name: Download Assets from Release
         if: ${{ inputs.release_tag != '' }}
         run: |
-          mkdir -p landing/assets
-          gh release download ${{ inputs.release_tag }} --pattern "*.png" --pattern "*.webm" --dir landing/assets --clobber
+          mkdir -p preview-generator/generated-assets
+          gh release download ${{ inputs.release_tag }} --pattern "*.png" --pattern "*.webm" --dir preview-generator/generated-assets --clobber
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -55,13 +55,10 @@ jobs:
           cache: 'npm'
           cache-dependency-path: 'landing/package-lock.json'
 
-      - name: Install and Build
+      - name: Install and Build Landing & Docs
         run: |
-          cd landing
-          npm ci
-          npm run build
+          make landing-build
         env:
-          # You can override these via GitHub Repository Secrets/Variables if needed
           APP_URL: ${{ vars.APP_URL || 'https://app.getkeda.app' }}
           GITHUB_REPO_URL: ${{ vars.GITHUB_REPO_URL || 'https://github.com/schoren/keda' }}
           CONTACT_EMAIL: ${{ vars.CONTACT_EMAIL || 'info@getkeda.app' }}
@@ -72,7 +69,6 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Upload the generated dist folder
           path: 'landing/dist'
 
       - name: Deploy to GitHub Pages

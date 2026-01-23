@@ -349,8 +349,8 @@ jobs:
           push: true
           tags: schoren/keda-${{ matrix.image }}:${{ github.sha }}
 
-  preview-generator-test:
-    name: Video Demo Test (Playwright)
+  generate-previews:
+    name: Generate Previews
     needs: [build-images, setup-playwright]
     runs-on: ubuntu-latest
     steps:
@@ -451,7 +451,7 @@ jobs:
     needs: 
       - backend-tests
       - client-tests
-      - preview-generator-test
+      - generate-previews
       - lint-backend
       - lint-client
       - security-gosec
