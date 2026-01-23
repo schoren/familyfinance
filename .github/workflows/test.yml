@@ -444,6 +444,7 @@ jobs:
 
   build-landing-and-docs:
     name: Build Landing & Docs
+    needs: [generate-previews]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -456,10 +457,11 @@ jobs:
           cache-dependency-path: |
             landing/package-lock.json
             docs/package-lock.json
-      - name: Create dummy assets
-        run: |
-          mkdir -p preview-generator/generated-assets
-          touch preview-generator/generated-assets/placeholder.png
+      - name: Download Previews
+        uses: actions/download-artifact@v4
+        with:
+          name: marketing-assets
+          path: preview-generator/generated-assets
       - name: Build Landing and Docs
         run: make landing-build
         env:
