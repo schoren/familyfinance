@@ -474,7 +474,6 @@ jobs:
     needs: 
       - backend-tests
       - client-tests
-      - generate-previews
       - lint-backend
       - lint-client
       - security-gosec
