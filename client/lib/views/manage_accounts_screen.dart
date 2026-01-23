@@ -69,9 +69,10 @@ class ManageAccountsScreen extends ConsumerWidget {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, stack) => Center(child: Text('Error: $err')),
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.push('/manage-accounts/new'),
-        child: const Icon(Icons.add),
+        label: Text(l10n.newAccount),
+        icon: const Icon(Icons.add),
       ),
     );
   }

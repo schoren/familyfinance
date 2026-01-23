@@ -51,9 +51,12 @@ if [ $TEST_EXIT_CODE -eq 0 ]; then
   # We try to keep only the [file-slug] part.
   find generated-assets -mindepth 2 -name "*.webm" | while read -r video; do
     DIR_NAME=$(basename "$(dirname "$video")")
-    # Remove everything starting from the first capital letter (start of title slug or project)
-    # OR from a 5-char hex hash which Playwright sometimes inserts
-    CLEAN_NAME=$(echo "$DIR_NAME" | sed 's/-[A-Z].*//; s/-[0-9a-f]\{5\}.*//')
+    # Extract the test name by taking the part before the last dash (Chromium) 
+    # and after the last dash of the prefix (Video-Assets or similar)
+    # The format is typically: file-name-Describe-Title-Test-Name-project
+    # We'll take everything between the last and second-to-last dashes if possible, 
+    # or just use a more surgical sed.
+    CLEAN_NAME=$(echo "$DIR_NAME" | sed 's/-Chromium.*//; s/.*Video-Assets-//; s/.*Screenshots-//')
     cp "$video" "generated-assets/${CLEAN_NAME}.webm"
   done
 

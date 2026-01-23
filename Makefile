@@ -237,9 +237,9 @@ landing-build: docs-build
 	@echo "🏗️  Building landing page..."
 	cd landing && npm install && npm run build
 	@echo "📦 Integrating documentation into landing page..."
-	mkdir -p landing/dist/en/docs landing/dist/es/docs
-	cp -r docs/.vitepress/dist/en/* landing/dist/en/docs/ 2>/dev/null || cp -r docs/.vitepress/dist/* landing/dist/en/docs/
-	cp -r docs/.vitepress/dist/es/* landing/dist/es/docs/ 2>/dev/null || true
+	rm -rf landing/dist/docs
+	mkdir -p landing/dist/docs
+	cp -r docs/.vitepress/dist/* landing/dist/docs/
 	@echo "✅ Landing page built in landing/dist"
 
 landing-serve: landing-build

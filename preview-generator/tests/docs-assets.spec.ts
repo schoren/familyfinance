@@ -1,79 +1,90 @@
 import { test, expect } from '@playwright/test';
-import { setupMarketingPage, highlight, clearHighlights } from './helpers';
+import { setupMarketingPage } from './helpers';
 
-test.describe('Documentation Assets', () => {
+test.describe('Documentation Video Assets', () => {
   test.beforeEach(async ({ page }) => {
     await setupMarketingPage(page);
     await page.goto('/');
     await page.locator('flt-glass-pane').waitFor({ state: 'attached' });
-    // Wait for the app to load
-    await expect(page.getByRole('button', { name: /Budget|Spent/i })).toBeVisible({ timeout: 30000 });
+    await page.waitForTimeout(5000);
   });
 
-  test('dashboard-screenshot', async ({ page }) => {
-    await page.waitForTimeout(3000);
+  test('expenses-creation', async ({ page }) => {
+    const supermarketBtn = page.getByRole('group', { name: /Supermarket/i });
+    await supermarketBtn.first().click();
+
+    // Use pressSequentially as it's more reliable for Flutter Web
+    const amountInput = page.getByRole('textbox', { name: /Amount/i });
+    await amountInput.pressSequentially('42.50');
+
+    const noteInput = page.getByRole('textbox', { name: /Note/i });
+    await noteInput.pressSequentially('Personal groceries');
+
+    const saveBtn = page.getByRole('button', { name: /Save/i });
+    await saveBtn.click();
+
+    await page.waitForTimeout(2000);
+  });
+
+  test('categories-creation', async ({ page }) => {
+    const addBtn = page.getByRole('button', { name: /New Category/i });
+    await addBtn.click();
+
+    const nameInput = page.getByRole('textbox', { name: /Name/i });
+    const budgetInput = page.getByRole('textbox', { name: /Budget/i });
+
+    await nameInput.pressSequentially('New Hobby');
+    await budgetInput.pressSequentially('100');
+
+    const saveBtn = page.getByRole('button', { name: /Save/i });
+    await saveBtn.click();
+
+    await page.waitForTimeout(2000);
+  });
+
+  test('accounts-creation', async ({ page }) => {
+    // Navigate to Accounts
+    const tab = page.getByLabel('Accounts').first();
+    await tab.click();
+    await page.waitForTimeout(2000);
+
+    const addBtn = page.getByRole('button', { name: /New Account/i });
+    await addBtn.click();
+    await page.waitForTimeout(1000);
+
+    // Default is Card, which has "Bank" field
+    const bankInput = page.getByRole('textbox', { name: /Bank/i });
+    await bankInput.pressSequentially('Modern Bank');
+
+    const saveBtn = page.getByRole('button', { name: /SAVE/i });
+    await saveBtn.click();
+
+    await page.waitForTimeout(2000);
+  });
+});
+
+test.describe('Documentation Screenshots', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/');
+    await page.locator('flt-glass-pane').waitFor({ state: 'attached' });
+    await page.waitForTimeout(5000);
+  });
+
+  test('dashboard-view', async ({ page }) => {
     await page.screenshot({ path: 'generated-assets/dashboard.png' });
   });
 
-  test('new-expense-flow', async ({ page }) => {
-    const supermarketBtn = page.getByRole('group', { name: /Supermarket/i });
-    await highlight(page, supermarketBtn, "Click on a category to add an expense");
-    await supermarketBtn.click();
-    await clearHighlights(page);
-
-    const amountInput = page.getByRole('textbox', { name: 'Amount' });
-    await expect(amountInput).toBeVisible();
-    await highlight(page, amountInput, "Enter the amount");
-    await amountInput.fill('42.50');
-    await clearHighlights(page);
-
-    const noteInput = page.getByRole('textbox', { name: 'Note (optional)' });
-    await highlight(page, noteInput, "Add a description");
-    await noteInput.fill('Dinner with friends');
-    await clearHighlights(page);
-
-    const saveBtn = page.getByRole('button', { name: 'Save Expense' });
-    await highlight(page, saveBtn, "Save your expense");
-    await saveBtn.click();
-
-    await expect(page.getByRole('button', { name: /Budget|Spent/i })).toBeVisible();
-    await page.screenshot({ path: 'generated-assets/expense-added.png' });
-  });
-
-  test('categories-flow', async ({ page }) => {
-    const addBtn = page.getByRole('button', { name: 'New Category' });
-    await highlight(page, addBtn, "Click here to add a new category");
-    await addBtn.click();
-    await clearHighlights(page);
-
-    // Try to find the heading or the text "New Category"
-    await expect(page.getByText('New Category')).toBeVisible({ timeout: 10000 });
-    await page.screenshot({ path: 'generated-assets/categories.png' });
-    const backBtn = page.locator('button').filter({ hasText: 'back' }).or(page.getByRole('button', { name: 'back' }));
-    await backBtn.click();
-  });
-
-  test('accounts-screenshot', async ({ page }) => {
-    const tab = page.getByRole('tab', { name: 'Accounts' });
+  test('members-view', async ({ page }) => {
+    const tab = page.getByLabel('Members').first();
     await tab.click();
-    await expect(page.getByRole('heading', { name: 'Accounts' })).toBeVisible();
-    await page.waitForTimeout(1000);
-    await page.screenshot({ path: 'generated-assets/accounts.png' });
-  });
-
-  test('members-screenshot', async ({ page }) => {
-    const tab = page.getByRole('tab', { name: 'Members' });
-    await tab.click();
-    await expect(page.getByRole('heading', { name: 'Members' })).toBeVisible();
-    await page.waitForTimeout(1000);
+    await page.waitForTimeout(2000);
     await page.screenshot({ path: 'generated-assets/members.png' });
   });
 
-  test('settings-screenshot', async ({ page }) => {
-    const tab = page.getByRole('tab', { name: 'Settings' });
+  test('settings-view', async ({ page }) => {
+    const tab = page.getByLabel('Settings').first();
     await tab.click();
-    await expect(page.getByText('Language')).toBeVisible();
-    await page.waitForTimeout(1000);
+    await page.waitForTimeout(2000);
     await page.screenshot({ path: 'generated-assets/settings.png' });
   });
 });

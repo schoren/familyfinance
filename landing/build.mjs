@@ -13,7 +13,7 @@ const TRANSLATIONS = JSON.parse(fs.readFileSync(path.join(SRC_DIR, 'translations
 
 const ENV_VARS = {
   APP_URL: process.env.APP_URL || '/app',
-  GITHUB_REPO_URL: process.env.GITHUB_REPO_URL || 'https://github.com/schoren/family-finance',
+  GITHUB_REPO_URL: process.env.GITHUB_REPO_URL || 'https://github.com/schoren/keda',
   APP_STORE_URL: process.env.APP_STORE_URL || '#',
   PLAY_STORE_URL: process.env.PLAY_STORE_URL || '#',
   CONTACT_EMAIL: process.env.CONTACT_EMAIL || 'info@getkeda.app',

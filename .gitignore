@@ -8,7 +8,13 @@ server/app/coverage.out
 landing/.env
 landing/node_modules
 landing/dist
+landing/assets
 
 preview-generator/node_modules
 preview-generator/test-results
 preview-generator/generated-assets
+
+docs/.vitepress/dist
+docs/.vitepress/cache
+docs/node_modules
+docs/public/assets
