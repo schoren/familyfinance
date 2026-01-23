@@ -46,13 +46,16 @@ test.describe('Documentation Video Assets', () => {
     // Navigate to Accounts
     const tab = page.getByLabel('Accounts').first();
     await tab.click();
-    await page.waitForTimeout(2000);
 
     const addBtn = page.getByRole('button', { name: /New Account/i });
     await addBtn.click();
-    await page.waitForTimeout(1000);
 
-    // Default is Card, which has "Bank" field
+    const brandDropdown = page.getByRole('button', { name: /Brand/i });
+    await brandDropdown.click();
+
+    const mastercardMenuitem = page.getByRole('menuitem', { name: /Mastercard/i });
+    await mastercardMenuitem.click();
+
     const bankInput = page.getByRole('textbox', { name: /Bank/i });
     await bankInput.pressSequentially('Modern Bank');
 
