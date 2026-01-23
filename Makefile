@@ -234,6 +234,10 @@ test-quick: test-backend test-client
 
 # Landing Page
 landing-build: docs-build
+	@echo "📥 Importing assets..."
+	rm -rf landing/assets
+	cp -r docs/public/assets landing/assets
+	cp client/assets/logo.png landing/assets/
 	@echo "🏗️  Building landing page..."
 	cd landing && npm install && npm run build
 	@echo "📦 Integrating documentation into landing page..."
@@ -248,6 +252,10 @@ landing-serve: landing-build
 
 # Documentation
 docs-build:
+	@echo "📥 Importing assets..."
+	rm -rf docs/public/assets
+	cp -r preview-generator/generated-assets docs/public/assets
+	cp client/assets/logo.png docs/public/assets/
 	@echo "🏗️  Building documentation..."
 	cd docs && npm install && npx vitepress build
 	@echo "✅ Documentation built in docs/.vitepress/dist"

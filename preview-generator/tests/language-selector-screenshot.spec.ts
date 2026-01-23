@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { setupMarketingPage, spotlightMultiple, clearHighlights } from './helpers';
 
-test('Take Language Selector Screenshot', async ({ page }) => {
+test('language-selector', async ({ page }) => {
   await setupMarketingPage(page);
   await page.goto('/');
   await page.locator('flt-glass-pane').waitFor({ state: 'attached' });

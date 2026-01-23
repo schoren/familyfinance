@@ -15,15 +15,15 @@ test.describe('Documentation Video Assets', () => {
 
     // Use pressSequentially as it's more reliable for Flutter Web
     const amountInput = page.getByRole('textbox', { name: /Amount/i });
-    await amountInput.pressSequentially('42.50');
+    await amountInput.pressSequentially('42.50', { delay: 100 });
 
     const noteInput = page.getByRole('textbox', { name: /Note/i });
-    await noteInput.pressSequentially('Personal groceries');
+    await noteInput.pressSequentially('Personal groceries', { delay: 100 });
 
     const saveBtn = page.getByRole('button', { name: /Save/i });
     await saveBtn.click();
 
-    await page.waitForTimeout(2000);
+    await page.waitForTimeout(500);
   });
 
   test('categories-creation', async ({ page }) => {
@@ -31,15 +31,15 @@ test.describe('Documentation Video Assets', () => {
     await addBtn.click();
 
     const nameInput = page.getByRole('textbox', { name: /Name/i });
-    const budgetInput = page.getByRole('textbox', { name: /Budget/i });
+    await nameInput.pressSequentially('New Hobby', { delay: 100 });
 
-    await nameInput.pressSequentially('New Hobby');
-    await budgetInput.pressSequentially('100');
+    const budgetInput = page.getByRole('textbox', { name: /Budget/i });
+    await budgetInput.pressSequentially('100', { delay: 100 });
 
     const saveBtn = page.getByRole('button', { name: /Save/i });
     await saveBtn.click();
 
-    await page.waitForTimeout(2000);
+    await page.waitForTimeout(500);
   });
 
   test('accounts-creation', async ({ page }) => {

@@ -26,13 +26,6 @@ export default defineConfig({
         nav: [
           { text: 'Home', link: '/' },
           { text: 'Guide', link: '/expenses' },
-          {
-            text: 'v0.13.0',
-            items: [
-              { text: 'Changelog', link: 'https://github.com/schoren/keda/releases' },
-              { text: 'Previous Versions', items: [] }
-            ]
-          }
         ],
         sidebar: [
           {
@@ -62,13 +55,6 @@ export default defineConfig({
         nav: [
           { text: 'Inicio', link: '/es/' },
           { text: 'Guía', link: '/es/expenses' },
-          {
-            text: 'v0.13.0',
-            items: [
-              { text: 'Registro de cambios', link: 'https://github.com/schoren/keda/releases' },
-              { text: 'Versiones anteriores', items: [] }
-            ]
-          }
         ],
         sidebar: [
           {

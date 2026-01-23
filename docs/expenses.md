@@ -6,7 +6,10 @@ Tracking your spending is the core of Keda.
 
 To add an expense, simply click on the category it belongs to on the dashboard, fill in the amount and note, and save.
 
-![Adding an Expense Video](/assets/expenses-creation.webm)
+<video autoplay loop muted playsinline class="expenses-creation">
+  <source src="/assets/expenses-creation.webm" type="video/webm">
+  Your browser does not support the video tag.
+</video>
 
 ## Expense List
 

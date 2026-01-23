@@ -6,7 +6,10 @@ El seguimiento de tus gastos es el núcleo de Keda.
 
 Para añadir un gasto, simplemente haz clic en la categoría a la que pertenece en el dashboard, ingresa el monto y la nota, y guarda.
 
-![Video de carga de gasto](/assets/expenses-creation.webm)
+<video autoplay loop muted playsinline class="expenses-creation">
+  <source src="/assets/expenses-creation.webm" type="video/webm">
+  Your browser does not support the video tag.
+</video>
 
 ## Lista de Gastos
 
