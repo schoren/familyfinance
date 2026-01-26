@@ -64,6 +64,37 @@ test.describe('Documentation Video Assets', () => {
 
     await page.waitForTimeout(2000);
   });
+
+  test('server-config-flow', async ({ page }) => {
+    // Navigate to Settings
+    const tab = page.getByLabel('Settings').first();
+    await tab.click();
+
+    // Click Server URL item - specify that we want the button/listitem
+    const serverUrlItem = page.getByRole('button', { name: /Server URL/i }).first();
+    await serverUrlItem.click();
+
+    // Fill new URL - wait for it to be visible first
+    const urlInput = page.getByRole('textbox', { name: /Server URL/i });
+    await urlInput.waitFor({ state: 'visible' });
+
+    // Clear and type - for Flutter Web, clicking and pressing keys one by one is better
+    // Triple click to select all text, then backspace
+    await urlInput.click({ clickCount: 3 });
+    await page.keyboard.press('Backspace');
+    await urlInput.pressSequentially('https://mykeda.example.com', { delay: 100 });
+
+    // Save
+    const saveBtn = page.getByRole('button', { name: /SAVE/i });
+    await saveBtn.click();
+
+    // Verify it navigated back (the input field should be gone)
+    await expect(urlInput).not.toBeVisible();
+    // And we should be back at Settings
+    await expect(page.getByRole('heading', { name: /Settings/i })).toBeVisible();
+
+    await page.waitForTimeout(1000);
+  });
 });
 
 test.describe('Documentation Screenshots', () => {
@@ -90,4 +121,26 @@ test.describe('Documentation Screenshots', () => {
     await page.waitForTimeout(2000);
     await page.screenshot({ path: 'generated-assets/settings.png' });
   });
+
+  test('server-url-settings', async ({ page }) => {
+    const tab = page.getByLabel('Settings').first();
+    await tab.click();
+
+    const serverUrlItem = page.getByRole('button', { name: /Server URL/i }).first();
+    await serverUrlItem.click();
+
+    await page.screenshot({ path: 'generated-assets/server-url-settings.png' });
+  });
+
+  // test('server-url-login', async ({ page }) => {
+  //   // Navigate with forceShowLogin
+  //   await page.goto('/login?forceShowLogin=true');
+  //   await page.locator('flt-glass-pane').waitFor({ state: 'attached' });
+  //   await page.waitForTimeout(3000);
+
+  //   const configBtn = page.getByRole('button', { name: /Set server URL/i });
+  //   await configBtn.click();
+
+  //   await page.screenshot({ path: 'generated-assets/server-url-login.png' });
+  // });
 });

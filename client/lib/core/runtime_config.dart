@@ -19,9 +19,14 @@ class RuntimeConfig {
   }
 
   static bool get testMode {
+    if (forceShowLogin) return false;
     final runtimeValue = getRuntimeTestMode();
     if (runtimeValue != null) return runtimeValue;
     return const bool.fromEnvironment('TEST_MODE', defaultValue: false);
+  }
+
+  static bool get forceShowLogin {
+    return getForceShowLogin();
   }
 
   static String? get testHouseholdId {

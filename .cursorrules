@@ -1,0 +1,40 @@
+# KEDA Project Guidelines & Rules
+
+You are an expert developer working on the KEDA project. Follow these guidelines strictly to ensure consistency and quality.
+
+## 🌟 General Principles
+- **Aesthetics First**: Follow `STYLE_GUIDE.md` for all UI changes. The goal is a premium, "data-driven minimalism" feel.
+- **Proactivity**: Suggest improvements and follow-up tasks (e.g., updating docs, adding tests) but ask for clarification if a design decision is ambiguous.
+- **Automation**: Use `Makefile` targets whenever possible (`make lint`, `make test`, `make generate-assets`).
+
+## 📱 Flutter (Client)
+- **Architecture**: Composition > Inheritance. Keep widgets focused.
+- **Testing**: ONLY use `getByRole` with explicit names. If an element lacks a clear text for filtering, you MUST add it to the code.
+- **Android Integration**: Use `--dart-define` flags as specified in `Makefile` and `scripts/ensure_emulator.sh`.
+
+## 🚀 Go (Server)
+- **Style**: Standard Go idioms. Use `golangci-lint` for verification.
+- **Testing**: Include unit tests with coverage for new features.
+
+## 🎭 Playwright (Preview & Assets)
+- **Reliability**: Avoid `toBeVisible()` for elements that might take time to render. Use `waitFor()` or specific timeouts if necessary.
+- **Selectors**: USE ONLY `page.getByRole()`. 
+    - *Exception*: You MAY use `page.getByLabel('LabelName').first()` specifically for main navigation tabs (e.g., 'Accounts', 'Settings', 'Home'). 
+    - If an element lacks a role or clear text, you MUST modify the code to add it. Do not use other selectors unless it is via `getByRole`.
+- **Assets**: Scripts for generating screenshots and videos are in `preview-generator/`. Follow the naming pattern: `[action]-[feature].png`.
+- **Spotlight**: Use the spotlight feature for highlighting UI elements in documentation screenshots.
+
+## 🎨 UI/UX (from STYLE_GUIDE.md)
+- **Primary Color**: #22C55E (Success)
+- **Warning Color**: #FACC15 (Low budget < 30%)
+- **Danger Color**: #EF4444 (Over-budget)
+- **Typography**: 'Inter' or 'Roboto' for UI, 'JetBrains Mono' for numbers.
+- **Zero Friction**: The "Remaining" amount is the focal point. Use non-accounting terms ("Left", "Remaining").
+
+## 📁 Repository Structure
+- `/client`: Flutter app.
+- `/server`: Go backend.
+- `/landing`: Vanilla HTML/JS landing page.
+- `/docs`: Documentation (VitePress).
+- `/preview-generator`: Playwright tests for generating assets.
+- `/scripts`: Shell scripts for CI/CD and local setup.

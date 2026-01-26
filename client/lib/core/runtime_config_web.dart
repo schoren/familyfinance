@@ -1,6 +1,7 @@
 // ignore: avoid_web_libraries_in_flutter
 import 'dart:js' as js; // ignore: deprecated_member_use
 import 'package:flutter/foundation.dart';
+import 'dart:html' as html;
 
 String? getRuntimeApiUrl() {
   try {
@@ -47,6 +48,15 @@ bool? getRuntimeTestMode() {
     debugPrint('[Dart SDK] Error reading TEST_MODE: $e');
   }
   return null;
+}
+
+bool getForceShowLogin() {
+  try {
+    final uri = Uri.parse(html.window.location.href);
+    return uri.queryParameters['forceShowLogin'] == 'true';
+  } catch (e) {
+    return false;
+  }
 }
 
 String? getRuntimeTestHouseholdId() {

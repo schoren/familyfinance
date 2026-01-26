@@ -13,6 +13,10 @@ services:
 
   server:
     image: ${SERVER_IMAGE:-keda-server:latest}
+    build:
+      context: ../server
+      args:
+        APP_VERSION: ${APP_VERSION:-local-dev}
     environment:
       DB_HOST: db
       DB_PORT: 5432
@@ -37,6 +41,10 @@ services:
 
   client:
     image: ${CLIENT_IMAGE:-keda-client:latest}
+    build:
+      context: ../client
+      args:
+        APP_VERSION: ${APP_VERSION:-local-dev}
     environment:
       API_URL: http://localhost:8092
       GOOGLE_CLIENT_ID:
