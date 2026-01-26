@@ -38,19 +38,21 @@ final routerProvider = Provider<GoRouter>((ref) {
       final authState = ref.read(authProvider);
       final loggingIn = state.matchedLocation == '/login';
       final splashing = state.matchedLocation == '/splash';
+      final settingServer = state.matchedLocation == '/server-settings';
       
       if (authState.isInitialLoading) {
         return splashing ? null : '/splash';
       }
 
       if (!authState.isAuthenticated) {
-        if (loggingIn) return null;
+        if (loggingIn || settingServer) return null;
         final query = state.uri.queryParameters;
         if (query.isNotEmpty) {
           return Uri(path: '/login', queryParameters: query).toString();
         }
         return '/login';
       }
+
       if (loggingIn || splashing) {
         return '/';
       }
