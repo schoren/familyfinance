@@ -661,6 +661,24 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'URL no válida'**
   String get invalidUrl;
+
+  /// No description provided for @date.
+  ///
+  /// In es, this message translates to:
+  /// **'FECHA'**
+  String get date;
+
+  /// No description provided for @prevMonth.
+  ///
+  /// In es, this message translates to:
+  /// **'Mes anterior'**
+  String get prevMonth;
+
+  /// No description provided for @nextMonth.
+  ///
+  /// In es, this message translates to:
+  /// **'Mes siguiente'**
+  String get nextMonth;
 }
 
 class _AppLocalizationsDelegate

@@ -310,4 +310,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get invalidUrl => 'Invalid URL';
+
+  @override
+  String get date => 'DATE';
+
+  @override
+  String get prevMonth => 'Previous month';
+
+  @override
+  String get nextMonth => 'Next month';
 }

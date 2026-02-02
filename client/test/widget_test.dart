@@ -8,10 +8,11 @@ void main() {
     // Build our app and trigger a frame.
     await tester.pumpWidget(
       createTestApp(
-        home: const Scaffold(
+        home: Scaffold(
           body: MonthSummaryCard(
             totalBudget: 1000.0,
             totalSpent: 400.0,
+            selectedMonth: DateTime.now(),
           ),
         ),
       ),
@@ -34,10 +35,11 @@ void main() {
   testWidgets('MonthSummaryCard shows over budget message', (WidgetTester tester) async {
     await tester.pumpWidget(
       createTestApp(
-        home: const Scaffold(
+        home: Scaffold(
           body: MonthSummaryCard(
             totalBudget: 1000.0,
             totalSpent: 1200.0,
+            selectedMonth: DateTime.now(),
           ),
         ),
       ),
