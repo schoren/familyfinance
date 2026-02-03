@@ -9,6 +9,7 @@ import 'package:keda/models/category.dart' as _i2;
 import 'package:keda/models/expense.dart' as _i4;
 import 'package:keda/models/finance_account.dart' as _i3;
 import 'package:keda/models/monthly_summary.dart' as _i5;
+import 'package:keda/models/recommendation.dart' as _i9;
 import 'package:keda/repositories/api_client.dart' as _i6;
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:mockito/src/dummies.dart' as _i7;
@@ -283,6 +284,20 @@ class MockApiClient extends _i1.Mock implements _i6.ApiClient {
             ),
           )
           as _i8.Future<_i5.MonthlySummary>);
+
+  @override
+  _i8.Future<List<_i9.Recommendation>> getRecommendations() =>
+      (super.noSuchMethod(
+            Invocation.method(#getRecommendations, []),
+            returnValue: _i8.Future<List<_i9.Recommendation>>.value(
+              <_i9.Recommendation>[],
+            ),
+            returnValueForMissingStub:
+                _i8.Future<List<_i9.Recommendation>>.value(
+                  <_i9.Recommendation>[],
+                ),
+          )
+          as _i8.Future<List<_i9.Recommendation>>);
 
   @override
   _i8.Future<void> createInvitation(String? email) =>

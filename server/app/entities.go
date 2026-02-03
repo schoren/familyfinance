@@ -61,18 +61,19 @@ type Category struct {
 }
 
 type Transaction struct {
-	ID          string         `gorm:"type:varchar(255);primaryKey" json:"id"`
-	CreatedAt   time.Time      `json:"created_at"`
-	UpdatedAt   time.Time      `json:"updated_at"`
-	DeletedAt   gorm.DeletedAt `gorm:"index" json:"-"`
-	AccountID   string         `gorm:"type:varchar(255)" json:"account_id"`
-	CategoryID  string         `gorm:"type:varchar(255)" json:"category_id"`
-	UserID      string         `gorm:"type:varchar(255)" json:"user_id"`
-	User        User           `gorm:"foreignKey:UserID" json:"user"`
-	Amount      float64        `gorm:"type:decimal(10,2)" json:"amount"`
-	Date        time.Time      `gorm:"type:timestamp" json:"date"`
-	Description string         `gorm:"type:varchar(255)" json:"note"`
-	HouseholdID string         `gorm:"type:varchar(255)" json:"household_id"`
+	ID                    string         `gorm:"type:varchar(255);primaryKey" json:"id"`
+	CreatedAt             time.Time      `json:"created_at"`
+	UpdatedAt             time.Time      `json:"updated_at"`
+	DeletedAt             gorm.DeletedAt `gorm:"index" json:"-"`
+	AccountID             string         `gorm:"type:varchar(255)" json:"account_id"`
+	CategoryID            string         `gorm:"type:varchar(255)" json:"category_id"`
+	UserID                string         `gorm:"type:varchar(255)" json:"user_id"`
+	User                  User           `gorm:"foreignKey:UserID" json:"user"`
+	Amount                float64        `gorm:"type:decimal(10,2)" json:"amount"`
+	Date                  time.Time      `gorm:"type:timestamp" json:"date"`
+	Description           string         `gorm:"type:varchar(255)" json:"note"`
+	HouseholdID           string         `gorm:"type:varchar(255)" json:"household_id"`
+	ReplacedTransactionID *string        `gorm:"type:varchar(255)" json:"-"`
 }
 
 type Invitation struct {

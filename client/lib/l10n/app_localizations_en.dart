@@ -57,6 +57,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addExpense => 'Add Expense';
 
   @override
+  String get categories => 'Categories';
+
+  @override
+  String get editExpense => 'Edit Expense';
+
+  @override
+  String get newExpense => 'New Expense';
+
+  @override
+  String get deleteExpense => 'Delete Expense';
+
+  @override
+  String get deleteExpenseConfirm =>
+      'Are you sure you want to delete this expense?';
+
+  @override
+  String get updateExpense => 'UPDATE EXPENSE';
+
+  @override
   String get systemDefault => 'System Default';
 
   @override
@@ -319,4 +338,39 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get nextMonth => 'Next month';
+
+  @override
+  String get recommendationsTitle => 'Budget Suggestions';
+
+  @override
+  String get recommendationsSubtitle =>
+      'Based on your spending last month, we have some recommendations to adjust your categories.';
+
+  @override
+  String get viewSuggestions => 'View Suggestions';
+
+  @override
+  String get recommendationDialogTitle => 'Adjustment Recommendations';
+
+  @override
+  String get applySelected => 'Apply Selected';
+
+  @override
+  String get currentBudget => 'Current Budget';
+
+  @override
+  String get newBudget => 'New Budget';
+
+  @override
+  String get totalBudgetChange => 'Total Budget Change';
+
+  @override
+  String increaseTo(String amount) {
+    return 'Increase to $amount';
+  }
+
+  @override
+  String decreaseTo(String amount) {
+    return 'Decrease to $amount';
+  }
 }

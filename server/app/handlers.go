@@ -530,8 +530,8 @@ func (h *Handlers) UpdateTransaction(c *gin.Context) {
 	householdID := c.Param("household_id")
 	id := c.Param("id")
 
-	var transaction Transaction
-	if err := h.db.Where("household_id = ?", householdID).First(&transaction, "id = ?", id).Error; err != nil {
+	var oldTransaction Transaction
+	if err := h.db.Where("household_id = ?", householdID).First(&oldTransaction, "id = ?", id).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Transaction not found"})
 		return
 	}
@@ -542,22 +542,43 @@ func (h *Handlers) UpdateTransaction(c *gin.Context) {
 		return
 	}
 
-	// Update fields
-	transaction.AccountID = updates.AccountID
-	transaction.CategoryID = updates.CategoryID
-	transaction.Amount = updates.Amount
-	transaction.Date = updates.Date.UTC()
-	transaction.Description = updates.Description
+	// Use transaction for atomicity
+	var newTransaction Transaction
+	err := h.db.Transaction(func(tx *gorm.DB) error {
+		// Soft delete original record
+		if err := tx.Delete(&oldTransaction).Error; err != nil {
+			return err
+		}
 
-	if err := h.db.Save(&transaction).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update transaction"})
+		// Create new record
+		newTransaction = Transaction{
+			ID:                    uuid.New().String(),
+			AccountID:             updates.AccountID,
+			CategoryID:            updates.CategoryID,
+			UserID:                oldTransaction.UserID,
+			Amount:                updates.Amount,
+			Date:                  updates.Date.UTC(),
+			Description:           updates.Description,
+			HouseholdID:           householdID,
+			ReplacedTransactionID: &oldTransaction.ID,
+		}
+
+		if err := tx.Create(&newTransaction).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update transaction version"})
 		return
 	}
 
 	// Preload user for consistent frontend experience
-	h.db.Preload("User").First(&transaction, "id = ?", transaction.ID)
+	h.db.Preload("User").First(&newTransaction, "id = ?", newTransaction.ID)
 
-	c.JSON(http.StatusOK, transaction)
+	c.JSON(http.StatusOK, newTransaction)
 }
 
 func (h *Handlers) DeleteTransaction(c *gin.Context) {

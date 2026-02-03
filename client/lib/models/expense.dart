@@ -39,4 +39,26 @@ class Expense {
     }
     return map;
   }
+
+  Expense copyWith({
+    String? id,
+    DateTime? date,
+    String? categoryId,
+    String? accountId,
+    String? userId,
+    User? user,
+    double? amount,
+    String? note,
+  }) {
+    return Expense(
+      id: id ?? this.id,
+      date: date ?? this.date,
+      categoryId: categoryId ?? this.categoryId,
+      accountId: accountId ?? this.accountId,
+      userId: userId ?? this.userId,
+      user: user ?? this.user,
+      amount: amount ?? this.amount,
+      note: note ?? this.note,
+    );
+  }
 }

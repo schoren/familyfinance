@@ -57,18 +57,7 @@ class ApiClient {
     }
     return headers;
   }
-  void _logResponse(String method, Uri uri, int statusCode, String responseBody, {String? requestBody}) {
-    print('🌐 HTTP $method: $uri');
-    if (requestBody != null) {
-      print('📤 Request body: $requestBody');
-    }
-    if (responseBody.isNotEmpty) {
-      print('📥 Response [$statusCode]: $responseBody');
-    } else {
-      print('📥 Response [$statusCode]: (empty)');
-    }
-  }
-
+  
   // ============================================================================
   // CATEGORIES
   // ============================================================================
@@ -76,7 +65,6 @@ class ApiClient {
   Future<List<Category>> getCategories() async {
     final uri = Uri.parse('$_scopedUrl/categories');
     final response = await _client.get(uri, headers: _headers);
-    _logResponse('GET', uri, response.statusCode, response.body);
 
     if (response.statusCode == 200) {
       final List<dynamic> json = jsonDecode(response.body);
@@ -93,7 +81,6 @@ class ApiClient {
       headers: _headers,
       body: jsonEncode(category.toJson()),
     );
-    _logResponse('POST', uri, responseBody.statusCode, responseBody.body, requestBody: jsonEncode(category.toJson()));
 
     if (responseBody.statusCode == 201) {
       return Category.fromJson(jsonDecode(responseBody.body) as Map<String, dynamic>);
@@ -109,7 +96,6 @@ class ApiClient {
       headers: _headers,
       body: jsonEncode(category.toJson()),
     );
-    _logResponse('PUT', uri, responseBody.statusCode, responseBody.body, requestBody: jsonEncode(category.toJson()));
 
     if (responseBody.statusCode == 200) {
       return Category.fromJson(jsonDecode(responseBody.body) as Map<String, dynamic>);
@@ -134,7 +120,6 @@ class ApiClient {
   Future<List<FinanceAccount>> getAccounts() async {
     final uri = Uri.parse('$_scopedUrl/accounts');
     final response = await _client.get(uri, headers: _headers);
-    _logResponse('GET', uri, response.statusCode, response.body);
 
     if (response.statusCode == 200) {
       final List<dynamic> json = jsonDecode(response.body);
@@ -151,7 +136,6 @@ class ApiClient {
       headers: _headers,
       body: jsonEncode(account.toJson()),
     );
-    _logResponse('POST', uri, responseBody.statusCode, responseBody.body, requestBody: jsonEncode(account.toJson()));
 
     if (responseBody.statusCode == 201) {
       return FinanceAccount.fromJson(jsonDecode(responseBody.body) as Map<String, dynamic>);
@@ -167,7 +151,6 @@ class ApiClient {
       headers: _headers,
       body: jsonEncode(account.toJson()),
     );
-    _logResponse('PUT', uri, responseBody.statusCode, responseBody.body, requestBody: jsonEncode(account.toJson()));
 
     if (responseBody.statusCode == 200) {
       return FinanceAccount.fromJson(jsonDecode(responseBody.body) as Map<String, dynamic>);
@@ -194,7 +177,6 @@ class ApiClient {
       queryParameters: month != null ? {'month': month} : null,
     );
     final response = await _client.get(uri, headers: _headers);
-    _logResponse('GET', uri, response.statusCode, response.body);
 
     if (response.statusCode == 200) {
       final List<dynamic> json = jsonDecode(response.body);
@@ -211,7 +193,6 @@ class ApiClient {
       headers: _headers,
       body: jsonEncode(expense.toJson()),
     );
-    _logResponse('POST', uri, responseBody.statusCode, responseBody.body, requestBody: jsonEncode(expense.toJson()));
 
     if (responseBody.statusCode == 201) {
       return Expense.fromJson(jsonDecode(responseBody.body) as Map<String, dynamic>);
@@ -227,7 +208,6 @@ class ApiClient {
       headers: _headers,
       body: jsonEncode(expense.toJson()),
     );
-    _logResponse('PUT', uri, responseBody.statusCode, responseBody.body, requestBody: jsonEncode(expense.toJson()));
 
     if (responseBody.statusCode == 200) {
       return Expense.fromJson(jsonDecode(responseBody.body) as Map<String, dynamic>);
@@ -264,7 +244,6 @@ class ApiClient {
   Future<MonthlySummary> getMonthlySummary(String month) async {
     final uri = Uri.parse('$_scopedUrl/summary/$month');
     final response = await _client.get(uri, headers: _headers);
-    _logResponse('GET', uri, response.statusCode, response.body);
 
     if (response.statusCode == 200) {
       return MonthlySummary.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
@@ -276,7 +255,6 @@ class ApiClient {
   Future<List<Recommendation>> getRecommendations() async {
     final uri = Uri.parse('$_scopedUrl/recommendations');
     final response = await _client.get(uri, headers: _headers);
-    _logResponse('GET', uri, response.statusCode, response.body);
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> json = jsonDecode(response.body);

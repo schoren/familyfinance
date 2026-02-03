@@ -9,6 +9,7 @@ import '../models/expense.dart';
 import '../models/finance_account.dart';
 import '../widgets/user_avatar.dart';
 import '../widgets/month_navigation_selector.dart';
+import '../widgets/expense_tile.dart';
 
 class ExpensesScreen extends ConsumerWidget {
   const ExpensesScreen({super.key});
@@ -106,43 +107,10 @@ class ExpensesScreen extends ConsumerWidget {
                                     ),
                                   ),
                                   ...dayExpenses.map((expense) {
-                                    final account = accounts.firstWhere((a) => a.id == expense.accountId, orElse: () => accounts.first);
-                                    final category = categories.firstWhere((c) => c.id == expense.categoryId, orElse: () => categories.first);
-                                    final timeStr = DateFormat.Hm(Localizations.localeOf(context).toString()).format(expense.date.toLocal());
-      
-                                    return ListTile(
-                                      leading: expense.user == null
-                                        ? const CircleAvatar(
-                                            child: Icon(Icons.receipt_long),
-                                          )
-                                        : UserAvatar(
-                                            pictureUrl: expense.user!.pictureUrl,
-                                            name: expense.user!.name,
-                                            color: expense.user!.color,
-                                          ),
-                                      title: Text(expense.note ?? l10n.noNote),
-                                      subtitle: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            '$timeStr • ${category.name} • ${account.getLocalizedDisplayName(l10n)}',
-                                            style: Theme.of(context).textTheme.bodySmall,
-                                          ),
-                                          if (expense.user != null)
-                                            Text(
-                                              l10n.createdBy(expense.user!.name),
-                                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                                fontSize: 10,
-                                                color: Colors.grey,
-                                                fontStyle: FontStyle.italic,
-                                              ),
-                                            ),
-                                        ],
-                                      ),
-                                      trailing: Text(
-                                        Formatters.formatMoney(expense.amount, locale),
-                                        style: const TextStyle(fontWeight: FontWeight.bold),
-                                      ),
+                                    return ExpenseTile(
+                                      expense: expense,
+                                      accounts: accounts,
+                                      categories: categories,
                                     );
                                   }),
                                 ],

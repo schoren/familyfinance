@@ -25,7 +25,6 @@ final _shellNavigatorMembersKey = GlobalKey<NavigatorState>(debugLabel: 'shellMe
 final _shellNavigatorSettingsKey = GlobalKey<NavigatorState>(debugLabel: 'shellSettings');
 
 final routerProvider = Provider<GoRouter>((ref) {
-  debugPrint('DEBUG: GoRouter instance created');
   final listenable = _AuthListenable(ref);
 
   return GoRouter(
@@ -142,6 +141,13 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final categoryId = state.pathParameters['categoryId']!;
           return NewExpenseScreen(categoryId: categoryId);
+        },
+      ),
+      GoRoute(
+        path: '/edit-expense/:expenseId',
+        builder: (context, state) {
+          final expenseId = state.pathParameters['expenseId']!;
+          return NewExpenseScreen(expenseId: expenseId);
         },
       ),
       GoRoute(
