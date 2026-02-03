@@ -4,6 +4,7 @@ import '../models/category.dart';
 import '../models/finance_account.dart';
 import '../models/expense.dart';
 import '../models/monthly_summary.dart';
+import '../models/recommendation.dart';
 
 class SyncResponse {
   final List<Category> categories;
@@ -56,12 +57,16 @@ class ApiClient {
     }
     return headers;
   }
-  void _logResponse(String method, Uri uri, int statusCode, String body) {
+  void _logResponse(String method, Uri uri, int statusCode, String responseBody, {String? requestBody}) {
     print('🌐 HTTP $method: $uri');
-    if (body != null) {
-      print('📤 Request body: $body');
+    if (requestBody != null) {
+      print('📤 Request body: $requestBody');
     }
-    print('📥 Response [$statusCode]: $body');
+    if (responseBody.isNotEmpty) {
+      print('📥 Response [$statusCode]: $responseBody');
+    } else {
+      print('📥 Response [$statusCode]: (empty)');
+    }
   }
 
   // ============================================================================
@@ -83,31 +88,33 @@ class ApiClient {
 
   Future<Category> createCategory(Category category) async {
     final uri = Uri.parse('$_scopedUrl/categories');
-    final response = await _client.post(
+    final responseBody = await _client.post(
       uri,
       headers: _headers,
       body: jsonEncode(category.toJson()),
     );
+    _logResponse('POST', uri, responseBody.statusCode, responseBody.body, requestBody: jsonEncode(category.toJson()));
 
-    if (response.statusCode == 201) {
-      return Category.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
+    if (responseBody.statusCode == 201) {
+      return Category.fromJson(jsonDecode(responseBody.body) as Map<String, dynamic>);
     } else {
-      throw Exception('Failed to create category: ${response.statusCode}');
+      throw Exception('Failed to create category: ${responseBody.statusCode}');
     }
   }
 
   Future<Category> updateCategory(String id, Category category) async {
     final uri = Uri.parse('$_scopedUrl/categories/$id');
-    final response = await _client.put(
+    final responseBody = await _client.put(
       uri,
       headers: _headers,
       body: jsonEncode(category.toJson()),
     );
+    _logResponse('PUT', uri, responseBody.statusCode, responseBody.body, requestBody: jsonEncode(category.toJson()));
 
-    if (response.statusCode == 200) {
-      return Category.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
+    if (responseBody.statusCode == 200) {
+      return Category.fromJson(jsonDecode(responseBody.body) as Map<String, dynamic>);
     } else {
-      throw Exception('Failed to update category: ${response.statusCode}');
+      throw Exception('Failed to update category: ${responseBody.statusCode}');
     }
   }
 
@@ -139,31 +146,33 @@ class ApiClient {
 
   Future<FinanceAccount> createAccount(FinanceAccount account) async {
     final uri = Uri.parse('$_scopedUrl/accounts');
-    final response = await _client.post(
+    final responseBody = await _client.post(
       uri,
       headers: _headers,
       body: jsonEncode(account.toJson()),
     );
+    _logResponse('POST', uri, responseBody.statusCode, responseBody.body, requestBody: jsonEncode(account.toJson()));
 
-    if (response.statusCode == 201) {
-      return FinanceAccount.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
+    if (responseBody.statusCode == 201) {
+      return FinanceAccount.fromJson(jsonDecode(responseBody.body) as Map<String, dynamic>);
     } else {
-      throw Exception('Failed to create account: ${response.statusCode}');
+      throw Exception('Failed to create account: ${responseBody.statusCode}');
     }
   }
 
   Future<FinanceAccount> updateAccount(String id, FinanceAccount account) async {
     final uri = Uri.parse('$_scopedUrl/accounts/$id');
-    final response = await _client.put(
+    final responseBody = await _client.put(
       uri,
       headers: _headers,
       body: jsonEncode(account.toJson()),
     );
+    _logResponse('PUT', uri, responseBody.statusCode, responseBody.body, requestBody: jsonEncode(account.toJson()));
 
-    if (response.statusCode == 200) {
-      return FinanceAccount.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
+    if (responseBody.statusCode == 200) {
+      return FinanceAccount.fromJson(jsonDecode(responseBody.body) as Map<String, dynamic>);
     } else {
-      throw Exception('Failed to update account: ${response.statusCode}');
+      throw Exception('Failed to update account: ${responseBody.statusCode}');
     }
   }
 
@@ -197,31 +206,33 @@ class ApiClient {
 
   Future<Expense> createTransaction(Expense expense) async {
     final uri = Uri.parse('$_scopedUrl/transactions');
-    final response = await _client.post(
+    final responseBody = await _client.post(
       uri,
       headers: _headers,
       body: jsonEncode(expense.toJson()),
     );
+    _logResponse('POST', uri, responseBody.statusCode, responseBody.body, requestBody: jsonEncode(expense.toJson()));
 
-    if (response.statusCode == 201) {
-      return Expense.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
+    if (responseBody.statusCode == 201) {
+      return Expense.fromJson(jsonDecode(responseBody.body) as Map<String, dynamic>);
     } else {
-      throw Exception('Failed to create transaction: ${response.statusCode}');
+      throw Exception('Failed to create transaction: ${responseBody.statusCode}');
     }
   }
 
   Future<Expense> updateTransaction(String id, Expense expense) async {
     final uri = Uri.parse('$_scopedUrl/transactions/$id');
-    final response = await _client.put(
+    final responseBody = await _client.put(
       uri,
       headers: _headers,
       body: jsonEncode(expense.toJson()),
     );
+    _logResponse('PUT', uri, responseBody.statusCode, responseBody.body, requestBody: jsonEncode(expense.toJson()));
 
-    if (response.statusCode == 200) {
-      return Expense.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
+    if (responseBody.statusCode == 200) {
+      return Expense.fromJson(jsonDecode(responseBody.body) as Map<String, dynamic>);
     } else {
-      throw Exception('Failed to update transaction: ${response.statusCode}');
+      throw Exception('Failed to update transaction: ${responseBody.statusCode}');
     }
   }
 
@@ -259,6 +270,20 @@ class ApiClient {
       return MonthlySummary.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
     } else {
       throw Exception('Failed to fetch monthly summary: ${response.statusCode}');
+    }
+  }
+
+  Future<List<Recommendation>> getRecommendations() async {
+    final uri = Uri.parse('$_scopedUrl/recommendations');
+    final response = await _client.get(uri, headers: _headers);
+    _logResponse('GET', uri, response.statusCode, response.body);
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> json = jsonDecode(response.body);
+      final List<dynamic> suggestions = json['suggestions'] as List<dynamic>;
+      return suggestions.map((e) => Recommendation.fromJson(e as Map<String, dynamic>)).toList();
+    } else {
+      throw Exception('Failed to fetch recommendations: ${response.statusCode}');
     }
   }
 

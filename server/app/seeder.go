@@ -110,6 +110,14 @@ func SeedData(db *gorm.DB, householdID string) error {
 
 		// 3 Days ago
 		{ID: "tx-5", AccountID: walletID, CategoryID: catEntertainmentID, UserID: "user-3", Amount: 15.00, Date: time.Now().AddDate(0, 0, -3), Description: "Movies", HouseholdID: householdID},
+
+		// Previous Month (to trigger recommendations)
+		// Supermarket: Budget 500, spent 600 (exceeded by 20%) -> suggest increase
+		{ID: "tx-prev-1", AccountID: bankID, CategoryID: catGroceriesID, UserID: "test-user-id", Amount: 600.00, Date: time.Now().AddDate(0, -1, -5), Description: "Monthly Groceries", HouseholdID: householdID},
+		// Entertainment: Budget 100, spent 50 (under by 50%) -> suggest decrease
+		{ID: "tx-prev-2", AccountID: walletID, CategoryID: catEntertainmentID, UserID: "user-2", Amount: 50.00, Date: time.Now().AddDate(0, -1, -10), Description: "Concert", HouseholdID: householdID},
+		// Transport: Budget 80, spent 75 (under by 6%) -> no suggestion (delta < 10%)
+		{ID: "tx-prev-3", AccountID: bankID, CategoryID: catTransportID, UserID: "test-user-id", Amount: 75.00, Date: time.Now().AddDate(0, -1, -15), Description: "Fuel", HouseholdID: householdID},
 	}
 
 	for _, t := range transactions {

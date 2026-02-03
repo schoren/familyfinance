@@ -1,8 +1,17 @@
 import { test, expect } from '@playwright/test';
-import { setupMarketingPage, spotlightMultiple, clearHighlights } from './helpers';
+import { setupMarketingPage, spotlightMultiple, clearHighlights, mockDate } from './helpers';
 
 test('language-selector', async ({ page }) => {
   await setupMarketingPage(page);
+
+  // Mock recommendations to be empty for general tests
+  await page.route('**/recommendations', async route => {
+    await route.fulfill({ status: 200, body: JSON.stringify({ suggestions: [] }) });
+  });
+
+  // Mock date to 15th to hide recommendations (persistent)
+  await mockDate(page, '2026-02-15T12:00:00');
+
   await page.goto('/');
   await page.locator('flt-glass-pane').waitFor({ state: 'attached' });
 

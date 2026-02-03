@@ -183,6 +183,34 @@ export const clickWithRipple = async (page: Page, locator: Locator) => {
 };
 
 /**
+ * Mocks the system date persistently using addInitScript.
+ */
+export const mockDate = async (page: Page, dateStr: string) => {
+  await page.addInitScript((s) => {
+    const mockTime = new Date(s).getTime();
+    const OriginalDate = Date;
+
+    function MockDate(...args: any[]) {
+      if (args.length === 0) {
+        return new OriginalDate(mockTime);
+      }
+      // @ts-ignore
+      return new OriginalDate(...args);
+    }
+
+    MockDate.prototype = OriginalDate.prototype;
+    MockDate.now = () => mockTime;
+    MockDate.UTC = OriginalDate.UTC;
+    MockDate.parse = OriginalDate.parse;
+
+    // @ts-ignore
+    window.Date = MockDate;
+
+    console.log(`[MockDate] Persistently mocking date to: ${new OriginalDate(mockTime).toISOString()}`);
+  }, dateStr);
+};
+
+/**
  * Setup common page features like click visualization.
  */
 export const setupMarketingPage = async (page: Page) => {

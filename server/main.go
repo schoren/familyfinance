@@ -92,6 +92,9 @@ func main() {
 
 		// Monthly summary
 		h.GET("/summary/:month", handlers.GetMonthlySummary)
+
+		// Recommendations
+		h.GET("/recommendations", handlers.GetRecommendations)
 	}
 
 	port := os.Getenv("PORT")

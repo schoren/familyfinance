@@ -22,8 +22,10 @@ class MonthSummaryCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final locale = Localizations.localeOf(context).toString();
     final monthName = DateFormat('MMMM yyyy', locale).format(selectedMonth);
-    // Capitalize first letter
-    final formattedMonth = monthName[0].toUpperCase() + monthName.substring(1);
+    // Capitalize first letter safely
+    final formattedMonth = monthName.isNotEmpty 
+        ? monthName[0].toUpperCase() + monthName.substring(1)
+        : '';
 
     final remaining = totalBudget - totalSpent;
     final isOverBudget = remaining < 0;

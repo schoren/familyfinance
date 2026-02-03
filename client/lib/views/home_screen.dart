@@ -9,6 +9,7 @@ import '../utils/formatters.dart';
 import '../utils/ios_keyboard_fix.dart';
 import './widgets/month_summary_card.dart';
 import '../widgets/month_navigation_selector.dart';
+import './widgets/recommendation_notification.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -48,6 +49,10 @@ class HomeScreen extends ConsumerWidget {
               return CustomScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 slivers: [
+                  if (isCurrentMonth)
+                    const SliverToBoxAdapter(
+                      child: RecommendationNotification(),
+                    ),
                   SliverToBoxAdapter(
                     child: Padding(
                       padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),

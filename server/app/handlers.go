@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"math"
 	"math/big"
 	"net/http"
 	"net/mail"
@@ -645,6 +646,64 @@ func (h *Handlers) GetMonthlySummary(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, summary)
+}
+
+func (h *Handlers) GetRecommendations(c *gin.Context) {
+	householdID := c.Param("household_id")
+
+	// Default to previous month
+	now := time.Now()
+	firstOfCurrentMonth := time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, time.UTC)
+	startOfPrevMonth := firstOfCurrentMonth.AddDate(0, -1, 0)
+	endOfPrevMonth := firstOfCurrentMonth
+
+	// Get all categories for this household
+	var categories []Category
+	if err := h.db.Where("household_id = ?", householdID).Find(&categories).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch categories"})
+		return
+	}
+
+	type Suggestion struct {
+		CategoryID string  `json:"category_id"`
+		Category   string  `json:"category"`
+		Action     string  `json:"action"`
+		Amount     float64 `json:"amount"`
+	}
+
+	suggestions := []Suggestion{}
+
+	for _, cat := range categories {
+		if cat.MonthlyBudget == 0 {
+			continue
+		}
+
+		var spent float64
+		h.db.Model(&Transaction{}).
+			Where("category_id = ? AND date >= ? AND date < ?", cat.ID, startOfPrevMonth, endOfPrevMonth).
+			Select("COALESCE(SUM(amount), 0)").
+			Scan(&spent)
+
+		delta := (spent - cat.MonthlyBudget) / cat.MonthlyBudget
+		if delta > 0.1 || delta < -0.1 {
+			action := "increase"
+			if spent < cat.MonthlyBudget {
+				action = "decrease"
+			}
+
+			// Round spent to nearest 10
+			roundedAmount := math.Round(spent/10) * 10
+
+			suggestions = append(suggestions, Suggestion{
+				CategoryID: cat.ID,
+				Category:   cat.Name,
+				Action:     action,
+				Amount:     roundedAmount,
+			})
+		}
+	}
+
+	c.JSON(http.StatusOK, gin.H{"suggestions": suggestions})
 }
 
 // ============================================================================

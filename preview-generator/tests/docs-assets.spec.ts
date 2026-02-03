@@ -1,9 +1,16 @@
 import { test, expect } from '@playwright/test';
-import { setupMarketingPage } from './helpers';
+import { setupMarketingPage, mockDate } from './helpers';
 
 test.describe('Documentation Video Assets', () => {
   test.beforeEach(async ({ page }) => {
+    page.on('console', msg => console.log(`[Browser Console] ${msg.text()}`));
     await setupMarketingPage(page);
+    // Mock recommendations to be empty for all general tests
+    await page.route('**/recommendations', async route => {
+      await route.fulfill({ status: 200, body: JSON.stringify({ suggestions: [] }) });
+    });
+    // Mock date to 15th to hide recommendations by default (persistent)
+    await mockDate(page, '2026-02-15T12:00:00');
     await page.goto('/');
     await page.locator('flt-glass-pane').waitFor({ state: 'attached' });
     await page.waitForTimeout(5000);
@@ -121,6 +128,13 @@ test.describe('Server URL from Login', () => {
 
 test.describe('Documentation Screenshots', () => {
   test.beforeEach(async ({ page }) => {
+    page.on('console', msg => console.log(`[Browser Console] ${msg.text()}`));
+    // Mock recommendations to be empty for all general tests
+    await page.route('**/recommendations', async route => {
+      await route.fulfill({ status: 200, body: JSON.stringify({ suggestions: [] }) });
+    });
+    // Mock date to 15th to hide recommendations by default (persistent)
+    await mockDate(page, '2026-02-15T12:00:00');
     await page.goto('/');
     await page.locator('flt-glass-pane').waitFor({ state: 'attached' });
     await page.waitForTimeout(5000);
@@ -142,6 +156,39 @@ test.describe('Documentation Screenshots', () => {
     await tab.click();
     await page.waitForTimeout(2000);
     await page.screenshot({ path: 'generated-assets/settings.png' });
+  });
+
+  test('recommendations-notification', async ({ page }) => {
+    // UNMOCK recommendations for this test
+    await page.unroute('**/recommendations');
+
+    // Override the default mock to show recommendations
+    await mockDate(page, '2026-02-01T12:00:00');
+
+    await page.goto('/');
+    await page.locator('flt-glass-pane').waitFor({ state: 'attached' });
+    await page.waitForTimeout(5000);
+
+    // The notification should be visible now
+    await page.screenshot({ path: 'generated-assets/recommendations-notification.png' });
+  });
+
+  test('recommendations-dialog', async ({ page }) => {
+    // UNMOCK recommendations for this test
+    await page.unroute('**/recommendations');
+
+    // Override the default mock to show recommendations
+    await mockDate(page, '2026-02-01T12:00:00');
+
+    await page.goto('/');
+    await page.locator('flt-glass-pane').waitFor({ state: 'attached' });
+    await page.waitForTimeout(5000);
+
+    const viewBtn = page.getByRole('button', { name: /View Suggestions|Ver Sugerencias/i });
+    await viewBtn.click();
+    await page.waitForTimeout(1000);
+
+    await page.screenshot({ path: 'generated-assets/recommendations-dialog.png' });
   });
 
 });

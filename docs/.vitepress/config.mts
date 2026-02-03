@@ -41,6 +41,7 @@ export default defineConfig({
               { text: 'Expenses', link: '/expenses' },
               { text: 'Categories', link: '/categories' },
               { text: 'Accounts', link: '/accounts' },
+              { text: 'Recommendations', link: '/recommendations' },
               { text: 'Household', link: '/household' }
             ]
           }
@@ -70,6 +71,7 @@ export default defineConfig({
               { text: 'Gastos', link: '/es/expenses' },
               { text: 'Categorías', link: '/es/categories' },
               { text: 'Cuentas', link: '/es/accounts' },
+              { text: 'Recomendaciones', link: '/es/recommendations' },
               { text: 'Hogar', link: '/es/household' }
             ]
           }

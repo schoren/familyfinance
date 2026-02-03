@@ -94,6 +94,14 @@ make dev-down         # Stop development environment
 make clean            # Remove test artifacts and clean workspace
 ```
 
+## Budget Recommendations
+
+At the beginning of each month (first two weeks), the app analyzes your spending from the previous month and provides budget adjustment suggestions:
+- **Automatic Analysis**: Compares actual spending vs. budget for each category.
+- **Dynamic Suggestions**: Recommends increasing or decreasing the budget if the variance is greater than 10%.
+- **Seamless Integration**: Suggestions appear in a notification banner on the dashboard, allowing you to review and apply them with a single click.
+- **User Control**: Suggestions are only applied if explicitly approved by the user.
+
 ## Documentation
 - [E2E Testing Guide](E2E_TESTING.md) - How E2E tests work and test authentication
 - [Docker Compose Guide](DOCKER_COMPOSE_GUIDE.md) - Differences between dev and test environments

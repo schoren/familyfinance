@@ -18,4 +18,18 @@ class Category {
 
   factory Category.fromJson(Map<String, dynamic> json) => _$CategoryFromJson(json);
   Map<String, dynamic> toJson() => _$CategoryToJson(this);
+
+  Category copyWith({
+    String? id,
+    String? name,
+    double? monthlyBudget,
+    bool? isActive,
+  }) {
+    return Category(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      monthlyBudget: monthlyBudget ?? this.monthlyBudget,
+      isActive: isActive ?? this.isActive,
+    );
+  }
 }

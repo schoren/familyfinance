@@ -172,5 +172,29 @@
   "invalidUrl": "URL no válida",
   "date": "FECHA",
   "prevMonth": "Mes anterior",
-  "nextMonth": "Mes siguiente"
+  "nextMonth": "Mes siguiente",
+  "recommendationsTitle": "Sugerencias de Presupuesto",
+  "recommendationsSubtitle": "Basado en tus gastos del mes pasado, tenemos algunas recomendaciones para ajustar tus categorías.",
+  "viewSuggestions": "Ver Sugerencias",
+  "recommendationDialogTitle": "Recomendaciones de Ajuste",
+  "applySelected": "Aplicar Seleccionados",
+  "currentBudget": "Presupuesto Actual",
+  "newBudget": "Nuevo Presupuesto",
+  "totalBudgetChange": "Cambio Total de Presupuesto",
+  "increaseTo": "Aumentar a {amount}",
+  "@increaseTo": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "decreaseTo": "Disminuir a {amount}",
+  "@decreaseTo": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  }
 }

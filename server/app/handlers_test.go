@@ -901,3 +901,92 @@ func TestTransactionTimezone(t *testing.T) {
 	}
 	assert.True(t, found)
 }
+
+func TestGetRecommendations(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	db := setupTestDB()
+	h := NewHandlers(db)
+	householdID := "test-hh"
+
+	now := time.Now()
+	firstOfCurrentMonth := time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, time.UTC)
+	startOfPrevMonth := firstOfCurrentMonth.AddDate(0, -1, 0)
+
+	// Seed data
+	// 1. Category that exceeds budget by > 10%
+	cat1 := Category{ID: "cat-1", Name: "Food", HouseholdID: householdID, MonthlyBudget: 500}
+	db.Create(&cat1)
+	db.Create(&Transaction{
+		ID:          "t1",
+		Amount:      600, // 20% over budget
+		CategoryID:  cat1.ID,
+		HouseholdID: householdID,
+		Date:        startOfPrevMonth.Add(12 * time.Hour),
+	})
+
+	// 2. Category that is under budget by > 10%
+	cat2 := Category{ID: "cat-2", Name: "Games", HouseholdID: householdID, MonthlyBudget: 100}
+	db.Create(&cat2)
+	db.Create(&Transaction{
+		ID:          "t2",
+		Amount:      50, // 50% under budget
+		CategoryID:  cat2.ID,
+		HouseholdID: householdID,
+		Date:        startOfPrevMonth.Add(12 * time.Hour),
+	})
+
+	// 3. Category with no change (or < 10%)
+	cat3 := Category{ID: "cat-3", Name: "Rent", HouseholdID: householdID, MonthlyBudget: 1000}
+	db.Create(&cat3)
+	db.Create(&Transaction{
+		ID:          "t3",
+		Amount:      1005, // 0.5% over budget
+		CategoryID:  cat3.ID,
+		HouseholdID: householdID,
+		Date:        startOfPrevMonth.Add(12 * time.Hour),
+	})
+
+	r := gin.Default()
+	r.GET("/households/:household_id/recommendations", h.GetRecommendations)
+
+	req, _ := http.NewRequest("GET", "/households/"+householdID+"/recommendations", nil)
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	var resp struct {
+		Suggestions []struct {
+			CategoryID string  `json:"category_id"`
+			Category   string  `json:"category"`
+			Action     string  `json:"action"`
+			Amount     float64 `json:"amount"`
+		} `json:"suggestions"`
+	}
+	err := json.Unmarshal(w.Body.Bytes(), &resp)
+	assert.NoError(t, err)
+
+	assert.Len(t, resp.Suggestions, 2)
+
+	// Check Food (cat-1)
+	var foodFound bool
+	for _, s := range resp.Suggestions {
+		if s.CategoryID == "cat-1" {
+			foodFound = true
+			assert.Equal(t, "increase", s.Action)
+			assert.Equal(t, float64(600), s.Amount)
+		}
+	}
+	assert.True(t, foodFound)
+
+	// Check Games (cat-2)
+	var gamesFound bool
+	for _, s := range resp.Suggestions {
+		if s.CategoryID == "cat-2" {
+			gamesFound = true
+			assert.Equal(t, "decrease", s.Action)
+			assert.Equal(t, float64(50), s.Amount)
+		}
+	}
+	assert.True(t, gamesFound)
+}
