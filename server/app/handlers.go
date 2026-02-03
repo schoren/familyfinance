@@ -712,8 +712,19 @@ func (h *Handlers) GetRecommendations(c *gin.Context) {
 				action = "decrease"
 			}
 
-			// Round spent to nearest 10
-			roundedAmount := math.Round(spent/10) * 10
+			// Dynamic rounding: round based on the number's magnitude
+			// 10-99 → round to 10, 100-999 → round to 100, 1000-9999 → round to 1000
+			// Cap at 10,000 to avoid over-rounding very large numbers
+			roundingFactor := 10.0
+			if spent >= 100 {
+				magnitude := math.Floor(math.Log10(spent))
+				roundingFactor = math.Pow(10, magnitude)
+				// Cap at 10,000 for better granularity on large numbers
+				if roundingFactor > 10000 {
+					roundingFactor = 10000
+				}
+			}
+			roundedAmount := math.Round(spent/roundingFactor) * roundingFactor
 
 			suggestions = append(suggestions, Suggestion{
 				CategoryID: cat.ID,

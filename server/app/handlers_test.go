@@ -3,6 +3,7 @@ package app
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -989,4 +990,110 @@ func TestGetRecommendations(t *testing.T) {
 		}
 	}
 	assert.True(t, gamesFound)
+}
+
+func TestGetRecommendations_DynamicRounding(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	db := setupTestDB()
+	h := NewHandlers(db)
+	householdID := "test-hh"
+
+	now := time.Now()
+	firstOfCurrentMonth := time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, time.UTC)
+	startOfPrevMonth := firstOfCurrentMonth.AddDate(0, -1, 0)
+
+	testCases := []struct {
+		name           string
+		categoryName   string
+		budget         float64
+		spent          float64
+		expectedAmount float64
+	}{
+		// < 100: round to nearest 10
+		{"Small amount 1", "Cat1", 50, 85, 90},
+		{"Small amount 2", "Cat2", 50, 23, 20},
+		{"Small amount 3", "Cat3", 50, 40, 40}, // Changed from 45 to 40 to exceed -10% threshold
+		{"Small amount 4", "Cat4", 50, 7, 10},
+
+		// >= 100 and < 1000: round to nearest 100
+		{"Medium amount 1", "Cat5", 200, 450, 500},
+		{"Medium amount 2", "Cat6", 500, 250, 300},
+		{"Medium amount 3", "Cat7", 300, 680, 700},
+		{"Medium amount 4", "Cat8", 400, 150, 200},
+
+		// >= 1000 and < 10000: round to nearest 1000
+		{"Large amount 1", "Cat9", 2000, 3500, 4000},
+		{"Large amount 2", "Cat10", 5000, 2300, 2000},
+		{"Large amount 3", "Cat11", 3000, 6800, 7000},
+		{"Large amount 4", "Cat12", 4000, 1200, 1000},
+
+		// >= 10000 and < 100000: round to nearest 10000
+		{"Very large amount 1", "Cat13", 20000, 35000, 40000},
+		{"Very large amount 2", "Cat14", 50000, 23000, 20000},
+		{"Very large amount 3", "Cat15", 30000, 68000, 70000},
+
+		// Edge cases
+		{"Edge case 99", "Cat16", 50, 99, 100},
+		{"Edge case 100", "Cat17", 50, 100, 100},
+		{"Edge case 999", "Cat18", 500, 999, 1000},
+		{"Edge case 1000", "Cat19", 500, 1000, 1000},
+		{"Edge case 9999", "Cat20", 5000, 9999, 10000},
+		{"Edge case 10000", "Cat21", 5000, 10000, 10000},
+	}
+
+	for i, tc := range testCases {
+		catID := fmt.Sprintf("cat-%d", i)
+		cat := Category{
+			ID:            catID,
+			Name:          tc.categoryName,
+			HouseholdID:   householdID,
+			MonthlyBudget: tc.budget,
+		}
+		db.Create(&cat)
+
+		// Create transaction with spent amount (ensure > 10% difference for recommendation)
+		db.Create(&Transaction{
+			ID:          fmt.Sprintf("t-%d", i),
+			Amount:      tc.spent,
+			CategoryID:  catID,
+			HouseholdID: householdID,
+			Date:        startOfPrevMonth.Add(12 * time.Hour),
+		})
+	}
+
+	r := gin.Default()
+	r.GET("/households/:household_id/recommendations", h.GetRecommendations)
+
+	req, _ := http.NewRequest("GET", "/households/"+householdID+"/recommendations", nil)
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	var resp struct {
+		Suggestions []struct {
+			CategoryID string  `json:"category_id"`
+			Category   string  `json:"category"`
+			Action     string  `json:"action"`
+			Amount     float64 `json:"amount"`
+		} `json:"suggestions"`
+	}
+	err := json.Unmarshal(w.Body.Bytes(), &resp)
+	assert.NoError(t, err)
+
+	// Verify each test case
+	for i, tc := range testCases {
+		catID := fmt.Sprintf("cat-%d", i)
+		found := false
+		for _, s := range resp.Suggestions {
+			if s.CategoryID == catID {
+				found = true
+				assert.Equal(t, tc.expectedAmount, s.Amount,
+					"Test case '%s': expected amount %.0f but got %.0f",
+					tc.name, tc.expectedAmount, s.Amount)
+				break
+			}
+		}
+		assert.True(t, found, "Test case '%s': category %s not found in suggestions", tc.name, catID)
+	}
 }
