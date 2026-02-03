@@ -145,6 +145,13 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(
+        path: '/edit-expense/:expenseId',
+        builder: (context, state) {
+          final expenseId = state.pathParameters['expenseId']!;
+          return NewExpenseScreen(expenseId: expenseId);
+        },
+      ),
+      GoRoute(
         path: '/manage-category/new',
         builder: (context, state) => const ManageCategoryScreen(),
       ),

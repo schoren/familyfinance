@@ -194,6 +194,42 @@ abstract class AppLocalizations {
   /// **'Agregar Gasto'**
   String get addExpense;
 
+  /// No description provided for @categories.
+  ///
+  /// In es, this message translates to:
+  /// **'Categorías'**
+  String get categories;
+
+  /// No description provided for @editExpense.
+  ///
+  /// In es, this message translates to:
+  /// **'Editar Gasto'**
+  String get editExpense;
+
+  /// No description provided for @newExpense.
+  ///
+  /// In es, this message translates to:
+  /// **'Nuevo Gasto'**
+  String get newExpense;
+
+  /// No description provided for @deleteExpense.
+  ///
+  /// In es, this message translates to:
+  /// **'Eliminar Gasto'**
+  String get deleteExpense;
+
+  /// No description provided for @deleteExpenseConfirm.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Estás seguro de que deseas eliminar este gasto?'**
+  String get deleteExpenseConfirm;
+
+  /// No description provided for @updateExpense.
+  ///
+  /// In es, this message translates to:
+  /// **'ACTUALIZAR GASTO'**
+  String get updateExpense;
+
   /// No description provided for @systemDefault.
   ///
   /// In es, this message translates to:
@@ -679,6 +715,66 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Mes siguiente'**
   String get nextMonth;
+
+  /// No description provided for @recommendationsTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Sugerencias de Presupuesto'**
+  String get recommendationsTitle;
+
+  /// No description provided for @recommendationsSubtitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Basado en tus gastos del mes pasado, tenemos algunas recomendaciones para ajustar tus categorías.'**
+  String get recommendationsSubtitle;
+
+  /// No description provided for @viewSuggestions.
+  ///
+  /// In es, this message translates to:
+  /// **'Ver Sugerencias'**
+  String get viewSuggestions;
+
+  /// No description provided for @recommendationDialogTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Recomendaciones de Ajuste'**
+  String get recommendationDialogTitle;
+
+  /// No description provided for @applySelected.
+  ///
+  /// In es, this message translates to:
+  /// **'Aplicar Seleccionados'**
+  String get applySelected;
+
+  /// No description provided for @currentBudget.
+  ///
+  /// In es, this message translates to:
+  /// **'Presupuesto Actual'**
+  String get currentBudget;
+
+  /// No description provided for @newBudget.
+  ///
+  /// In es, this message translates to:
+  /// **'Nuevo Presupuesto'**
+  String get newBudget;
+
+  /// No description provided for @totalBudgetChange.
+  ///
+  /// In es, this message translates to:
+  /// **'Cambio Total de Presupuesto'**
+  String get totalBudgetChange;
+
+  /// No description provided for @increaseTo.
+  ///
+  /// In es, this message translates to:
+  /// **'Aumentar a {amount}'**
+  String increaseTo(String amount);
+
+  /// No description provided for @decreaseTo.
+  ///
+  /// In es, this message translates to:
+  /// **'Disminuir a {amount}'**
+  String decreaseTo(String amount);
 }
 
 class _AppLocalizationsDelegate

@@ -6,6 +6,7 @@ import '../providers/data_providers.dart';
 import '../utils/formatters.dart';
 import '../models/expense.dart';
 import '../widgets/month_navigation_selector.dart';
+import '../widgets/expense_tile.dart';
 
 class CategoryDetailScreen extends ConsumerWidget {
   final String categoryId;
@@ -127,37 +128,10 @@ class CategoryDetailScreen extends ConsumerWidget {
                                           ),
                                         ),
                                         ...dayExpenses.map((expense) {
-                                          final accountList = accounts.where((a) => a.id == expense.accountId);
-                                          final account = accountList.isNotEmpty ? accountList.first : null;
-                                          final timeStr = '${expense.date.toLocal().hour}:${expense.date.toLocal().minute.toString().padLeft(2, '0')}';
-
-                                          return ListTile(
-                                            leading: const CircleAvatar(
-                                              child: Icon(Icons.attach_money),
-                                            ),
-                                            title: Text(expense.note ?? l10n.noNote),
-                                            subtitle: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  '$timeStr • ${account?.displayName ?? l10n.unknownAccount}',
-                                                  style: Theme.of(context).textTheme.bodySmall,
-                                                ),
-                                                if (expense.user != null)
-                                                  Text(
-                                                    l10n.createdBy(expense.user!.name),
-                                                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                                      fontSize: 10,
-                                                      color: Colors.grey,
-                                                      fontStyle: FontStyle.italic,
-                                                    ),
-                                                  ),
-                                              ],
-                                            ),
-                                            trailing: Text(
-                                               Formatters.formatMoney(expense.amount, locale),
-                                              style: const TextStyle(fontWeight: FontWeight.bold),
-                                            ),
+                                          return ExpenseTile(
+                                            expense: expense,
+                                            accounts: accounts,
+                                            categories: categories,
                                           );
                                         }),
                                       ],

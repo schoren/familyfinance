@@ -13,8 +13,9 @@ import '../models/finance_account.dart';
 import 'package:uuid/uuid.dart';
 
 class NewExpenseScreen extends ConsumerStatefulWidget {
-  final String categoryId;
-  const NewExpenseScreen({super.key, required this.categoryId});
+  final String? categoryId;
+  final String? expenseId;
+  const NewExpenseScreen({super.key, this.categoryId, this.expenseId});
 
   @override
   ConsumerState<NewExpenseScreen> createState() => _NewExpenseScreenState();
@@ -27,25 +28,51 @@ class _NewExpenseScreenState extends ConsumerState<NewExpenseScreen> {
   final _focusNode = FocusNode();
 
   String? _selectedAccountId;
+  String? _selectedCategoryId;
   static const String _createNewAccountKey = 'CREATE_NEW_ACCOUNT';
   late DateTime _selectedDate;
+  bool _isEditing = false;
+  Expense? _originalExpense;
 
   @override
   void initState() {
     super.initState();
-    final selectedMonth = ref.read(selectedMonthProvider);
-    final now = DateTime.now();
-    if (selectedMonth.year == now.year && selectedMonth.month == now.month) {
-      _selectedDate = now;
+    _selectedCategoryId = widget.categoryId;
+    _selectedDate = DateTime.now();
+
+    if (widget.expenseId != null) {
+      _isEditing = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _loadExpense();
+      });
     } else {
-      _selectedDate = DateTime(selectedMonth.year, selectedMonth.month, 1);
+      final selectedMonth = ref.read(selectedMonthProvider);
+      final now = DateTime.now();
+      if (selectedMonth.year == now.year && selectedMonth.month == now.month) {
+        _selectedDate = now;
+      } else {
+        _selectedDate = DateTime(selectedMonth.year, selectedMonth.month, 1);
+      }
     }
+
     Future.delayed(const Duration(milliseconds: 400), () {
       if (mounted) {
         IOSKeyboardFix.stop();
         _focusNode.requestFocus();
       }
     });
+  }
+
+  void _loadExpense() {
+    final expenses = ref.read(expensesProvider).value ?? [];
+    final expense = expenses.firstWhere((e) => e.id == widget.expenseId, orElse: () => throw Exception('Expense not found'));
+    _originalExpense = expense;
+    _amountController.text = expense.amount.toString();
+    _noteController.text = expense.note ?? '';
+    _selectedAccountId = expense.accountId;
+    _selectedCategoryId = expense.categoryId;
+    _selectedDate = expense.date.toLocal();
+    setState(() {});
   }
 
   @override
@@ -66,17 +93,35 @@ class _NewExpenseScreenState extends ConsumerState<NewExpenseScreen> {
       return;
     }
 
-    final amount = double.parse(_amountController.text);
-    final newExpense = Expense(
-      id: const Uuid().v4(),
-      date: _selectedDate,
-      categoryId: widget.categoryId,
-      accountId: _selectedAccountId!,
-      amount: amount,
-      note: _noteController.text.isEmpty ? null : _noteController.text,
-    );
+    if (_selectedCategoryId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select a category')),
+      );
+      return;
+    }
 
-    await ref.read(expensesProvider.notifier).addExpense(newExpense);
+    final amount = double.parse(_amountController.text);
+    
+    if (_isEditing && _originalExpense != null) {
+      final updatedExpense = _originalExpense!.copyWith(
+        date: _selectedDate,
+        categoryId: _selectedCategoryId!,
+        accountId: _selectedAccountId!,
+        amount: amount,
+        note: _noteController.text.isEmpty ? null : _noteController.text,
+      );
+      await ref.read(expensesProvider.notifier).updateExpense(updatedExpense);
+    } else {
+      final newExpense = Expense(
+        id: const Uuid().v4(),
+        date: _selectedDate,
+        categoryId: _selectedCategoryId!,
+        accountId: _selectedAccountId!,
+        amount: amount,
+        note: _noteController.text.isEmpty ? null : _noteController.text,
+      );
+      await ref.read(expensesProvider.notifier).addExpense(newExpense);
+    }
     
     if (mounted) {
       context.pop();
@@ -92,11 +137,11 @@ class _NewExpenseScreenState extends ConsumerState<NewExpenseScreen> {
       data: (categories) {
         final l10n = AppLocalizations.of(context)!;
         final category = categories.firstWhere(
-          (c) => c.id == widget.categoryId,
+          (c) => c.id == _selectedCategoryId,
           orElse: () => Category(id: '', name: l10n.loading, monthlyBudget: 0),
         );
         
-        if (category.id.isEmpty) {
+        if (category.id.isEmpty && !_isEditing) {
           return Scaffold(
             appBar: AppBar(title: Text(l10n.error)),
             body: Center(child: Text(l10n.categoryNotFound)),
@@ -109,7 +154,7 @@ class _NewExpenseScreenState extends ConsumerState<NewExpenseScreen> {
             if (_selectedAccountId == null && accounts.isNotEmpty) {
               _selectedAccountId = accounts.first.id;
             }
-            return _buildForm(context, category, accounts);
+            return _buildForm(context, category, accounts, categoriesAsync);
           },
           loading: () => const Scaffold(body: Center(child: CircularProgressIndicator())),
           error: (err, _) => Scaffold(body: Center(child: Text('Error: $err'))),
@@ -120,13 +165,18 @@ class _NewExpenseScreenState extends ConsumerState<NewExpenseScreen> {
     );
   }
 
-  Widget _buildForm(BuildContext context, Category category, List<FinanceAccount> accounts) {
+  Widget _buildForm(BuildContext context, Category category, List<FinanceAccount> accounts, AsyncValue<List<Category>> categoriesAsync) {
     final l10n = AppLocalizations.of(context)!;
     final remaining = ref.watch(categoryRemainingProvider(category.id));
     final locale = Localizations.localeOf(context).toString();
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
+      appBar: AppBar(
+        title: Text(_isEditing ? l10n.editExpense : l10n.newExpense),
+        backgroundColor: const Color(0xFFF8FAFC),
+        elevation: 0,
+      ),
       body: GestureDetector(
         onTap: () => _focusNode.requestFocus(),
         child: SingleChildScrollView(
@@ -214,6 +264,34 @@ class _NewExpenseScreenState extends ConsumerState<NewExpenseScreen> {
                     return null;
                   },
                 ),
+                const SizedBox(height: 24),
+                // Category Selector (only if editing or if we want flexibility)
+                if (_isEditing)
+                  DropdownButtonFormField<String>(
+                    value: _selectedCategoryId,
+                    decoration: InputDecoration(
+                      labelText: l10n.categories,
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: BorderSide.none,
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                    ),
+                    items: categoriesAsync.value?.map((category) {
+                      return DropdownMenuItem(
+                        value: category.id,
+                        child: Text(category.name),
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        _selectedCategoryId = value;
+                      });
+                    },
+                  ),
+                if (_isEditing) const SizedBox(height: 24),
               const SizedBox(height: 24),
               if (accounts.isNotEmpty)
                 DropdownButtonFormField<String>(
@@ -357,7 +435,7 @@ class _NewExpenseScreenState extends ConsumerState<NewExpenseScreen> {
               const SizedBox(height: 24),
               Autocomplete<String>(
                 optionsBuilder: (TextEditingValue textEditingValue) {
-                  final suggestions = ref.read(suggestedNotesProvider(widget.categoryId)).value ?? [];
+                  final suggestions = ref.read(suggestedNotesProvider(_selectedCategoryId ?? '')).value ?? [];
                   if (textEditingValue.text.isEmpty) {
                     return suggestions;
                   }
@@ -410,7 +488,7 @@ class _NewExpenseScreenState extends ConsumerState<NewExpenseScreen> {
                     elevation: 0,
                   ),
                   child: Text(
-                    l10n.saveExpense, 
+                    _isEditing ? l10n.updateExpense : l10n.saveExpense, 
                     style: GoogleFonts.inter(
                       fontSize: 16, 
                       fontWeight: FontWeight.bold,
