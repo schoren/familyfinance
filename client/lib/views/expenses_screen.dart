@@ -92,6 +92,12 @@ class ExpensesScreen extends ConsumerWidget {
                               final dateKey = dateKeys[index];
                               final dayExpenses = groupedExpenses[dateKey]!;
                               final displayDate = DateFormat.yMMMMEEEEd(Localizations.localeOf(context).toString()).format(dayExpenses.first.date.toLocal());
+                              
+                              // Calculate daily total
+                              final dailyTotal = dayExpenses.fold<double>(
+                                0.0,
+                                (sum, expense) => sum + expense.amount,
+                              );
       
                               return Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -113,6 +119,32 @@ class ExpensesScreen extends ConsumerWidget {
                                       categories: categories,
                                     );
                                   }),
+                                  Padding(
+                                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                                    child: Column(
+                                      children: [
+                                        const Divider(),
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.end,
+                                          children: [
+                                            Text(
+                                              'Daily Total: ',
+                                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            Text(
+                                              Formatters.formatMoney(dailyTotal, locale),
+                                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                                fontWeight: FontWeight.bold,
+                                                color: Theme.of(context).colorScheme.primary,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                 ],
                               );
                             },
