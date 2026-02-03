@@ -1,9 +1,11 @@
 import { test, expect } from '@playwright/test';
-import { setupMarketingPage } from './helpers';
+import { setupMarketingPage, mockDate } from './helpers';
 
 test.describe('Documentation Video Assets', () => {
   test.beforeEach(async ({ page }) => {
     await setupMarketingPage(page);
+    // Mock date to 15th to hide recommendations by default (persistent)
+    await mockDate(page, '2026-02-15T12:00:00');
     await page.goto('/');
     await page.locator('flt-glass-pane').waitFor({ state: 'attached' });
     await page.waitForTimeout(5000);
@@ -121,6 +123,8 @@ test.describe('Server URL from Login', () => {
 
 test.describe('Documentation Screenshots', () => {
   test.beforeEach(async ({ page }) => {
+    // Mock date to 15th to hide recommendations by default (persistent)
+    await mockDate(page, '2026-02-15T12:00:00');
     await page.goto('/');
     await page.locator('flt-glass-pane').waitFor({ state: 'attached' });
     await page.waitForTimeout(5000);
@@ -145,12 +149,8 @@ test.describe('Documentation Screenshots', () => {
   });
 
   test('recommendations-notification', async ({ page }) => {
-    // We don't need to mock date if the seeder matches current month, 
-    // but for stability let's ensure we are in the first days of a month
-    await page.evaluate(() => {
-      const Feb1st2026 = new Date('2026-02-01T12:00:00').getTime();
-      Date.now = () => Feb1st2026;
-    });
+    // Override the default mock to show recommendations
+    await mockDate(page, '2026-02-01T12:00:00');
 
     await page.goto('/');
     await page.locator('flt-glass-pane').waitFor({ state: 'attached' });
@@ -161,10 +161,8 @@ test.describe('Documentation Screenshots', () => {
   });
 
   test('recommendations-dialog', async ({ page }) => {
-    await page.evaluate(() => {
-      const Feb1st2026 = new Date('2026-02-01T12:00:00').getTime();
-      Date.now = () => Feb1st2026;
-    });
+    // Override the default mock to show recommendations
+    await mockDate(page, '2026-02-01T12:00:00');
 
     await page.goto('/');
     await page.locator('flt-glass-pane').waitFor({ state: 'attached' });

@@ -1,8 +1,12 @@
 import { test, expect } from '@playwright/test';
-import { setupMarketingPage } from './helpers';
+import { setupMarketingPage, mockDate } from './helpers';
 
 test('new-expense', async ({ page }) => {
   await setupMarketingPage(page);
+
+  // Mock date to 15th to hide recommendations (persistent)
+  await mockDate(page, '2026-02-15T12:00:00');
+
   await page.goto('/');
   await page.locator('flt-glass-pane').waitFor({ state: 'attached' });
 

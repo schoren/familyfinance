@@ -1,10 +1,13 @@
 import { test, expect } from '@playwright/test';
-import { highlight, clearHighlights, setupMarketingPage } from './helpers';
+import { highlight, clearHighlights, setupMarketingPage, mockDate } from './helpers';
 
 test('Record Demo Video', async ({ page }) => {
   await setupMarketingPage(page);
 
   page.on('console', msg => console.log(`[Browser Console] ${msg.text()}`));
+
+  // Mock date to 15th to hide recommendations (persistent)
+  await mockDate(page, '2026-02-15T12:00:00');
 
   await page.goto('/');
   await page.locator('flt-glass-pane').waitFor({ state: 'attached' });
