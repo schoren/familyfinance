@@ -49,8 +49,9 @@ test.describe('Documentation Video Assets', () => {
     await page.waitForTimeout(500);
 
     // Tap on an expense tile to Edit
-    const groceriesTile = page.getByRole('button', { name: /Groceries/i }).first();
-    await groceriesTile.click();
+    // Seeded data has "Weekly grocery shopping"
+    const groceryTile = page.getByRole('button', { name: /grocery/i }).first();
+    await groceryTile.click();
     await page.waitForTimeout(500);
 
     // Update the amount
@@ -80,8 +81,9 @@ test.describe('Documentation Video Assets', () => {
     await page.waitForTimeout(500);
 
     // Swipe LEFT-TO-RIGHT on an expense tile to Delete
-    const groceriesTile = page.getByRole('button', { name: /Groceries/i }).first();
-    const pos = await groceriesTile.evaluate((el) => {
+    // Seeded data has "Weekly grocery shopping", so we search for "grocery"
+    const groceryTile = page.getByRole('button', { name: /grocery/i }).first();
+    const pos = await groceryTile.evaluate((el) => {
       const rect = el.getBoundingClientRect();
       return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2, w: rect.width };
     });

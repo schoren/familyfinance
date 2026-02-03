@@ -1,6 +1,36 @@
 #!/bin/bash
 set -e
 
+# Parse command line arguments
+SKIP_BUILD=false
+TEST_FILTER=""
+TIMEOUT=""
+
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --skip-build)
+      SKIP_BUILD=true
+      shift
+      ;;
+    --test)
+      TEST_FILTER="$2"
+      shift 2
+      ;;
+    --timeout)
+      TIMEOUT="$2"
+      shift 2
+      ;;
+    *)
+      echo "Unknown option: $1"
+      echo "Usage: $0 [--skip-build] [--test <test-name>] [--timeout <ms>]"
+      echo "  --skip-build: Skip Docker build step"
+      echo "  --test <name>: Run only tests matching the given name"
+      echo "  --timeout <ms>: Override test timeout in milliseconds (default: 120000)"
+      exit 1
+      ;;
+  esac
+done
+
 if [ "$CI" = "true" ]; then
   echo "📦 Using CI cache..."
   npm ci
@@ -16,11 +46,15 @@ echo "🎥 Starting demo environment..."
 # Ensure cleanup of any previous run
 docker compose -p keda-preview-generator -f docker-compose.yml down -v 2>/dev/null || true
 
-# Pull images if they are remote tags, otherwise just use local
+# Determine if we need to build
 BUILD_FLAG=""
-if [[ "${SERVER_IMAGE}" == "" && "${CLIENT_IMAGE}" == "" ]]; then
-  echo "🐳 No images provided via environment, will build from source..."
-  BUILD_FLAG="--build"
+if [ "$SKIP_BUILD" = false ]; then
+  if [[ "${SERVER_IMAGE}" == "" && "${CLIENT_IMAGE}" == "" ]]; then
+    echo "🐳 No images provided via environment, will build from source..."
+    BUILD_FLAG="--build"
+  fi
+else
+  echo "⏭️  Skipping build (--skip-build flag set)"
 fi
 
 echo "🔨 Starting containers..."
@@ -33,8 +67,20 @@ timeout 60 bash -c 'until curl -sf http://localhost:8085 > /dev/null 2>&1; do sl
 echo "✅ Demo environment ready at http://localhost:8085"
 
 echo "🎬 Generating assets..."
+
+# Build Playwright command with optional flags
+PW_CMD="npx playwright test --trace on"
+if [ -n "$TEST_FILTER" ]; then
+  echo "🎯 Running tests matching: $TEST_FILTER"
+  PW_CMD="$PW_CMD -g \"$TEST_FILTER\""
+fi
+if [ -n "$TIMEOUT" ]; then
+  echo "⏱️  Using timeout: ${TIMEOUT}ms"
+  PW_CMD="$PW_CMD --timeout $TIMEOUT"
+fi
+
 set +e
-npx playwright test --trace on
+eval $PW_CMD
 TEST_EXIT_CODE=$?
 set -e
 
