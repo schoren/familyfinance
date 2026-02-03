@@ -33,7 +33,7 @@
 
   <title>keda</title>
   <script src="config.js"></script>
-  <script src="keyboard_fix.js"></script>
+  <script src="force_numeric.js"></script>
   <link rel="manifest" href="manifest.json">
   <style>
     body {
@@ -132,9 +132,6 @@
     <div class="splash-version">APP_VERSION_PLACEHOLD</div>
   </div>
 
-  <!-- Static input for iOS keyboard priming -->
-  <input id="ios-keyboard-primer" type="text" inputmode="decimal"
-    style="position:fixed; top:0; left:0; width:1px; height:1px; font-size:16px; opacity:0.01; z-index:99999; border:none; outline:none; background:transparent;">
 
   <script>
     function hideSplash() {

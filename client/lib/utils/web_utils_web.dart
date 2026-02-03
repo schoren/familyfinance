@@ -10,6 +10,14 @@ void hideSplash() {
   }
 }
 
+void forceNumericInput() {
+  try {
+    js.context.callMethod('forceNumericInput');
+  } catch (e) {
+    // Ignore
+  }
+}
+
 void configureUrlStrategy() {
   usePathUrlStrategy();
 }

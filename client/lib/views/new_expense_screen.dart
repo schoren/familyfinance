@@ -6,7 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:keda/l10n/app_localizations.dart';
 import '../providers/data_providers.dart';
 import '../utils/formatters.dart';
-import '../utils/ios_keyboard_fix.dart';
+import '../utils/web_utils.dart'; // Import for forceNumericInput
 import '../models/expense.dart';
 import '../models/category.dart';
 import '../models/finance_account.dart';
@@ -55,12 +55,6 @@ class _NewExpenseScreenState extends ConsumerState<NewExpenseScreen> {
       }
     }
 
-    Future.delayed(const Duration(milliseconds: 400), () {
-      if (mounted) {
-        IOSKeyboardFix.stop();
-        _focusNode.requestFocus();
-      }
-    });
   }
 
   void _loadExpense() {
@@ -244,13 +238,22 @@ class _NewExpenseScreenState extends ConsumerState<NewExpenseScreen> {
                 TextFormField(
                   controller: _amountController,
                   focusNode: _focusNode,
+                  onTap: () {
+                    forceNumericInput();
+                  },
                   autofocus: false,
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: false),
+                  autocorrect: false,
+                  enableSuggestions: false,
                   textInputAction: TextInputAction.next,
                   style: GoogleFonts.jetBrainsMono(fontSize: 32, fontWeight: FontWeight.bold),
                   decoration: InputDecoration(
                     labelText: l10n.amount,
-                    prefixText: '\$ ',
+                    prefixIcon: const Padding(
+                      padding: EdgeInsets.only(left: 20, right: 8),
+                      child: Text('\$ ', style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
+                    ),
+                    prefixIconConstraints: const BoxConstraints(minWidth: 0, minHeight: 0),
                     filled: true,
                     fillColor: Colors.white,
                     border: OutlineInputBorder(
