@@ -83,30 +83,7 @@ class _NewExpenseScreenState extends ConsumerState<NewExpenseScreen> {
     super.dispose();
   }
 
-  Future<void> _showDeleteConfirmation() async {
-    final l10n = AppLocalizations.of(context)!;
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(l10n.deleteExpense),
-        content: Text(l10n.deleteExpenseConfirm),
-        actions: [
-          TextButton(onPressed: () => ctx.pop(false), child: Text(l10n.cancel)),
-          TextButton(
-            onPressed: () => ctx.pop(true),
-            child: Text(l10n.delete, style: const TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
-    );
 
-    if (confirmed == true && mounted) {
-      await ref.read(expensesProvider.notifier).deleteExpense(widget.expenseId!);
-      if (mounted) {
-        context.pop();
-      }
-    }
-  }
 
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
@@ -522,33 +499,6 @@ class _NewExpenseScreenState extends ConsumerState<NewExpenseScreen> {
                   ),
                 ),
               ),
-              if (_isEditing) ...[
-                const SizedBox(height: 16),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton.icon(
-                    onPressed: _showDeleteConfirmation,
-                    icon: const Icon(Icons.delete_outline, color: Colors.white),
-                    label: Text(
-                      l10n.deleteExpense,
-                      style: GoogleFonts.inter(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 16,
-                      ),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 20),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(24),
-                      ),
-                      elevation: 0,
-                    ),
-                  ),
-                ),
-              ],
             ],
             ),
           ),

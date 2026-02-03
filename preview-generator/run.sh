@@ -44,19 +44,44 @@ docker compose -p keda-preview-generator -f docker-compose.yml down -v
 if [ $TEST_EXIT_CODE -eq 0 ]; then
   echo "✅ Assets generated."
   # Playwright saves assets in generated-assets/<test-name>/video.webm or screenshot.png
+  echo "📋 Consolidating assets..."
   
-  find generated-assets -mindepth 2 -name "*.webm" | while read -r video; do
-    DIR_NAME=$(basename "$(dirname "$video")")
-    # Extract the test name from Playwright's directory format.
-    # New logic: remove project name, then remove the hash if present, 
-    # then remove known prefixes like Video-Assets or Shortcuts.
-    # Also remove the file-name-screenshot- prefix if it matches the test name.
-    CLEAN_NAME=$(echo "$DIR_NAME" | sed -E 's/-Chromium.*//; s/-Record.*//; s/.*Video-Assets-//; s/.*Screenshots-//; s/.*Documentation-Video-Assets-//; s/.*Documentation-Screenshots-//; s/.*Server-URL-from-Login-//; s/-[a-f0-9]{5}-.*//; s/-[a-f0-9]{5}$//; s/^new-expense-screenshot-//; s/^language-selector-screenshot-//; s/^docs-assets-//')
-    mv "$video" "generated-assets/${CLEAN_NAME}.webm"
+  find generated-assets -mindepth 2 \( -name "*.webm" -o -name "*.png" \) | while read -r asset; do
+    DIR_NAME=$(basename "$(dirname "$asset")")
+    EXT="${asset##*.}"
+    
+    # Simple approach: extract test name after known prefixes
+    # 1. Remove browser suffix
+    # 2. Remove trailing hash (5 hex chars)
+    # 3. Extract name after known prefix patterns
+    # 4. Remove embedded hashes
+    TEST_NAME=$(echo "$DIR_NAME" \
+      | sed -E 's/-(Chromium|Firefox|WebKit)$//' \
+      | sed -E 's/-[a-f0-9]{5}$//' \
+      | sed -E 's/^.*-(Video-Assets|Screenshots|from-Login|screenshot)-//' \
+      | sed -E 's/-[a-f0-9]{5}-/-/' \
+      | sed -E 's/^-+|-+$//g')
+    
+    # Special cases
+    if [[ "$DIR_NAME" == demo-* ]]; then
+      TEST_NAME="demo"
+    elif [[ "$DIR_NAME" == *"ecommendations-notification"* ]]; then
+      TEST_NAME="recommendations-notification"
+    # If no prefix matched, try removing common test suite prefixes
+    elif [[ "$TEST_NAME" == "$DIR_NAME" ]] || [[ "$TEST_NAME" == *"docs-assets"* ]] || [[ "$TEST_NAME" == *"Video"* ]]; then
+      TEST_NAME=$(echo "$DIR_NAME" \
+        | sed -E 's/-(Chromium|Firefox|WebKit)$//' \
+        | sed -E 's/-[a-f0-9]{5}$//' \
+        | sed -E 's/^(docs-assets-|demo-|new-expense-screenshot-|language-selector-screenshot-)//g' \
+        | sed -E 's/^Documentation-//' \
+        | sed -E 's/-[a-f0-9]{5}-/-/' \
+        | sed -E 's/^-+|-+$//g')
+    fi
+    
+    if [ -n "$TEST_NAME" ] && [ "$TEST_NAME" != "-" ]; then
+      cp "$asset" "generated-assets/${TEST_NAME}.${EXT}"
+    fi
   done
-
-  # 2. Handle screenshots: consolidated in the root
-  find generated-assets -mindepth 2 -name "*.png" -exec cp {} generated-assets/ \;
   
   # 3. Cleanup: remove individual test directories
   find generated-assets -mindepth 1 -maxdepth 1 -type d -exec rm -rf {} +

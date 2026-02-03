@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' hide Category;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -33,9 +34,10 @@ class ExpenseTile extends ConsumerWidget {
 
     return Dismissible(
       key: Key('expense_${expense.id}'),
-      direction: DismissDirection.endToStart,
+      direction: DismissDirection.startToEnd,
       confirmDismiss: (direction) async {
-        return await showDialog(
+        // Swipe Right -> Delete
+        return await showDialog<bool>(
           context: context,
           builder: (ctx) => AlertDialog(
             title: Text(l10n.deleteExpense),
@@ -95,8 +97,42 @@ class ExpenseTile extends ConsumerWidget {
               Formatters.formatMoney(expense.amount, locale),
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
-            const SizedBox(width: 8),
-            const Icon(Icons.chevron_right, size: 16, color: Colors.grey),
+            if (MediaQuery.of(context).size.width < 600) ...[
+              const SizedBox(width: 8),
+              const Icon(Icons.chevron_right, size: 16, color: Colors.grey),
+            ] else ...[
+              const SizedBox(width: 16),
+              IconButton(
+                icon: const Icon(Icons.edit_outlined, size: 20, color: Colors.blue),
+                onPressed: () => context.push('/edit-expense/${expense.id}'),
+                tooltip: l10n.editExpense,
+                visualDensity: VisualDensity.compact,
+              ),
+              IconButton(
+                icon: const Icon(Icons.delete_outline, size: 20, color: Colors.red),
+                onPressed: () async {
+                  final confirmed = await showDialog<bool>(
+                    context: context,
+                    builder: (ctx) => AlertDialog(
+                      title: Text(l10n.deleteExpense),
+                      content: Text(l10n.deleteExpenseConfirm),
+                      actions: [
+                        TextButton(onPressed: () => ctx.pop(false), child: Text(l10n.cancel)),
+                        TextButton(
+                          onPressed: () => ctx.pop(true),
+                          child: Text(l10n.delete, style: const TextStyle(color: Colors.red)),
+                        ),
+                      ],
+                    ),
+                  );
+                  if (confirmed == true) {
+                    ref.read(expensesProvider.notifier).deleteExpense(expense.id);
+                  }
+                },
+                tooltip: l10n.deleteExpense,
+                visualDensity: VisualDensity.compact,
+              ),
+            ],
           ],
         ),
         onTap: () => context.push('/edit-expense/${expense.id}'),

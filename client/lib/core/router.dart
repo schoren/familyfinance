@@ -25,7 +25,6 @@ final _shellNavigatorMembersKey = GlobalKey<NavigatorState>(debugLabel: 'shellMe
 final _shellNavigatorSettingsKey = GlobalKey<NavigatorState>(debugLabel: 'shellSettings');
 
 final routerProvider = Provider<GoRouter>((ref) {
-  debugPrint('DEBUG: GoRouter instance created');
   final listenable = _AuthListenable(ref);
 
   return GoRouter(
