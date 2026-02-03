@@ -15,7 +15,6 @@ Para añadir un gasto, simplemente haz clic en la categoría a la que pertenece 
 
 En el dashboard, puedes ver el total gastado por categoría.
 
-- **Filtrar**: Usa la barra de búsqueda para gastos específicos.
 - **Editar**: Toca un gasto en la vista detallada de la categoría.
 - **Eliminar**: Desliza de izquierda a derecha un gasto o usa el icono de eliminar (en desktop).
 

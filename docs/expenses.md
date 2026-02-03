@@ -15,7 +15,6 @@ To add an expense, simply click on the category it belongs to on the dashboard, 
 
 On the dashboard, you can see the total spent per category. 
 
-- **Filter**: Use the search bar for specific expenses.
 - **Edit**: Tap on an expense in the category detail view.
 - **Delete**: Swipe left-to-right on an expense or use the delete icon (on desktop).
 
