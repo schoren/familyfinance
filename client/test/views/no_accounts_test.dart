@@ -3,6 +3,7 @@ import 'package:keda/models/monthly_summary.dart';
 import 'package:keda/providers/auth_provider.dart';
 import 'package:keda/providers/data_providers.dart';
 import 'package:keda/views/new_expense_screen.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
@@ -46,11 +47,20 @@ void main() {
 
     await tester.pumpAndSettle();
     
-    // Wait for focus delay timer
-    await tester.pump(const Duration(milliseconds: 250));
+    // Step 1: Enter amount
+    await tester.enterText(find.byType(TextFormField), '10.00');
+    await tester.pumpAndSettle();
+
+    // Go to Step 2
+    await tester.tap(find.text('AGREGAR DETALLES'));
+    await tester.pumpAndSettle();
+
+    // Go to Step 3
+    await tester.tap(find.text('ELEGIR CUENTA'));
+    await tester.pumpAndSettle();
 
     // Verify button exists
-    expect(find.text('Crear mi primera cuenta'), findsOneWidget);
+    expect(find.text('Añadir nueva cuenta...'), findsOneWidget);
   });
 }
 

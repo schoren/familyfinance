@@ -52,11 +52,16 @@ void main() {
     // Initial load
     await tester.pumpAndSettle();
     
-    // Wait for focus delay timer
-    await tester.pump(const Duration(milliseconds: 250));
+    // Step 1: Enter amount
+    await tester.enterText(find.byType(TextFormField), '10.00');
+    await tester.pumpAndSettle();
 
-    // Find the note field by label
-    final noteField = find.widgetWithText(TextFormField, 'NOTA (OPCIONAL)');
+    // Go to Step 2
+    await tester.tap(find.text('AGREGAR DETALLES'));
+    await tester.pumpAndSettle();
+
+    // Find the note field by type (it's the only one in Step 2)
+    final noteField = find.byType(TextFormField);
     expect(noteField, findsOneWidget);
 
     // Enter some text to trigger autocomplete
@@ -79,7 +84,7 @@ void main() {
     expect(find.text('Custom Note'), findsOneWidget);
   });
 
-  testWidgets('NewExpenseScreen shows "Añadir nueva cuenta..." in accounts dropdown', (tester) async {
+  testWidgets('NewExpenseScreen shows "Add new account..." in accounts step', (tester) async {
     final categories = [Category(id: categoryId, name: 'Food', monthlyBudget: 100)];
     final accounts = [FinanceAccount(id: 'acc1', name: 'Cash', type: AccountType.cash, displayName: 'Cash')];
 
@@ -101,19 +106,22 @@ void main() {
 
     await tester.pumpAndSettle();
     
-    // Wait for focus delay timer
-    await tester.pump(const Duration(milliseconds: 250));
+    // Step 1: Enter amount
+    await tester.enterText(find.byType(TextFormField), '10.00');
+    await tester.pumpAndSettle();
 
-    final dropdown = find.byType(DropdownButtonFormField<String>);
-    expect(dropdown, findsOneWidget);
+    // Go to Step 2
+    await tester.tap(find.text('AGREGAR DETALLES'));
+    await tester.pumpAndSettle();
 
-    await tester.tap(dropdown);
+    // Go to Step 3
+    await tester.tap(find.text('ELEGIR CUENTA'));
     await tester.pumpAndSettle();
 
     expect(find.text('Añadir nueva cuenta...'), findsOneWidget);
   });
 
-  testWidgets('NewExpenseScreen shows "Crear mi primera cuenta" when no accounts exist', (tester) async {
+  testWidgets('NewExpenseScreen shows "Add new account..." (used as "Crear mi primera cuenta") when no accounts exist', (tester) async {
     final categories = [Category(id: categoryId, name: 'Food', monthlyBudget: 100)];
 
     when(mockApiClient.getCategories()).thenAnswer((_) async => categories);
@@ -134,10 +142,19 @@ void main() {
 
     await tester.pumpAndSettle();
     
-    // Wait for focus delay timer
-    await tester.pump(const Duration(milliseconds: 250));
+    // Step 1: Enter amount
+    await tester.enterText(find.byType(TextFormField), '10.00');
+    await tester.pumpAndSettle();
 
-    expect(find.text('Crear mi primera cuenta'), findsOneWidget);
+    // Go to Step 2
+    await tester.tap(find.text('AGREGAR DETALLES'));
+    await tester.pumpAndSettle();
+
+    // Go to Step 3
+    await tester.tap(find.text('ELEGIR CUENTA'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Añadir nueva cuenta...'), findsOneWidget);
   });
 }
 

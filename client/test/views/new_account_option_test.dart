@@ -50,12 +50,16 @@ void main() {
 
     await tester.pumpAndSettle();
 
-    // Find the dropdown by label
-    final dropdown = find.byType(DropdownButtonFormField<String>);
-    expect(dropdown, findsOneWidget);
+    // Step 1: Enter amount
+    await tester.enterText(find.byType(TextFormField), '10.00');
+    await tester.pumpAndSettle();
 
-    // Open dropdown
-    await tester.tap(dropdown);
+    // Go to Step 2
+    await tester.tap(find.text('AGREGAR DETALLES'));
+    await tester.pumpAndSettle();
+
+    // Go to Step 3
+    await tester.tap(find.text('ELEGIR CUENTA'));
     await tester.pumpAndSettle();
 
     // Verify option exists
