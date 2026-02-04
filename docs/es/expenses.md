@@ -4,7 +4,15 @@ El seguimiento de tus gastos es el núcleo de Keda.
 
 ## Añadir un Gasto
 
-Para añadir un gasto, simplemente haz clic en la categoría a la que pertenece en el dashboard, ingresa el monto y la nota, y guarda.
+Para añadir un gasto, simplemente haz clic en la categoría a la que pertenece en el dashboard. Esto abrirá un asistente de 3 pasos:
+
+1. **Monto**: Ingresa el monto de la transacción. Verás una vista previa de cómo esto afecta tu presupuesto restante.
+2. **Detalles**: Agrega una nota opcional y selecciona la fecha.
+3. **Cuenta**: Elige qué cuenta se utilizó para el gasto.
+
+![Paso 1: Monto](/assets/expense-wizard-step1.png)
+![Paso 2: Detalles](/assets/expense-wizard-step2.png)
+![Paso 3: Cuenta](/assets/expense-wizard-step3.png)
 
 <video autoplay loop muted playsinline class="expenses-creation">
   <source src="/assets/expenses-creation.webm" type="video/webm">

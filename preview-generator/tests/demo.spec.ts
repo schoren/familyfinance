@@ -31,21 +31,25 @@ test('Record Demo Video', async ({ page }) => {
   await clearHighlights(page);
   await supermarketBtn.click();
 
-  // New Expense Screen
-  const amountInput = page.getByRole('textbox', { name: 'Amount' });
+  // New Expense Screen - Step 1
+  const amountInput = page.getByRole('textbox', { name: /Amount/i });
   await expect(amountInput).toBeVisible();
   await highlight(page, amountInput, "Enter the transaction amount");
   await clearHighlights(page);
   await amountInput.pressSequentially('20.50', { delay: 100 });
 
-  const noteInput = page.getByRole('textbox', { name: 'Note (optional)' });
+  await page.getByRole('button', { name: /ADD DETAILS/i }).click();
+
+  // Step 2
+  const noteInput = page.getByRole('textbox', { name: /Note/i });
   await highlight(page, noteInput, "Add an optional description for the expense");
   await clearHighlights(page);
-  await noteInput.click();
   await noteInput.pressSequentially('Drive-Thru Burger', { delay: 100 });
   await page.waitForTimeout(500);
 
-  const saveBtn = page.getByRole('button', { name: 'Save Expense' });
+  await page.getByRole('button', { name: /CHOOSE ACCOUNT/i }).click();
+
+  const saveBtn = page.getByRole('button', { name: /SAVE EXPENSE/i });
   await saveBtn.click();
 
   // 3. Verification & Category Details

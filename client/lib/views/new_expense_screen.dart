@@ -335,20 +335,23 @@ class _NewExpenseScreenState extends ConsumerState<NewExpenseScreen> {
             },
           ),
           const SizedBox(height: 60),
-          TextFormField(
-            controller: _amountController,
-            focusNode: _focusNode,
-            onTap: () => forceNumericInput(),
-            autofocus: true,
-            keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: false),
-            style: GoogleFonts.jetBrainsMono(fontSize: 48, fontWeight: FontWeight.bold, color: const Color(0xFF0F172A)),
-            textAlign: TextAlign.center,
-            decoration: InputDecoration(
-              hintText: '0.00',
-              prefixText: '\$ ',
-              prefixStyle: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Color(0xFF64748B)),
-              border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(vertical: 20),
+          Semantics(
+            label: l10n.amount,
+            child: TextFormField(
+              controller: _amountController,
+              focusNode: _focusNode,
+              onTap: () => forceNumericInput(),
+              autofocus: true,
+              keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: false),
+              style: GoogleFonts.jetBrainsMono(fontSize: 48, fontWeight: FontWeight.bold, color: const Color(0xFF0F172A)),
+              textAlign: TextAlign.center,
+              decoration: InputDecoration(
+                hintText: '0.00',
+                prefixText: '\$ ',
+                prefixStyle: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Color(0xFF64748B)),
+                border: InputBorder.none,
+                contentPadding: const EdgeInsets.symmetric(vertical: 20),
+              ),
             ),
           ),
         ],
@@ -414,21 +417,24 @@ class _NewExpenseScreenState extends ConsumerState<NewExpenseScreen> {
               if (controller.text.isEmpty && _noteController.text.isNotEmpty) {
                  controller.text = _noteController.text;
               }
-              return TextFormField(
-                controller: controller,
-                focusNode: focusNode,
-                textCapitalization: TextCapitalization.sentences,
-                style: GoogleFonts.inter(fontSize: 16),
-                scrollPadding: const EdgeInsets.only(bottom: 200), // Safari fix
-                decoration: InputDecoration(
-                  hintText: l10n.addNote,
-                  filled: true,
-                  fillColor: Colors.white,
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
-                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
-                  contentPadding: const EdgeInsets.all(20),
+              return Semantics(
+                label: l10n.noteOptional,
+                child: TextFormField(
+                  controller: controller,
+                  focusNode: focusNode,
+                  textCapitalization: TextCapitalization.sentences,
+                  style: GoogleFonts.inter(fontSize: 16),
+                  scrollPadding: const EdgeInsets.only(bottom: 200), // Safari fix
+                  decoration: InputDecoration(
+                    hintText: l10n.addNote,
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
+                    enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
+                    contentPadding: const EdgeInsets.all(20),
+                  ),
+                  onChanged: (value) => _noteController.text = value,
                 ),
-                onChanged: (value) => _noteController.text = value,
               );
             },
           ),

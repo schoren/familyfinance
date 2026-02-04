@@ -4,7 +4,15 @@ Tracking your spending is the core of Keda.
 
 ## Adding an Expense
 
-To add an expense, simply click on the category it belongs to on the dashboard, fill in the amount and note, and save.
+To add an expense, simply click on the category it belongs to on the dashboard. This will open a 3-step wizard:
+
+1. **Amount**: Enter the transaction amount. You'll see a preview of how this affects your remaining budget.
+2. **Details**: Add an optional note and select the date.
+3. **Account**: Choose which account was used for the expense.
+
+![Step 1: Amount](/assets/expense-wizard-step1.png)
+![Step 2: Details](/assets/expense-wizard-step2.png)
+![Step 3: Account](/assets/expense-wizard-step3.png)
 
 <video autoplay loop muted playsinline class="expenses-creation">
   <source src="/assets/expenses-creation.webm" type="video/webm">
