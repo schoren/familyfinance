@@ -128,6 +128,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get categoryNotFound => 'Categoría no encontrada';
 
   @override
+  String get pleaseSelectCategory => 'Por favor selecciona una categoría';
+
+  @override
   String remaining(String amount) {
     return 'QUEDAN $amount';
   }
@@ -373,4 +376,24 @@ class AppLocalizationsEs extends AppLocalizations {
   String decreaseTo(String amount) {
     return 'Disminuir a $amount';
   }
+
+  @override
+  String get addDetails => 'AGREGAR DETALLES';
+
+  @override
+  String get chooseAccount => 'ELEGIR CUENTA';
+
+  @override
+  String get nextStep => 'Siguiente';
+
+  @override
+  String get prevStep => 'Atrás';
+
+  @override
+  String stepXofY(Object current, Object total) {
+    return 'Paso $current de $total';
+  }
+
+  @override
+  String get addNote => 'Agrega una nota...';
 }

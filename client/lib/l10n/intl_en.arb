@@ -51,6 +51,7 @@
   "errorLoadingExpenses": "Error loading expenses",
   "pleaseSelectAccount": "Please select an account",
   "categoryNotFound": "Category not found",
+  "pleaseSelectCategory": "Please select a category",
   "remaining": "REMAINING",
   "amount": "AMOUNT",
   "enterAmount": "Enter an amount",
@@ -195,12 +196,18 @@
       }
     }
   },
-  "decreaseTo": "Decrease to {amount}",
-  "@decreaseTo": {
-    "placeholders": {
-      "amount": {
-        "type": "String"
+    "decreaseTo": "Decrease to {amount}",
+    "@decreaseTo": {
+      "placeholders": {
+        "amount": {
+          "type": "String"
+        }
       }
-    }
-  }
+    },
+    "addDetails": "ADD DETAILS",
+    "chooseAccount": "CHOOSE ACCOUNT",
+    "nextStep": "Next Step",
+    "prevStep": "Back",
+    "stepXofY": "Step {current} of {total}",
+    "addNote": "Add a note..."
 }

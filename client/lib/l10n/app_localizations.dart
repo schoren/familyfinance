@@ -326,6 +326,12 @@ abstract class AppLocalizations {
   /// **'Categoría no encontrada'**
   String get categoryNotFound;
 
+  /// No description provided for @pleaseSelectCategory.
+  ///
+  /// In es, this message translates to:
+  /// **'Por favor selecciona una categoría'**
+  String get pleaseSelectCategory;
+
   /// No description provided for @remaining.
   ///
   /// In es, this message translates to:
@@ -775,6 +781,42 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Disminuir a {amount}'**
   String decreaseTo(String amount);
+
+  /// No description provided for @addDetails.
+  ///
+  /// In es, this message translates to:
+  /// **'AGREGAR DETALLES'**
+  String get addDetails;
+
+  /// No description provided for @chooseAccount.
+  ///
+  /// In es, this message translates to:
+  /// **'ELEGIR CUENTA'**
+  String get chooseAccount;
+
+  /// No description provided for @nextStep.
+  ///
+  /// In es, this message translates to:
+  /// **'Siguiente'**
+  String get nextStep;
+
+  /// No description provided for @prevStep.
+  ///
+  /// In es, this message translates to:
+  /// **'Atrás'**
+  String get prevStep;
+
+  /// No description provided for @stepXofY.
+  ///
+  /// In es, this message translates to:
+  /// **'Paso {current} de {total}'**
+  String stepXofY(Object current, Object total);
+
+  /// No description provided for @addNote.
+  ///
+  /// In es, this message translates to:
+  /// **'Agrega una nota...'**
+  String get addNote;
 }
 
 class _AppLocalizationsDelegate

@@ -7,6 +7,7 @@ import '../utils/formatters.dart';
 import '../models/expense.dart';
 import '../widgets/month_navigation_selector.dart';
 import '../widgets/expense_tile.dart';
+import '../utils/web_utils.dart';
 
 class CategoryDetailScreen extends ConsumerWidget {
   final String categoryId;

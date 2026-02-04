@@ -51,6 +51,7 @@
   "errorLoadingExpenses": "Error cargando gastos",
   "pleaseSelectAccount": "Por favor selecciona una cuenta",
   "categoryNotFound": "Categoría no encontrada",
+  "pleaseSelectCategory": "Por favor selecciona una categoría",
   "remaining": "RESTANTE",
   "amount": "MONTO",
   "enterAmount": "Ingresa un monto",
@@ -195,12 +196,18 @@
       }
     }
   },
-  "decreaseTo": "Disminuir a {amount}",
-  "@decreaseTo": {
-    "placeholders": {
-      "amount": {
-        "type": "String"
+    "decreaseTo": "Disminuir a {amount}",
+    "@decreaseTo": {
+      "placeholders": {
+        "amount": {
+          "type": "String"
+        }
       }
-    }
-  }
+    },
+    "addDetails": "AGREGAR DETALLES",
+    "chooseAccount": "ELEGIR CUENTA",
+    "nextStep": "Siguiente",
+    "prevStep": "Atrás",
+    "stepXofY": "Paso {current} de {total}",
+    "addNote": "Agrega una nota..."
 }

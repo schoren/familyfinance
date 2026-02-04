@@ -128,8 +128,7 @@ class _ManageCategoryScreenState extends ConsumerState<ManageCategoryScreen> {
               TextFormField(
                 controller: _nameController,
                 textInputAction: TextInputAction.next,
-                autofocus: true,
-                textCapitalization: TextCapitalization.sentences,
+                autofocus: false,
                 decoration: InputDecoration(
                   labelText: AppLocalizations.of(context)!.name,
                   border: const OutlineInputBorder(),
@@ -145,12 +144,18 @@ class _ManageCategoryScreenState extends ConsumerState<ManageCategoryScreen> {
               TextFormField(
                 controller: _budgetController,
                 textInputAction: TextInputAction.done,
+                autocorrect: false,
+                enableSuggestions: false,
                 decoration: InputDecoration(
                   labelText: AppLocalizations.of(context)!.monthlyBudget,
-                  prefixText: '\$ ',
+                  prefixIcon: const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 12),
+                    child: Text('\$ ', style: TextStyle(fontSize: 16)),
+                  ),
+                  prefixIconConstraints: const BoxConstraints(minWidth: 0, minHeight: 0),
                   border: const OutlineInputBorder(),
                 ),
-                keyboardType: TextInputType.number,
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 onFieldSubmitted: (_) => _save(),
                 validator: (value) {
                   if (value == null || value.isEmpty) {

@@ -28,13 +28,21 @@ test.describe('Documentation Video Assets', () => {
     const supermarketBtn = page.getByRole('group', { name: /Supermarket/i });
     await supermarketBtn.first().click();
 
-    // Use pressSequentially as it's more reliable for Flutter Web
+    // Step 1: Amount
     const amountInput = page.getByRole('textbox', { name: /Amount/i });
     await amountInput.pressSequentially('42.50', { delay: 100 });
 
+    const nextBtn1 = page.getByRole('button', { name: /ADD DETAILS/i });
+    await nextBtn1.click();
+
+    // Step 2: Note
     const noteInput = page.getByRole('textbox', { name: /Note/i });
     await noteInput.pressSequentially('Personal groceries', { delay: 100 });
 
+    const nextBtn2 = page.getByRole('button', { name: /CHOOSE ACCOUNT/i });
+    await nextBtn2.click();
+
+    // Step 3: Account (Selected by default)
     const saveBtn = page.getByRole('button', { name: /Save/i });
     await saveBtn.click();
 
@@ -49,22 +57,27 @@ test.describe('Documentation Video Assets', () => {
     await page.waitForTimeout(500);
 
     // Tap on an expense tile to Edit
-    // Seeded data has "Weekly grocery shopping"
     const groceryTile = page.getByRole('button', { name: /grocery/i }).first();
     await groceryTile.click();
     await page.waitForTimeout(500);
 
-    // Update the amount
+    // Step 1: Update the amount
     const amountInput = page.getByRole('textbox', { name: /Amount/i });
     await amountInput.click({ clickCount: 3 });
     await page.keyboard.press('Backspace');
     await amountInput.pressSequentially('55.00', { delay: 100 });
 
-    // Update the note
+    const nextBtn1 = page.getByRole('button', { name: /ADD DETAILS/i });
+    await nextBtn1.click();
+
+    // Step 2: Update the note
     const noteInput = page.getByRole('textbox', { name: /Note/i });
     await noteInput.click({ clickCount: 3 });
     await page.keyboard.press('Backspace');
     await noteInput.pressSequentially('Weekly shopping updated', { delay: 100 });
+
+    const nextBtn2 = page.getByRole('button', { name: /CHOOSE ACCOUNT/i });
+    await nextBtn2.click();
 
     // Save/Update
     const updateBtn = page.getByRole('button', { name: /Update/i });
@@ -258,6 +271,30 @@ test.describe('Documentation Screenshots', () => {
     await page.waitForTimeout(500);
 
     await page.screenshot({ path: 'generated-assets/recommendations-dialog.png' });
+  });
+
+  test('expense-wizard-steps', async ({ page }) => {
+    const supermarketBtn = page.getByRole('group', { name: /Supermarket/i });
+    await supermarketBtn.first().click();
+    await page.waitForTimeout(500);
+
+    // Step 1
+    await page.screenshot({ path: 'generated-assets/expense-wizard-step1.png' });
+
+    const amountInput = page.getByRole('textbox', { name: /Amount/i });
+    await amountInput.pressSequentially('42.50', { delay: 100 });
+    await page.getByRole('button', { name: /ADD DETAILS/i }).click();
+    await page.waitForTimeout(500);
+
+    // Step 2
+    await page.screenshot({ path: 'generated-assets/expense-wizard-step2.png' });
+
+    await page.getByRole('textbox', { name: /Note/i }).pressSequentially('Personal groceries', { delay: 100 });
+    await page.getByRole('button', { name: /CHOOSE ACCOUNT/i }).click();
+    await page.waitForTimeout(500);
+
+    // Step 3
+    await page.screenshot({ path: 'generated-assets/expense-wizard-step3.png' });
   });
 
 });

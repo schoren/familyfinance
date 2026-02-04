@@ -68,7 +68,7 @@ type Transaction struct {
 	AccountID             string         `gorm:"type:varchar(255)" json:"account_id"`
 	CategoryID            string         `gorm:"type:varchar(255)" json:"category_id"`
 	UserID                string         `gorm:"type:varchar(255)" json:"user_id"`
-	User                  User           `gorm:"foreignKey:UserID" json:"user"`
+	User                  *User          `gorm:"foreignKey:UserID" json:"user,omitempty"`
 	Amount                float64        `gorm:"type:decimal(10,2)" json:"amount"`
 	Date                  time.Time      `gorm:"type:timestamp" json:"date"`
 	Description           string         `gorm:"type:varchar(255)" json:"note"`

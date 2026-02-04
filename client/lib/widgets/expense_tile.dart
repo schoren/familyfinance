@@ -10,6 +10,7 @@ import '../providers/data_providers.dart';
 import '../utils/formatters.dart';
 import '../widgets/user_avatar.dart';
 import 'package:keda/l10n/app_localizations.dart';
+import '../utils/web_utils.dart';
 
 class ExpenseTile extends ConsumerWidget {
   final Expense expense;
