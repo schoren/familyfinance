@@ -22,15 +22,6 @@ test('new-expense', async ({ page }) => {
   await expect(amountInput).toBeVisible();
   await amountInput.pressSequentially('42.00', { delay: 100 });
 
-  await page.getByRole('button', { name: /ADD DETAILS/i }).click();
-
-  // Step 2
-  const noteInput = page.getByRole('textbox', { name: /Note/i });
-  await noteInput.pressSequentially('Weekly groceries', { delay: 100 });
-
-  await page.getByRole('button', { name: /CHOOSE ACCOUNT/i }).click();
-
-  // Take screenshot of step 3
-  await page.waitForTimeout(1000);
+  await page.waitForTimeout(200);
   await page.screenshot({ path: 'generated-assets/new-expense.png' });
 });

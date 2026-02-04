@@ -10,8 +10,16 @@ To add an expense, simply click on the category it belongs to on the dashboard. 
 2. **Details**: Add an optional note and select the date.
 3. **Account**: Choose which account was used for the expense.
 
+### Step 1: Amount
+Enter the transaction amount. The progress bar at the top displays a real-time preview of how this expense will affect your remaining budget for the selected category.
 ![Step 1: Amount](/assets/expense-wizard-step1.png)
+
+### Step 2: Details
+Add an optional note to describe the transaction and confirm the date. We've optimized the input field so it remains fully visible even when your mobile keyboard is open.
 ![Step 2: Details](/assets/expense-wizard-step2.png)
+
+### Step 3: Account
+Select which account was used for the payment. Your most frequently used account is selected by default to speed up the process.
 ![Step 3: Account](/assets/expense-wizard-step3.png)
 
 <video autoplay loop muted playsinline class="expenses-creation">

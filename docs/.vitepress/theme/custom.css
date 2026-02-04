@@ -1,0 +1,29 @@
+/* Standardize image and video presentation */
+.vp-doc img,
+.vp-doc video {
+  max-width: 350px;
+  width: 100%;
+  height: auto;
+  margin: 2rem 0;
+  border-radius: 12px;
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  display: block;
+}
+
+/* Center media */
+.vp-doc img,
+.vp-doc video {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Captions styling */
+.vp-doc p>img+em,
+.vp-doc p>img+br+em {
+  display: block;
+  text-align: center;
+  font-size: 0.9em;
+  color: var(--vp-c-text-2);
+  margin-top: -1rem;
+  margin-bottom: 2rem;
+}

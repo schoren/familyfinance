@@ -44,6 +44,7 @@ test('Record Demo Video', async ({ page }) => {
   const noteInput = page.getByRole('textbox', { name: /Note/i });
   await highlight(page, noteInput, "Add an optional description for the expense");
   await clearHighlights(page);
+  await page.waitForTimeout(500);
   await noteInput.pressSequentially('Drive-Thru Burger', { delay: 100 });
   await page.waitForTimeout(500);
 

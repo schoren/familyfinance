@@ -10,8 +10,16 @@ Para añadir un gasto, simplemente haz clic en la categoría a la que pertenece 
 2. **Detalles**: Agrega una nota opcional y selecciona la fecha.
 3. **Cuenta**: Elige qué cuenta se utilizó para el gasto.
 
+### Paso 1: Monto
+Ingresa el monto de la transacción. La barra de progreso en la parte superior muestra una vista previa en tiempo real de cómo este gasto afectará tu presupuesto restante para la categoría seleccionada.
 ![Paso 1: Monto](/assets/expense-wizard-step1.png)
+
+### Paso 2: Detalles
+Agrega una nota opcional para describir la transacción y confirma la fecha. Hemos optimizado el campo de entrada para que permanezca completamente visible incluso cuando el teclado del móvil está abierto.
 ![Paso 2: Detalles](/assets/expense-wizard-step2.png)
+
+### Paso 3: Cuenta
+Selecciona qué cuenta se utilizó para el pago. Tu cuenta más utilizada se selecciona por defecto para acelerar el proceso.
 ![Paso 3: Cuenta](/assets/expense-wizard-step3.png)
 
 <video autoplay loop muted playsinline class="expenses-creation">
