@@ -25,7 +25,7 @@ func TestMandatoryCashAccountRules(t *testing.T) {
 	r.GET("/households/:household_id/accounts", h.GetAccounts)
 
 	// 1. Verify Household creation auto-creates a cash account
-	newHH := Household{ID: householdID, Name: "Test Family"}
+	newHH := Household{ID: householdID, Name: SecretString("Test Family")}
 	body, _ := json.Marshal(newHH)
 	req, _ := http.NewRequest("POST", "/households", bytes.NewBuffer(body))
 	w := httptest.NewRecorder()
@@ -40,11 +40,11 @@ func TestMandatoryCashAccountRules(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Len(t, accounts, 1)
 	assert.Equal(t, "cash", accounts[0].Type)
-	assert.Equal(t, "Cash", accounts[0].Name)
+	assert.Equal(t, "Cash", string(accounts[0].Name))
 	cashAccountID := accounts[0].ID
 
 	// 2. Verify we cannot create another cash account
-	anotherCash := Account{Name: "Another Cash", Type: "cash"}
+	anotherCash := Account{Name: SecretString("Another Cash"), Type: "cash"}
 	body, _ = json.Marshal(anotherCash)
 	req, _ = http.NewRequest("POST", "/households/"+householdID+"/accounts", bytes.NewBuffer(body))
 	w = httptest.NewRecorder()
@@ -52,7 +52,7 @@ func TestMandatoryCashAccountRules(t *testing.T) {
 	assert.Equal(t, http.StatusBadRequest, w.Code)
 
 	// 3. Verify we cannot edit the cash account
-	updateAcc := Account{Name: "New Name", Type: "bank"}
+	updateAcc := Account{Name: SecretString("New Name"), Type: "bank"}
 	body, _ = json.Marshal(updateAcc)
 	req, _ = http.NewRequest("PUT", "/households/"+householdID+"/accounts/"+cashAccountID, bytes.NewBuffer(body))
 	w = httptest.NewRecorder()

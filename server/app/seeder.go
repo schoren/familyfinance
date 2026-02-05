@@ -14,8 +14,8 @@ func SeedData(db *gorm.DB, householdID string) error {
 	users := []User{
 		{
 			ID:          "test-user-id",
-			Email:       "demo@keda.app",
-			Name:        "Demo User",
+			Email:       SecretString("demo@keda.app"),
+			Name:        SecretString("Demo User"),
 			GoogleID:    "google-id-1",
 			PictureURL:  "https://lh3.googleusercontent.com/a-/ALV-UjWqgX8g_Xg_Xg_Xg_Xg_Xg_Xg_Xg_Xg=s96-c",
 			Color:       getRandomColor(),
@@ -23,16 +23,16 @@ func SeedData(db *gorm.DB, householdID string) error {
 		},
 		{
 			ID:          "user-2",
-			Email:       "partner@keda.app",
-			Name:        "Partner",
+			Email:       SecretString("partner@keda.app"),
+			Name:        SecretString("Partner"),
 			GoogleID:    "google-id-2",
 			Color:       getRandomColor(),
 			HouseholdID: householdID,
 		},
 		{
 			ID:          "user-3",
-			Email:       "kid@keda.app",
-			Name:        "Kid",
+			Email:       SecretString("kid@keda.app"),
+			Name:        SecretString("Kid"),
 			GoogleID:    "google-id-3",
 			Color:       getRandomColor(),
 			HouseholdID: householdID,
@@ -48,7 +48,7 @@ func SeedData(db *gorm.DB, householdID string) error {
 	// Household (ensure it exists if not created by user trigger)
 	household := Household{
 		ID:   householdID,
-		Name: "Familia Demo",
+		Name: SecretString("Familia Demo"),
 	}
 	if err := db.FirstOrCreate(&household, Household{ID: householdID}).Error; err != nil {
 		return err
@@ -61,13 +61,13 @@ func SeedData(db *gorm.DB, householdID string) error {
 		{
 			ID:          walletID,
 			Type:        "cash",
-			Name:        "Cash",
+			Name:        SecretString("Cash"),
 			HouseholdID: householdID,
 		},
 		{
 			ID:          bankID,
 			Type:        "bank",
-			Name:        "ACME Bank",
+			Name:        SecretString("ACME Bank"),
 			HouseholdID: householdID,
 		},
 	}
@@ -85,10 +85,10 @@ func SeedData(db *gorm.DB, householdID string) error {
 	catTransportID := "cat-transport"
 
 	categories := []Category{
-		{ID: catGroceriesID, Name: "Supermarket", MonthlyBudget: 500.00, IsActive: true, HouseholdID: householdID},
-		{ID: catUtilitiesID, Name: "Utilities", MonthlyBudget: 150.00, IsActive: true, HouseholdID: householdID},
-		{ID: catEntertainmentID, Name: "Entertainment", MonthlyBudget: 100.00, IsActive: true, HouseholdID: householdID},
-		{ID: catTransportID, Name: "Transport", MonthlyBudget: 80.00, IsActive: true, HouseholdID: householdID},
+		{ID: catGroceriesID, Name: SecretString("Supermarket"), MonthlyBudget: 500.00, IsActive: true, HouseholdID: householdID},
+		{ID: catUtilitiesID, Name: SecretString("Utilities"), MonthlyBudget: 150.00, IsActive: true, HouseholdID: householdID},
+		{ID: catEntertainmentID, Name: SecretString("Entertainment"), MonthlyBudget: 100.00, IsActive: true, HouseholdID: householdID},
+		{ID: catTransportID, Name: SecretString("Transport"), MonthlyBudget: 80.00, IsActive: true, HouseholdID: householdID},
 	}
 
 	for _, c := range categories {
@@ -101,23 +101,23 @@ func SeedData(db *gorm.DB, householdID string) error {
 	// We use FirstOrCreate based on ID to avoid duplicates on restart
 	transactions := []Transaction{
 		// Today
-		{ID: "tx-1", AccountID: walletID, CategoryID: catGroceriesID, UserID: "test-user-id", Amount: 45.50, Date: time.Now(), Description: "Weekly grocery shopping", HouseholdID: householdID},
-		{ID: "tx-2", AccountID: bankID, CategoryID: catUtilitiesID, UserID: "test-user-id", Amount: 30.00, Date: time.Now(), Description: "Electricity", HouseholdID: householdID},
+		{ID: "tx-1", AccountID: walletID, CategoryID: catGroceriesID, UserID: "test-user-id", Amount: 45.50, Date: time.Now(), Description: SecretString("Weekly grocery shopping"), HouseholdID: householdID},
+		{ID: "tx-2", AccountID: bankID, CategoryID: catUtilitiesID, UserID: "test-user-id", Amount: 30.00, Date: time.Now(), Description: SecretString("Electricity"), HouseholdID: householdID},
 
 		// Yesterday
-		{ID: "tx-3", AccountID: walletID, CategoryID: catTransportID, UserID: "user-2", Amount: 5.00, Date: time.Now().AddDate(0, 0, -1), Description: "Uber", HouseholdID: householdID},
-		{ID: "tx-4", AccountID: bankID, CategoryID: catGroceriesID, UserID: "user-2", Amount: 12.30, Date: time.Now().AddDate(0, 0, -1), Description: "Weekly grocery shopping", HouseholdID: householdID},
+		{ID: "tx-3", AccountID: walletID, CategoryID: catTransportID, UserID: "user-2", Amount: 5.00, Date: time.Now().AddDate(0, 0, -1), Description: SecretString("Uber"), HouseholdID: householdID},
+		{ID: "tx-4", AccountID: bankID, CategoryID: catGroceriesID, UserID: "user-2", Amount: 12.30, Date: time.Now().AddDate(0, 0, -1), Description: SecretString("Weekly grocery shopping"), HouseholdID: householdID},
 
 		// 3 Days ago
-		{ID: "tx-5", AccountID: walletID, CategoryID: catEntertainmentID, UserID: "user-3", Amount: 15.00, Date: time.Now().AddDate(0, 0, -3), Description: "Movies", HouseholdID: householdID},
+		{ID: "tx-5", AccountID: walletID, CategoryID: catEntertainmentID, UserID: "user-3", Amount: 15.00, Date: time.Now().AddDate(0, 0, -3), Description: SecretString("Movies"), HouseholdID: householdID},
 
 		// Previous Month (to trigger recommendations)
 		// Supermarket: Budget 500, spent 600 (exceeded by 20%) -> suggest increase
-		{ID: "tx-prev-1", AccountID: bankID, CategoryID: catGroceriesID, UserID: "test-user-id", Amount: 600.00, Date: time.Now().AddDate(0, -1, -5), Description: "Monthly Groceries", HouseholdID: householdID},
+		{ID: "tx-prev-1", AccountID: bankID, CategoryID: catGroceriesID, UserID: "test-user-id", Amount: 600.00, Date: time.Now().AddDate(0, -1, -5), Description: SecretString("Monthly Groceries"), HouseholdID: householdID},
 		// Entertainment: Budget 100, spent 50 (under by 50%) -> suggest decrease
-		{ID: "tx-prev-2", AccountID: walletID, CategoryID: catEntertainmentID, UserID: "user-2", Amount: 50.00, Date: time.Now().AddDate(0, -1, -10), Description: "Concert", HouseholdID: householdID},
+		{ID: "tx-prev-2", AccountID: walletID, CategoryID: catEntertainmentID, UserID: "user-2", Amount: 50.00, Date: time.Now().AddDate(0, -1, -10), Description: SecretString("Concert"), HouseholdID: householdID},
 		// Transport: Budget 80, spent 75 (under by 6%) -> no suggestion (delta < 10%)
-		{ID: "tx-prev-3", AccountID: bankID, CategoryID: catTransportID, UserID: "test-user-id", Amount: 75.00, Date: time.Now().AddDate(0, -1, -15), Description: "Fuel", HouseholdID: householdID},
+		{ID: "tx-prev-3", AccountID: bankID, CategoryID: catTransportID, UserID: "test-user-id", Amount: 75.00, Date: time.Now().AddDate(0, -1, -15), Description: SecretString("Fuel"), HouseholdID: householdID},
 	}
 
 	for _, t := range transactions {

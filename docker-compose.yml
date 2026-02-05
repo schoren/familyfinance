@@ -28,6 +28,7 @@ services:
       - DB_PORT=5432
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - JWT_SECRET=${JWT_SECRET}
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY}
       - SMTP_HOST=mailpit
       - SMTP_PORT=1025
       - SMTP_USER=

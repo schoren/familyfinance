@@ -109,6 +109,11 @@ func main() {
 }
 
 func initDB() {
+	// Check for encryption key
+	if _, err := app.GetEncryptionKey(); err != nil {
+		log.Fatalf("Encryption key error: %v. Please set ENCRYPTION_KEY as a 32-byte hex string.", err)
+	}
+
 	var err error
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=UTC",
 		os.Getenv("DB_HOST"),
@@ -139,5 +144,10 @@ func initDB() {
 		if err := app.SeedData(db, householdID); err != nil {
 			log.Printf("⚠️  Failed to seed data: %v", err)
 		}
+	}
+
+	// Run encryption migration
+	if err := app.MigrateToEncryption(db); err != nil {
+		log.Printf("⚠️  Failed to run encryption migration: %v", err)
 	}
 }

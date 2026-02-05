@@ -91,7 +91,7 @@ func (h *Handlers) CreateInvitation(c *gin.Context) {
 
 	// Check for duplicate pending invitation
 	var existingInvitation Invitation
-	if err := h.db.Where("household_id = ? AND email = ? AND status = ?", householdID, req.Email, "pending").First(&existingInvitation).Error; err == nil {
+	if err := h.db.Where("household_id = ? AND email_hash = ? AND status = ?", householdID, HashSensitive(req.Email), "pending").First(&existingInvitation).Error; err == nil {
 		c.JSON(http.StatusConflict, gin.H{"error": "Invitation already pending for this email"})
 		return
 	}
@@ -107,7 +107,7 @@ func (h *Handlers) CreateInvitation(c *gin.Context) {
 	invitation := Invitation{
 		ID:          uuid.New().String(),
 		Code:        code,
-		Email:       req.Email,
+		Email:       SecretString(req.Email),
 		HouseholdID: householdID,
 		Status:      "pending",
 	}
@@ -165,8 +165,8 @@ func (h *Handlers) GetMembers(c *gin.Context) {
 	for _, user := range users {
 		response = append(response, MemberResponse{
 			ID:         user.ID,
-			Name:       user.Name,
-			Email:      user.Email,
+			Name:       string(user.Name),
+			Email:      string(user.Email),
 			PictureURL: user.PictureURL,
 			Color:      user.Color,
 			Status:     "active",
@@ -178,7 +178,7 @@ func (h *Handlers) GetMembers(c *gin.Context) {
 		response = append(response, MemberResponse{
 			ID:         invite.ID,
 			Name:       "Invitado", // Placeholder
-			Email:      invite.Email,
+			Email:      string(invite.Email),
 			Status:     "pending",
 			InviteCode: invite.Code,
 		})
@@ -400,11 +400,11 @@ func (h *Handlers) populateAccountDisplayName(a *Account) {
 	case "card":
 		brand := ""
 		if a.Brand != nil {
-			brand = *a.Brand
+			brand = string(*a.Brand)
 		}
 		bank := ""
 		if a.Bank != nil {
-			bank = *a.Bank
+			bank = string(*a.Bank)
 		}
 		if brand != "" && bank != "" {
 			a.DisplayName = brand + " - " + bank
@@ -416,9 +416,9 @@ func (h *Handlers) populateAccountDisplayName(a *Account) {
 			a.DisplayName = "Card"
 		}
 	case "bank":
-		a.DisplayName = a.Name
+		a.DisplayName = string(a.Name)
 	default:
-		a.DisplayName = a.Name
+		a.DisplayName = string(a.Name)
 	}
 }
 
@@ -478,21 +478,29 @@ func (h *Handlers) GetSuggestedNotes(c *gin.Context) {
 	householdID := c.Param("household_id")
 	categoryID := c.Param("id")
 
-	var notes []string
+	var results []struct {
+		Description SecretString
+	}
 	err := h.db.Model(&Transaction{}).
-		Select("description").
-		Where("household_id = ? AND category_id = ? AND description != ''", householdID, categoryID).
-		Group("description").
+		Select("MAX(description) as description").
+		Where("household_id = ? AND category_id = ? AND description_hash != ''", householdID, categoryID).
+		Group("description_hash").
 		Order("MAX(created_at) DESC").
 		Limit(50).
-		Pluck("description", &notes).Error
+		Scan(&results).Error
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch suggested notes"})
 		return
 	}
 
-	// Remove empty or redundant notes if any (redundant should be handled by DISTINCT)
+	notes := make([]string, 0, len(results))
+	for _, r := range results {
+		if r.Description != "" {
+			notes = append(notes, string(r.Description))
+		}
+	}
+
 	c.JSON(http.StatusOK, notes)
 }
 
@@ -649,7 +657,7 @@ func (h *Handlers) GetMonthlySummary(c *gin.Context) {
 
 		categorySummaries = append(categorySummaries, CategorySummary{
 			ID:        cat.ID,
-			Name:      cat.Name,
+			Name:      string(cat.Name),
 			Budget:    cat.MonthlyBudget,
 			Spent:     spent,
 			Remaining: cat.MonthlyBudget - spent,
@@ -728,7 +736,7 @@ func (h *Handlers) GetRecommendations(c *gin.Context) {
 
 			suggestions = append(suggestions, Suggestion{
 				CategoryID: cat.ID,
-				Category:   cat.Name,
+				Category:   string(cat.Name),
 				Action:     action,
 				Amount:     roundedAmount,
 			})
@@ -882,10 +890,18 @@ type GoogleLoginRequest struct {
 	InviteCode  string `json:"invite_code"`
 }
 
+type UserResponse struct {
+	ID         string `json:"id"`
+	Email      string `json:"email"`
+	Name       string `json:"name"`
+	PictureURL string `json:"picture_url"`
+	Color      string `json:"color"`
+}
+
 type AuthResponse struct {
-	Token       string `json:"token"`
-	User        User   `json:"user"`
-	HouseholdID string `json:"household_id"`
+	Token       string       `json:"token"`
+	User        UserResponse `json:"user"`
+	HouseholdID string       `json:"household_id"`
 }
 
 func (h *Handlers) AuthGoogle(c *gin.Context) {
@@ -933,8 +949,8 @@ func (h *Handlers) AuthGoogle(c *gin.Context) {
 	}
 
 	var user User
-	// Check if user exists (including soft deleted)
-	result := h.db.Unscoped().Where("email = ?", email).First(&user)
+	// Check if user exists (including soft deleted) - Use EmailHash for lookup
+	result := h.db.Unscoped().Where("email_hash = ?", HashSensitive(email)).First(&user)
 
 	if result.Error == gorm.ErrRecordNotFound {
 		// Really New User logic (Create Household, etc.)
@@ -955,7 +971,7 @@ func (h *Handlers) AuthGoogle(c *gin.Context) {
 			// Create new household if no valid invite code
 			household := Household{
 				ID:   uuid.New().String(),
-				Name: name + "'s Household",
+				Name: SecretString(name + "'s Household"),
 			}
 
 			if err := h.db.Create(&household).Error; err != nil {
@@ -968,8 +984,8 @@ func (h *Handlers) AuthGoogle(c *gin.Context) {
 
 		user = User{
 			ID:          uuid.New().String(),
-			Email:       email,
-			Name:        name,
+			Email:       SecretString(email),
+			Name:        SecretString(name),
 			GoogleID:    googleID,
 			PictureURL:  pictureURL,
 			Color:       getRandomColor(),
@@ -991,8 +1007,8 @@ func (h *Handlers) AuthGoogle(c *gin.Context) {
 		}
 		// Update user info if it changed
 		needsUpdate := false
-		if user.Name != name {
-			user.Name = name
+		if string(user.Name) != name {
+			user.Name = SecretString(name)
 			needsUpdate = true
 		}
 		if user.PictureURL != pictureURL && pictureURL != "" {
@@ -1015,11 +1031,19 @@ func (h *Handlers) AuthGoogle(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, AuthResponse{
-		Token:       token,
-		User:        user,
+	response := AuthResponse{
+		Token: token,
+		User: UserResponse{
+			ID:         user.ID,
+			Email:      string(user.Email),
+			Name:       string(user.Name),
+			PictureURL: user.PictureURL,
+			Color:      user.Color,
+		},
 		HouseholdID: user.HouseholdID,
-	})
+	}
+
+	c.JSON(http.StatusOK, response)
 }
 
 func (h *Handlers) generateJWT(user User) (string, error) {

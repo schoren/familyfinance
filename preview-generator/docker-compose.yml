@@ -24,6 +24,7 @@ services:
       DB_PASSWORD: demo_password
       DB_NAME: keda_demo
       JWT_SECRET: demo_jwt_secret
+      ENCRYPTION_KEY: demo_encryption_key
       PORT: 8090
       TEST_MODE: "true"
       TEST_HOUSEHOLD_ID: test-household-id

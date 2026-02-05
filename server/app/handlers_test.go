@@ -17,6 +17,8 @@ import (
 )
 
 func setupTestDB() *gorm.DB {
+	// Set a valid test encryption key (32 bytes = 64 hex chars)
+	os.Setenv("ENCRYPTION_KEY", "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef")
 	db, _ := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})
 	if err := db.AutoMigrate(Entities...); err != nil {
 		panic(err)
@@ -38,8 +40,8 @@ func TestGetCategories(t *testing.T) {
 	h := NewHandlers(db)
 
 	householdID := "test-household"
-	db.Create(&Category{ID: "cat-1", Name: "Food", HouseholdID: householdID, MonthlyBudget: 500})
-	db.Create(&Category{ID: "cat-2", Name: "Rent", HouseholdID: householdID, MonthlyBudget: 1000})
+	db.Create(&Category{ID: "cat-1", Name: SecretString("Food"), HouseholdID: householdID, MonthlyBudget: 500})
+	db.Create(&Category{ID: "cat-2", Name: SecretString("Rent"), HouseholdID: householdID, MonthlyBudget: 1000})
 
 	r := gin.Default()
 	r.GET("/households/:household_id/categories", h.GetCategories)
@@ -82,7 +84,7 @@ func TestCategoryCRUD(t *testing.T) {
 	categoryID := created.ID
 
 	// Update
-	updateCat := Category{Name: "Gaming", MonthlyBudget: 150}
+	updateCat := Category{Name: SecretString("Gaming"), MonthlyBudget: 150}
 	body, _ = json.Marshal(updateCat)
 	req, _ = http.NewRequest("PUT", "/households/"+householdID+"/categories/"+categoryID, bytes.NewBuffer(body))
 	w = httptest.NewRecorder()
@@ -92,7 +94,7 @@ func TestCategoryCRUD(t *testing.T) {
 	var updated Category
 	err = json.Unmarshal(w.Body.Bytes(), &updated)
 	assert.NoError(t, err)
-	assert.Equal(t, "Gaming", updated.Name)
+	assert.Equal(t, "Gaming", string(updated.Name))
 
 	// Delete
 	req, _ = http.NewRequest("DELETE", "/households/"+householdID+"/categories/"+categoryID, nil)
@@ -252,7 +254,7 @@ func TestTransactionCRUD(t *testing.T) {
 	assert.GreaterOrEqual(t, len(transactions), 1)
 
 	// Update
-	updateTx := Transaction{Amount: 75.0, Date: time.Now(), CategoryID: "cat1", AccountID: "acc1"}
+	updateTx := Transaction{Amount: 75.0, Date: time.Now(), CategoryID: "cat1", AccountID: "acc1", Description: SecretString("Updated tx")}
 	body, _ = json.Marshal(updateTx)
 	req, _ = http.NewRequest("PUT", "/households/"+householdID+"/transactions/"+transactionID, bytes.NewBuffer(body))
 	w = httptest.NewRecorder()
@@ -270,8 +272,8 @@ func TestAccountDisplayNames(t *testing.T) {
 	db := setupTestDB()
 	h := NewHandlers(db)
 
-	brand := "Visa"
-	bank := "Chase"
+	brand := SecretString("Visa")
+	bank := SecretString("Chase")
 
 	tests := []struct {
 		name     string
@@ -283,8 +285,8 @@ func TestAccountDisplayNames(t *testing.T) {
 		{"Card Brand only", Account{Type: "card", Brand: &brand}, "Visa"},
 		{"Card Bank only", Account{Type: "card", Bank: &bank}, "Chase"},
 		{"Card Basic", Account{Type: "card"}, "Card"},
-		{"Bank Account", Account{Type: "bank", Name: "Savings"}, "Savings"},
-		{"Default", Account{Type: "other", Name: "Other"}, "Other"},
+		{"Bank Account", Account{Type: "bank", Name: SecretString("Savings")}, "Savings"},
+		{"Default", Account{Type: "other", Name: SecretString("Other")}, "Other"},
 	}
 
 	for _, tt := range tests {
@@ -359,7 +361,7 @@ func TestJWTMiddleware(t *testing.T) {
 
 	// 3. Valid Token but wrong HouseholdID IN TOKEN vs URL
 	// Note: The user MUST exist in the DB now for the middleware to proceed to the household check
-	user := User{ID: "u1", HouseholdID: "hh1", Email: "u1@test.com", Name: "U1"}
+	user := User{ID: "u1", HouseholdID: "hh1", Email: SecretString("u1@test.com"), Name: SecretString("U1")}
 	db.Create(&user)
 	token, _ := h.generateJWT(user)
 
@@ -424,7 +426,7 @@ func TestHouseholdAndInvitation(t *testing.T) {
 	assert.Equal(t, http.StatusCreated, w.Code)
 
 	// Get Members
-	db.Create(&User{ID: "u1", Name: "User 1", HouseholdID: "hh-new"})
+	db.Create(&User{ID: "u1", Name: SecretString("User 1"), HouseholdID: "hh-new", Email: SecretString("u1@hh-new.com")})
 	req, _ = http.NewRequest("GET", "/households/hh-new/members", nil)
 	w = httptest.NewRecorder()
 	r.ServeHTTP(w, req)
@@ -469,7 +471,7 @@ func TestGetMembers_IncludesCode(t *testing.T) {
 	r.GET("/households/:household_id/members", h.GetMembers)
 
 	// Seed pending invitation
-	db.Create(&Invitation{ID: "inv1", Code: "SECRET123", HouseholdID: "hh-code", Status: "pending", Email: "pending@example.com"})
+	db.Create(&Invitation{ID: "inv1", Code: "SECRET123", HouseholdID: "hh-code", Status: "pending", Email: SecretString("pending@example.com")})
 
 	req, _ := http.NewRequest("GET", "/households/hh-code/members", nil)
 	w := httptest.NewRecorder()
@@ -493,7 +495,7 @@ func TestRemoveMember_Invitation(t *testing.T) {
 	r.DELETE("/households/:household_id/members/:user_id", h.RemoveMember)
 
 	// Seed invitation
-	db.Create(&Invitation{ID: "inv-to-del", Code: "DEL123", HouseholdID: "hh-del", Status: "pending", Email: "del@example.com"})
+	db.Create(&Invitation{ID: "inv-to-del", Code: "DEL123", HouseholdID: "hh-del", Status: "pending", Email: SecretString("del@example.com")})
 
 	// Delete
 	req, _ := http.NewRequest("DELETE", "/households/hh-del/members/inv-to-del", nil)
@@ -586,7 +588,8 @@ func TestAuthGoogle(t *testing.T) {
 	assert.Equal(t, "hh-target", resp.HouseholdID)
 
 	// 4. Soft-deleted user
-	db.Model(&User{}).Where("email = ?", "test@gmail.com").Update("deleted_at", gorm.DeletedAt{Time: time.Now(), Valid: true})
+	// 4. Soft-deleted user
+	db.Model(&User{}).Where("email_hash = ?", HashSensitive("test@gmail.com")).Update("deleted_at", gorm.DeletedAt{Time: time.Now(), Valid: true})
 	server.Config.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		userInfo := GoogleUserInfo{ID: "google-id-123", Email: "test@gmail.com", Name: "Test User"}
 		_ = json.NewEncoder(w).Encode(userInfo)
@@ -784,10 +787,10 @@ func TestGetSuggestedNotes(t *testing.T) {
 	categoryID := "cat-1"
 
 	// Seed data with duplicate notes and different categories
-	db.Create(&Transaction{ID: "t1", HouseholdID: householdID, CategoryID: categoryID, Description: "Milk", Date: time.Now()})
-	db.Create(&Transaction{ID: "t2", HouseholdID: householdID, CategoryID: categoryID, Description: "Milk", Date: time.Now().Add(time.Minute)})
-	db.Create(&Transaction{ID: "t3", HouseholdID: householdID, CategoryID: categoryID, Description: "Bread", Date: time.Now().Add(2 * time.Minute)})
-	db.Create(&Transaction{ID: "t4", HouseholdID: householdID, CategoryID: "cat-2", Description: "Fuel", Date: time.Now()})
+	db.Create(&Transaction{ID: "t1", HouseholdID: householdID, CategoryID: categoryID, Description: SecretString("Milk"), Date: time.Now()})
+	db.Create(&Transaction{ID: "t2", HouseholdID: householdID, CategoryID: categoryID, Description: SecretString("Milk"), Date: time.Now().Add(time.Minute)})
+	db.Create(&Transaction{ID: "t3", HouseholdID: householdID, CategoryID: categoryID, Description: SecretString("Bread"), Date: time.Now().Add(2 * time.Minute)})
+	db.Create(&Transaction{ID: "t4", HouseholdID: householdID, CategoryID: "cat-2", Description: SecretString("Fuel"), Date: time.Now()})
 
 	r := gin.Default()
 	r.GET("/households/:household_id/categories/:id/suggested-notes", h.GetSuggestedNotes)
@@ -848,7 +851,7 @@ func TestTransactionCreatorInfo(t *testing.T) {
 	err = json.Unmarshal(w.Body.Bytes(), &transactions)
 	assert.NoError(t, err)
 	assert.Len(t, transactions, 1)
-	assert.Equal(t, "Test User", transactions[0].User.Name)
+	assert.Equal(t, "Test User", string(transactions[0].User.Name))
 }
 
 func TestTransactionTimezone(t *testing.T) {
@@ -1045,7 +1048,7 @@ func TestGetRecommendations_DynamicRounding(t *testing.T) {
 		catID := fmt.Sprintf("cat-%d", i)
 		cat := Category{
 			ID:            catID,
-			Name:          tc.categoryName,
+			Name:          SecretString(tc.categoryName),
 			HouseholdID:   householdID,
 			MonthlyBudget: tc.budget,
 		}

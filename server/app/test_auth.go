@@ -28,9 +28,9 @@ func (h *Handlers) TestLogin(c *gin.Context) {
 		return
 	}
 
-	// Check if user already exists
+	// Check if user already exists - Use EmailHash for lookup
 	var user User
-	result := h.db.Where("email = ?", req.Email).First(&user)
+	result := h.db.Where("email_hash = ?", HashSensitive(req.Email)).First(&user)
 
 	if result.Error == nil {
 		// User exists, generate token and return
@@ -65,7 +65,7 @@ func (h *Handlers) TestLogin(c *gin.Context) {
 	if householdID == "" {
 		household := Household{
 			ID:   uuid.New().String(),
-			Name: req.Name + "'s Household",
+			Name: SecretString(req.Name + "'s Household"),
 		}
 		if err := h.db.Create(&household).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create household"})
@@ -78,8 +78,8 @@ func (h *Handlers) TestLogin(c *gin.Context) {
 	// Create new user
 	newUser := User{
 		ID:          uuid.New().String(),
-		Email:       req.Email,
-		Name:        req.Name,
+		Email:       SecretString(req.Email),
+		Name:        SecretString(req.Name),
 		HouseholdID: householdID,
 	}
 
