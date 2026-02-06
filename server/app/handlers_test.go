@@ -17,7 +17,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func setupTestDB() (*gorm.DB, *config.Config) {
+func setupTestDB(t *testing.T) (*gorm.DB, *config.Config) {
 	// Set a valid test encryption key (32 bytes = 64 hex chars)
 	cfg, _ := config.LoadConfig("")
 	cfg.EncryptionKey = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
@@ -41,7 +41,7 @@ func setupRouter(h *Handlers) *gin.Engine {
 
 func TestGetCategories(t *testing.T) {
 	gin.SetMode(gin.TestMode)
-	db, cfg := setupTestDB()
+	db, cfg := setupTestDB(t)
 	h := NewHandlers(db, cfg)
 
 	householdID := "test-household"
@@ -65,7 +65,7 @@ func TestGetCategories(t *testing.T) {
 
 func TestCategoryCRUD(t *testing.T) {
 	gin.SetMode(gin.TestMode)
-	db, cfg := setupTestDB()
+	db, cfg := setupTestDB(t)
 	h := NewHandlers(db, cfg)
 	householdID := "test-hh"
 
@@ -110,7 +110,7 @@ func TestCategoryCRUD(t *testing.T) {
 
 func TestCategoryErrorCases(t *testing.T) {
 	gin.SetMode(gin.TestMode)
-	db, cfg := setupTestDB()
+	db, cfg := setupTestDB(t)
 	h := NewHandlers(db, cfg)
 	householdID := "test-hh"
 
@@ -134,7 +134,7 @@ func TestCategoryErrorCases(t *testing.T) {
 
 func TestAccountCRUD(t *testing.T) {
 	gin.SetMode(gin.TestMode)
-	db, cfg := setupTestDB()
+	db, cfg := setupTestDB(t)
 	h := NewHandlers(db, cfg)
 	householdID := "test-hh"
 
@@ -186,7 +186,7 @@ func TestAccountCRUD(t *testing.T) {
 
 func TestGetMonthlySummary(t *testing.T) {
 	gin.SetMode(gin.TestMode)
-	db, cfg := setupTestDB()
+	db, cfg := setupTestDB(t)
 	h := NewHandlers(db, cfg)
 	householdID := "test-hh"
 	month := "2024-01"
@@ -223,7 +223,7 @@ func TestGetMonthlySummary(t *testing.T) {
 
 func TestTransactionCRUD(t *testing.T) {
 	gin.SetMode(gin.TestMode)
-	db, cfg := setupTestDB()
+	db, cfg := setupTestDB(t)
 	h := NewHandlers(db, cfg)
 	householdID := "test-hh"
 
@@ -274,7 +274,7 @@ func TestTransactionCRUD(t *testing.T) {
 }
 
 func TestAccountDisplayNames(t *testing.T) {
-	db, cfg := setupTestDB()
+	db, cfg := setupTestDB(t)
 	h := NewHandlers(db, cfg)
 
 	brand := SecretString("Visa")
@@ -304,7 +304,7 @@ func TestAccountDisplayNames(t *testing.T) {
 
 func TestGetTransactionsFiltering(t *testing.T) {
 	gin.SetMode(gin.TestMode)
-	db, cfg := setupTestDB()
+	db, cfg := setupTestDB(t)
 	h := NewHandlers(db, cfg)
 	householdID := "test-hh"
 
@@ -337,7 +337,7 @@ func TestGetTransactionsFiltering(t *testing.T) {
 
 func TestJWTMiddleware(t *testing.T) {
 	gin.SetMode(gin.TestMode)
-	db, cfg := setupTestDB()
+	db, cfg := setupTestDB(t)
 	h := NewHandlers(db, cfg)
 
 	// Set secret for test
@@ -403,7 +403,7 @@ func TestJWTMiddleware(t *testing.T) {
 
 func TestHouseholdAndInvitation(t *testing.T) {
 	gin.SetMode(gin.TestMode)
-	db, cfg := setupTestDB()
+	db, cfg := setupTestDB(t)
 	h := NewHandlers(db, cfg)
 
 	r := gin.Default()
@@ -444,7 +444,7 @@ func TestHouseholdAndInvitation(t *testing.T) {
 
 func TestCreateInvitation_Duplicate(t *testing.T) {
 	gin.SetMode(gin.TestMode)
-	db, cfg := setupTestDB()
+	db, cfg := setupTestDB(t)
 	h := NewHandlers(db, cfg)
 
 	r := gin.Default()
@@ -467,7 +467,7 @@ func TestCreateInvitation_Duplicate(t *testing.T) {
 
 func TestGetMembers_IncludesCode(t *testing.T) {
 	gin.SetMode(gin.TestMode)
-	db, cfg := setupTestDB()
+	db, cfg := setupTestDB(t)
 	h := NewHandlers(db, cfg)
 
 	r := gin.Default()
@@ -491,7 +491,7 @@ func TestGetMembers_IncludesCode(t *testing.T) {
 
 func TestRemoveMember_Invitation(t *testing.T) {
 	gin.SetMode(gin.TestMode)
-	db, cfg := setupTestDB()
+	db, cfg := setupTestDB(t)
 	h := NewHandlers(db, cfg)
 
 	r := gin.Default()
@@ -514,7 +514,7 @@ func TestRemoveMember_Invitation(t *testing.T) {
 
 func TestHandleSync(t *testing.T) {
 	gin.SetMode(gin.TestMode)
-	db, cfg := setupTestDB()
+	db, cfg := setupTestDB(t)
 	h := NewHandlers(db, cfg)
 	householdID := "hh-sync"
 
@@ -529,7 +529,7 @@ func TestHandleSync(t *testing.T) {
 
 func TestAuthGoogle(t *testing.T) {
 	gin.SetMode(gin.TestMode)
-	db, cfg := setupTestDB()
+	db, cfg := setupTestDB(t)
 	h := NewHandlers(db, cfg)
 
 	// Mock Google API
@@ -614,7 +614,7 @@ func TestAuthGoogle(t *testing.T) {
 
 func TestMoreErrorPaths(t *testing.T) {
 	gin.SetMode(gin.TestMode)
-	db, cfg := setupTestDB()
+	db, cfg := setupTestDB(t)
 	h := NewHandlers(db, cfg)
 	r := gin.Default()
 
@@ -691,7 +691,7 @@ func TestMoreErrorPaths(t *testing.T) {
 
 func TestAuthGoogle_NoToken(t *testing.T) {
 	gin.SetMode(gin.TestMode)
-	db, cfg := setupTestDB()
+	db, cfg := setupTestDB(t)
 	h := NewHandlers(db, cfg)
 	r := gin.Default()
 	r.POST("/auth/google", h.AuthGoogle)
@@ -704,7 +704,7 @@ func TestAuthGoogle_NoToken(t *testing.T) {
 
 func TestDBErrors(t *testing.T) {
 	gin.SetMode(gin.TestMode)
-	db, cfg := setupTestDB()
+	db, cfg := setupTestDB(t)
 	h := NewHandlers(db, cfg)
 
 	// Break the DB
@@ -784,7 +784,7 @@ func TestDBErrors(t *testing.T) {
 
 func TestGetSuggestedNotes(t *testing.T) {
 	gin.SetMode(gin.TestMode)
-	db, cfg := setupTestDB()
+	db, cfg := setupTestDB(t)
 	h := NewHandlers(db, cfg)
 	householdID := "test-hh"
 	categoryID := "cat-1"
@@ -815,7 +815,7 @@ func TestGetSuggestedNotes(t *testing.T) {
 
 func TestTransactionCreatorInfo(t *testing.T) {
 	gin.SetMode(gin.TestMode)
-	db, cfg := setupTestDB()
+	db, cfg := setupTestDB(t)
 	h := NewHandlers(db, cfg)
 	householdID := "test-hh"
 	userID := "user-1"
@@ -858,7 +858,7 @@ func TestTransactionCreatorInfo(t *testing.T) {
 }
 
 func TestTransactionTimezone(t *testing.T) {
-	db, cfg := setupTestDB()
+	db, cfg := setupTestDB(t)
 	h := NewHandlers(db, cfg)
 	r := setupRouter(h)
 
@@ -911,7 +911,7 @@ func TestTransactionTimezone(t *testing.T) {
 
 func TestGetRecommendations(t *testing.T) {
 	gin.SetMode(gin.TestMode)
-	db, cfg := setupTestDB()
+	db, cfg := setupTestDB(t)
 	h := NewHandlers(db, cfg)
 	householdID := "test-hh"
 
@@ -1000,7 +1000,7 @@ func TestGetRecommendations(t *testing.T) {
 
 func TestGetRecommendations_DynamicRounding(t *testing.T) {
 	gin.SetMode(gin.TestMode)
-	db, cfg := setupTestDB()
+	db, cfg := setupTestDB(t)
 	h := NewHandlers(db, cfg)
 	householdID := "test-hh"
 

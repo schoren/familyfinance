@@ -13,7 +13,7 @@ import (
 
 func TestMandatoryCashAccountRules(t *testing.T) {
 	gin.SetMode(gin.TestMode)
-	db, cfg := setupTestDB()
+	db, cfg := setupTestDB(t)
 	h := NewHandlers(db, cfg)
 	householdID := "test-hh"
 
